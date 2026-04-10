@@ -9,7 +9,7 @@ const links = [
   { href: "/shop", label: "Shop" },
   { href: "/media", label: "Media" },
   { href: "/blog", label: "Essays" },
-  { href: "/#about", label: "About" },
+  { href: "/about", label: "About Salim" },
 ];
 
 export default function Navbar() {
