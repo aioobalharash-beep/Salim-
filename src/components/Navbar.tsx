@@ -8,7 +8,7 @@ const links = [
   { href: "/training", label: "Training" },
   { href: "/shop", label: "Shop" },
   { href: "/media", label: "Media" },
-  { href: "/blog", label: "Essays" },
+  { href: "/journal", label: "Journal" },
   { href: "/about", label: "About Salim" },
 ];
 
