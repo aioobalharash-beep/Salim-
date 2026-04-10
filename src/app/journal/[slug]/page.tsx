@@ -40,12 +40,12 @@ function renderMarkdown(md: string) {
     const trimmed = block.trim();
     if (!trimmed) return null;
 
-    // Heading
+    // Heading ##
     if (trimmed.startsWith("## ")) {
       return (
         <h2
           key={i}
-          className="font-serif-brand text-2xl md:text-3xl mt-16 mb-6 text-on-surface"
+          className="font-headline text-[1.75rem] md:text-[2rem] leading-snug mt-20 mb-8 text-[#2C2C2C]"
         >
           {trimmed.replace("## ", "")}
         </h2>
@@ -55,25 +55,31 @@ function renderMarkdown(md: string) {
     // Blockquote
     if (trimmed.startsWith("> ")) {
       const text = trimmed.replace(/^> /gm, "");
+      const html = text
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*(.+?)\*/g, "<em>$1</em>");
       return (
         <blockquote
           key={i}
-          className="border-l-2 border-primary-container pl-8 py-2 my-10 italic text-primary font-serif-brand text-xl leading-relaxed"
+          className="my-14 mx-0 md:-mx-4 pl-8 md:pl-10 border-l-[2px] border-[#586059]/20 py-1"
         >
-          {text}
+          <p
+            className="font-headline italic text-xl md:text-[1.4rem] leading-relaxed text-[#586059]/80"
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
         </blockquote>
       );
     }
 
-    // Regular paragraph — handle inline bold and italic
+    // Paragraph — inline bold + italic
     const html = trimmed
-      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-      .replace(/\*(.+?)\*/g, "<em>$1</em>");
+      .replace(/\*\*(.+?)\*\*/g, "<strong class='font-medium text-[#2C2C2C]'>$1</strong>")
+      .replace(/\*(.+?)\*/g, "<em class='text-[#2C2C2C]/70'>$1</em>");
 
     return (
       <p
         key={i}
-        className="text-lg leading-[1.9] text-on-surface-variant mb-6"
+        className="font-body text-[1.05rem] md:text-lg leading-[2] text-[#2C2C2C]/55 mb-7"
         dangerouslySetInnerHTML={{ __html: html }}
       />
     );
@@ -89,70 +95,79 @@ export default async function ArticlePage({
   if (!article) notFound();
 
   return (
-    <article className="pt-40 pb-32">
-      {/* Header */}
-      <header className="max-w-2xl mx-auto px-6 md:px-8 mb-16">
-        <Link
-          href="/journal"
-          className="inline-flex items-center gap-2 mb-12 group"
-        >
-          <span className="material-symbols-outlined text-primary text-sm transition-transform group-hover:-translate-x-1">
-            arrow_back
-          </span>
-          <span className="font-label text-[10px] uppercase tracking-widest text-primary/50 group-hover:text-primary transition-colors">
-            Back to Journal
-          </span>
-        </Link>
-
-        <div className="flex items-center gap-3 mb-8">
-          <span className="font-label text-[10px] uppercase tracking-widest text-primary/50">
-            {article.date}
-          </span>
-          <span className="w-1 h-1 rounded-full bg-outline-variant/30" />
-          <span className="font-label text-[10px] uppercase tracking-widest text-primary/50">
-            {article.readTime}
-          </span>
-          <span className="w-1 h-1 rounded-full bg-outline-variant/30" />
-          <span className="font-label text-[10px] uppercase tracking-widest text-tertiary/70">
-            {article.category}
-          </span>
-        </div>
-
-        <h1 className="font-serif-brand text-4xl md:text-5xl leading-tight text-on-surface mb-8">
-          {article.title}
-        </h1>
-
-        <p className="font-headline text-xl italic text-on-surface-variant leading-relaxed">
-          {article.excerpt}
-        </p>
-
-        <div className="w-16 h-[1px] bg-primary/20 mt-12" />
-      </header>
-
-      {/* Body */}
-      <section className="max-w-2xl mx-auto px-6 md:px-8 font-body">
-        {renderMarkdown(article.content)}
-      </section>
-
-      {/* Footer */}
-      <footer className="max-w-2xl mx-auto px-6 md:px-8 mt-24 pt-12 border-t border-outline-variant/10">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-[#F5F5F0]">
+      <article className="pt-44 pb-40">
+        {/* ── Back Link (subtle, fixed position feel) ── */}
+        <div className="max-w-[700px] mx-auto px-6 md:px-8 mb-20">
           <Link
             href="/journal"
-            className="inline-flex items-center gap-3 group"
+            className="inline-flex items-center gap-2.5 group"
           >
-            <span className="material-symbols-outlined text-primary text-sm transition-transform group-hover:-translate-x-1">
-              arrow_back
+            <span className="text-[#586059]/30 group-hover:text-[#586059]/60 group-hover:-translate-x-0.5 transition-all duration-300 text-xs">
+              ←
             </span>
-            <span className="font-label text-[10px] uppercase tracking-[0.15em] text-primary border-b border-primary/30 pb-1 group-hover:border-primary transition-all duration-300">
-              All Perspectives
+            <span className="font-label text-[10px] uppercase tracking-[0.25em] text-[#586059]/30 group-hover:text-[#586059]/60 transition-colors duration-300">
+              Journal
             </span>
           </Link>
-          <span className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant/30">
-            {article.category}
-          </span>
         </div>
-      </footer>
-    </article>
+
+        {/* ── Header ── */}
+        <header className="max-w-[700px] mx-auto px-6 md:px-8 mb-20">
+          {/* Meta */}
+          <div className="flex items-center gap-3 mb-10">
+            <span className="font-label text-[10px] uppercase tracking-[0.2em] text-[#2C2C2C]/30">
+              {article.date}
+            </span>
+            <span className="w-[3px] h-[3px] rounded-full bg-[#2C2C2C]/10" />
+            <span className="font-label text-[10px] uppercase tracking-[0.2em] text-[#2C2C2C]/30">
+              {article.readTime}
+            </span>
+            <span className="w-[3px] h-[3px] rounded-full bg-[#2C2C2C]/10" />
+            <span className="font-label text-[10px] uppercase tracking-[0.2em] text-[#586059]/40">
+              {article.category}
+            </span>
+          </div>
+
+          {/* Title */}
+          <h1 className="font-headline text-4xl md:text-[3.2rem] md:leading-[1.15] text-[#2C2C2C] mb-10">
+            {article.title}
+          </h1>
+
+          {/* Lede / Excerpt */}
+          <p className="font-headline italic text-xl md:text-[1.35rem] leading-relaxed text-[#2C2C2C]/40">
+            {article.excerpt}
+          </p>
+
+          {/* Divider */}
+          <div className="w-12 h-[1px] bg-[#2C2C2C]/10 mt-16" />
+        </header>
+
+        {/* ── Body ── */}
+        <section className="max-w-[700px] mx-auto px-6 md:px-8">
+          {renderMarkdown(article.content)}
+        </section>
+
+        {/* ── Article Footer ── */}
+        <footer className="max-w-[700px] mx-auto px-6 md:px-8 mt-28 pt-14 border-t border-[#2C2C2C]/[0.04]">
+          <div className="flex items-center justify-between">
+            <Link
+              href="/journal"
+              className="inline-flex items-center gap-3 group"
+            >
+              <span className="text-[#586059]/30 group-hover:text-[#586059]/60 group-hover:-translate-x-0.5 transition-all duration-300 text-xs">
+                ←
+              </span>
+              <span className="font-label text-[10px] uppercase tracking-[0.25em] text-[#586059]/40 group-hover:text-[#586059]/70 transition-colors duration-300">
+                All Perspectives
+              </span>
+            </Link>
+            <span className="font-label text-[10px] uppercase tracking-[0.2em] text-[#2C2C2C]/15">
+              {article.category}
+            </span>
+          </div>
+        </footer>
+      </article>
+    </div>
   );
 }
