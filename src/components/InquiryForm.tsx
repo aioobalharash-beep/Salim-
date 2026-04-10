@@ -3,7 +3,7 @@
 export default function InquiryForm() {
   return (
     <section
-      id="inquiry"
+      id="enquiry-section"
       className="py-32 px-6 md:px-12 max-w-screen-2xl mx-auto"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-24">

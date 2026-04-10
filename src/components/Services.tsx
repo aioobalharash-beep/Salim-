@@ -1,35 +1,46 @@
+"use client";
+
+import { useState } from "react";
+import LeadCaptureModal from "./LeadCaptureModal";
+
 const services = [
   {
     icon: "school",
     title: "Training",
     description:
       "Advanced masterclasses for orchestral conductors and soloists focusing on interpretive emotional depth and precision.",
-    cta: { label: "Learn More", href: "/training" },
+    cta: { label: "Guitar Course", href: "/training/classical-guitar-course" },
+    action: "link" as const,
   },
   {
     icon: "edit_note",
     title: "Composition",
     description:
       "Bespoke commissions for cinematic scores, theatrical performances, and chamber ensembles bridging East and West.",
-    cta: { label: "Commission", href: "/#inquiry" },
+    cta: { label: "Enquire", href: "/#enquiry-section" },
+    action: "link" as const,
   },
   {
     icon: "forum",
     title: "Consulting",
     description:
-      "Strategic artistic direction for international festivals and cultural institutions looking to redefine their identity.",
-    cta: { label: "Consult", href: "/#inquiry" },
+      "A complimentary 15-minute introductory session to explore your artistic vision and how we might collaborate.",
+    cta: { label: "Book Free Session", href: "" },
+    action: "modal" as const,
   },
   {
     icon: "public",
-    title: "Cultural Expertise",
+    title: "Full Consulting",
     description:
-      "Preservation strategies and advisory for UNESCO-listed musical heritages and archival digitization projects.",
-    cta: { label: "Expertise", href: "/#inquiry" },
+      "Comprehensive artistic direction for international festivals, cultural institutions, and heritage preservation projects.",
+    cta: { label: "Begin Engagement", href: "/training/full-consulting" },
+    action: "link" as const,
   },
 ];
 
 export default function Services() {
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
     <section className="py-32 bg-surface-container-low">
       <div className="px-6 md:px-12 max-w-screen-2xl mx-auto">
@@ -59,19 +70,34 @@ export default function Services() {
               <p className="font-body text-sm leading-relaxed text-on-surface-variant flex-grow">
                 {service.description}
               </p>
-              <a
-                href={service.cta.href}
-                className="font-label text-[10px] uppercase tracking-widest text-primary group mt-8 inline-block"
-              >
-                {service.cta.label}{" "}
-                <span className="inline-block transition-transform group-hover:translate-x-1">
-                  →
-                </span>
-              </a>
+
+              {service.action === "modal" ? (
+                <button
+                  onClick={() => setModalOpen(true)}
+                  className="font-label text-[10px] uppercase tracking-widest text-primary group mt-8 inline-block text-left"
+                >
+                  {service.cta.label}{" "}
+                  <span className="inline-block transition-transform group-hover:translate-x-1">
+                    →
+                  </span>
+                </button>
+              ) : (
+                <a
+                  href={service.cta.href}
+                  className="font-label text-[10px] uppercase tracking-widest text-primary group mt-8 inline-block"
+                >
+                  {service.cta.label}{" "}
+                  <span className="inline-block transition-transform group-hover:translate-x-1">
+                    →
+                  </span>
+                </a>
+              )}
             </div>
           ))}
         </div>
       </div>
+
+      <LeadCaptureModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </section>
   );
 }

@@ -1,45 +1,52 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import PageHeader from "@/components/PageHeader";
-
-export const metadata: Metadata = {
-  title: "Training — Salim Dada",
-  description:
-    "Advanced masterclasses for orchestral conductors and soloists with Salim Dada.",
-};
+import LeadCaptureModal from "@/components/LeadCaptureModal";
 
 const masterclasses = [
   {
-    title: "Orchestral Conducting Intensive",
-    duration: "5 days",
-    description:
-      "A rigorous exploration of baton technique, score analysis, and rehearsal methodology for emerging conductors seeking interpretive maturity.",
-    icon: "music_note",
-  },
-  {
-    title: "Guitar Interpretation Workshop",
+    title: "Classical Guitar Interpretation",
     duration: "3 days",
     description:
       "Deep study of Mediterranean and North African guitar repertoire, focusing on tonal colour, microtonal sensitivity, and historical context.",
     icon: "piano",
+    cta: { label: "View Course", href: "/training/classical-guitar-course" },
+    action: "link" as const,
   },
   {
-    title: "Composition Seminar",
+    title: "Composition Tutoring",
     duration: "4 days",
     description:
       "A collaborative seminar on blending Western classical form with Maghrebi melodic traditions, covering orchestration, counterpoint, and sonic storytelling.",
     icon: "edit_note",
+    cta: { label: "Enquire", href: "/#enquiry-section" },
+    action: "link" as const,
   },
   {
-    title: "Cultural Musicology Lecture Series",
-    duration: "2 days",
+    title: "Free 15-Min Consultation",
+    duration: "15 min",
     description:
-      "An academic programme exploring the migration of musical scales across the Mediterranean, combining archival research with live demonstration.",
-    icon: "school",
+      "A complimentary introductory session to explore your artistic vision, discuss your goals, and understand how we might collaborate.",
+    icon: "forum",
+    cta: { label: "Reserve Session", href: "" },
+    action: "modal" as const,
+  },
+  {
+    title: "Full Consulting Engagement",
+    duration: "Ongoing",
+    description:
+      "Comprehensive artistic direction for international festivals, cultural institutions, and heritage preservation projects. Bespoke pricing.",
+    icon: "workspace_premium",
+    cta: { label: "Begin Engagement", href: "/training/full-consulting" },
+    action: "link" as const,
   },
 ];
 
 export default function TrainingPage() {
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
     <>
       <PageHeader
@@ -82,19 +89,34 @@ export default function TrainingPage() {
               <p className="font-body text-sm leading-relaxed text-on-surface-variant flex-grow">
                 {item.description}
               </p>
-              <a
-                href="/#inquiry"
-                className="font-label text-[10px] uppercase tracking-widest text-primary group mt-8 inline-block"
-              >
-                Register Interest{" "}
-                <span className="inline-block transition-transform group-hover:translate-x-1">
-                  →
-                </span>
-              </a>
+
+              {item.action === "modal" ? (
+                <button
+                  onClick={() => setModalOpen(true)}
+                  className="font-label text-[10px] uppercase tracking-widest text-primary group mt-8 inline-block text-left"
+                >
+                  {item.cta.label}{" "}
+                  <span className="inline-block transition-transform group-hover:translate-x-1">
+                    →
+                  </span>
+                </button>
+              ) : (
+                <a
+                  href={item.cta.href}
+                  className="font-label text-[10px] uppercase tracking-widest text-primary group mt-8 inline-block"
+                >
+                  {item.cta.label}{" "}
+                  <span className="inline-block transition-transform group-hover:translate-x-1">
+                    →
+                  </span>
+                </a>
+              )}
             </div>
           ))}
         </div>
       </section>
+
+      <LeadCaptureModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </>
   );
 }
