@@ -26,7 +26,7 @@ interface AboutData {
 }
 
 async function getAboutData(): Promise<AboutData> {
-  return kvGet<AboutData>("about", "about.json");
+  return kvGet<AboutData>("about");
 }
 
 export const dynamic = "force-dynamic";

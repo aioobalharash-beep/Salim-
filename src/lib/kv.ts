@@ -1,44 +1,52 @@
 import { kv } from "@vercel/kv";
-import fs from "fs/promises";
-import path from "path";
+
+// Static imports ensure Next.js file tracer bundles seed data
+// into serverless functions. Dynamic fs.readFile paths are invisible
+// to the tracer and get excluded from the Vercel deployment.
+import heroSeed from "../../content/hero.json";
+import articlesSeed from "../../content/articles.json";
+import aboutSeed from "../../content/about.json";
+import leadsSeed from "../../content/leads.json";
+
+const seeds: Record<string, unknown> = {
+  hero: heroSeed,
+  articles: articlesSeed,
+  about: aboutSeed,
+  leads: leadsSeed,
+};
 
 /**
- * Read a value from Vercel KV. If the key doesn't exist in KV,
- * fall back to the local seed JSON file so the site never goes blank.
+ * Read a value from Vercel KV. If the key doesn't exist in KV
+ * or KV is unavailable, fall back to the bundled seed data
+ * so the site never goes blank.
  */
-export async function kvGet<T>(key: string, seedFile: string): Promise<T> {
+export async function kvGet<T>(key: string): Promise<T> {
   try {
     const data = await kv.get<T>(key);
     if (data !== null && data !== undefined) {
       return data;
     }
   } catch {
-    // KV unavailable (local dev, missing env vars) — fall through to seed
+    // KV unavailable (local dev, missing env vars, parse error)
   }
 
-  // Fallback: read from local seed file
-  const filePath = path.join(process.cwd(), "content", seedFile);
-  const raw = await fs.readFile(filePath, "utf-8");
-  return JSON.parse(raw) as T;
+  // Fallback: return bundled seed data
+  const seed = seeds[key];
+  if (seed !== undefined) {
+    return seed as T;
+  }
+
+  // Final fallback: return empty array (for unknown keys like leads)
+  return [] as unknown as T;
 }
 
 /**
- * Write a value to Vercel KV. Also writes to local JSON as a
- * best-effort fallback for local development.
+ * Write a value to Vercel KV.
  */
-export async function kvSet<T>(key: string, value: T, seedFile: string): Promise<void> {
-  // Always try KV first
+export async function kvSet<T>(key: string, value: T): Promise<void> {
   try {
     await kv.set(key, value);
   } catch {
-    // KV unavailable — fall through to local write
-  }
-
-  // Best-effort local write (works in dev, silently fails on Vercel)
-  try {
-    const filePath = path.join(process.cwd(), "content", seedFile);
-    await fs.writeFile(filePath, JSON.stringify(value, null, 2), "utf-8");
-  } catch {
-    // Read-only filesystem on Vercel — expected, no action needed
+    // KV unavailable — silent fail (local dev without KV)
   }
 }

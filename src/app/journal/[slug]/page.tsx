@@ -14,7 +14,7 @@ interface Article {
 }
 
 async function getArticle(slug: string): Promise<Article | undefined> {
-  const articles = await kvGet<Article[]>("articles", "articles.json");
+  const articles = await kvGet<Article[]>("articles");
   return articles.find((a) => a.slug === slug);
 }
 
