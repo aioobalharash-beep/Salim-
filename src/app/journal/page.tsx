@@ -12,7 +12,12 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function JournalPage() {
-  const articles = await client.fetch(journalListQuery);
+  let articles = [];
+  try {
+    articles = (await client.fetch(journalListQuery)) ?? [];
+  } catch {
+    // Sanity unavailable — show empty list
+  }
 
   return (
     <div className="min-h-screen bg-[#F5F5F0] pt-44 pb-40">
