@@ -1,20 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
+import { kvGet, kvSet } from "@/lib/kv";
 
-const DATA_PATH = path.join(process.cwd(), "content", "about.json");
+const KV_KEY = "about";
+const SEED_FILE = "about.json";
 
-async function readAbout() {
-  const raw = await fs.readFile(DATA_PATH, "utf-8");
-  return JSON.parse(raw);
-}
-
-async function writeAbout(data: unknown) {
-  await fs.writeFile(DATA_PATH, JSON.stringify(data, null, 2), "utf-8");
-}
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const about = await readAbout();
+  const about = await kvGet(KV_KEY, SEED_FILE);
   return NextResponse.json(about);
 }
 
@@ -25,6 +18,6 @@ export async function PUT(req: NextRequest) {
   }
 
   const data = await req.json();
-  await writeAbout(data);
+  await kvSet(KV_KEY, data, SEED_FILE);
   return NextResponse.json({ ok: true });
 }

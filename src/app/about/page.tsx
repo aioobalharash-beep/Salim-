@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import fs from "fs/promises";
-import path from "path";
+import { kvGet } from "@/lib/kv";
 
 export const metadata: Metadata = {
   title: "About Salim — Salim Dada",
@@ -27,9 +26,7 @@ interface AboutData {
 }
 
 async function getAboutData(): Promise<AboutData> {
-  const filePath = path.join(process.cwd(), "content", "about.json");
-  const raw = await fs.readFile(filePath, "utf-8");
-  return JSON.parse(raw);
+  return kvGet<AboutData>("about", "about.json");
 }
 
 export const dynamic = "force-dynamic";

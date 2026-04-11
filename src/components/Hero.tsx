@@ -1,6 +1,5 @@
 import Image from "next/image";
-import fs from "fs/promises";
-import path from "path";
+import { kvGet } from "@/lib/kv";
 
 interface HeroPanel {
   id: string;
@@ -11,9 +10,7 @@ interface HeroPanel {
 }
 
 async function getHeroPanels(): Promise<HeroPanel[]> {
-  const filePath = path.join(process.cwd(), "content", "hero.json");
-  const raw = await fs.readFile(filePath, "utf-8");
-  return JSON.parse(raw);
+  return kvGet<HeroPanel[]>("hero", "hero.json");
 }
 
 export default async function Hero() {

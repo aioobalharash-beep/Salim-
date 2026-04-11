@@ -1,17 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
+import { kvGet, kvSet } from "@/lib/kv";
 
-const DATA_PATH = path.join(process.cwd(), "content", "leads.json");
-
-async function readLeads(): Promise<unknown[]> {
-  try {
-    const raw = await fs.readFile(DATA_PATH, "utf-8");
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
-}
+const KV_KEY = "leads";
+const SEED_FILE = "leads.json";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -20,7 +11,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Name and email required" }, { status: 400 });
   }
 
-  const leads = await readLeads();
+  const leads = await kvGet<unknown[]>(KV_KEY, SEED_FILE);
   const lead = {
     name: body.name,
     email: body.email,
@@ -29,7 +20,7 @@ export async function POST(req: NextRequest) {
   };
 
   leads.push(lead);
-  await fs.writeFile(DATA_PATH, JSON.stringify(leads, null, 2), "utf-8");
+  await kvSet(KV_KEY, leads, SEED_FILE);
 
   return NextResponse.json({ ok: true }, { status: 201 });
 }

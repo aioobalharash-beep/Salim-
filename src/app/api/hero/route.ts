@@ -1,20 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
+import { kvGet, kvSet } from "@/lib/kv";
 
-const DATA_PATH = path.join(process.cwd(), "content", "hero.json");
+const KV_KEY = "hero";
+const SEED_FILE = "hero.json";
 
-async function readHero() {
-  const raw = await fs.readFile(DATA_PATH, "utf-8");
-  return JSON.parse(raw);
-}
-
-async function writeHero(data: unknown) {
-  await fs.writeFile(DATA_PATH, JSON.stringify(data, null, 2), "utf-8");
-}
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const panels = await readHero();
+  const panels = await kvGet(KV_KEY, SEED_FILE);
   return NextResponse.json(panels);
 }
 
@@ -25,6 +18,6 @@ export async function PUT(req: NextRequest) {
   }
 
   const panels = await req.json();
-  await writeHero(panels);
+  await kvSet(KV_KEY, panels, SEED_FILE);
   return NextResponse.json({ ok: true });
 }

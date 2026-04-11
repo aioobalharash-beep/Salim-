@@ -1,8 +1,7 @@
-import fs from "fs/promises";
-import path from "path";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { kvGet } from "@/lib/kv";
 
 interface Article {
   slug: string;
@@ -15,9 +14,7 @@ interface Article {
 }
 
 async function getArticle(slug: string): Promise<Article | undefined> {
-  const filePath = path.join(process.cwd(), "content", "articles.json");
-  const raw = await fs.readFile(filePath, "utf-8");
-  const articles: Article[] = JSON.parse(raw);
+  const articles = await kvGet<Article[]>("articles", "articles.json");
   return articles.find((a) => a.slug === slug);
 }
 
