@@ -66,22 +66,23 @@ export default function JournalPage() {
       {/* ── Filter Bar ── */}
       <section className="max-w-3xl mx-auto px-6 md:px-8 mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 pb-10 border-b border-[#2C2C2C]/[0.06]">
-          {/* Category Text Links */}
-          <nav className="flex flex-wrap gap-x-8 gap-y-3">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`font-label text-[11px] uppercase tracking-[0.18em] transition-colors duration-300 pb-0.5 ${
-                  activeCategory === cat
-                    ? "text-[#2C2C2C] border-b border-[#2C2C2C]"
-                    : "text-[#2C2C2C]/30 hover:text-[#2C2C2C]/60 border-b border-transparent"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </nav>
+          {/* Category Dropdown */}
+          <div className="relative">
+            <select
+              value={activeCategory}
+              onChange={(e) => setActiveCategory(e.target.value)}
+              className="appearance-none bg-transparent border-0 border-b border-[#2C2C2C]/[0.08] focus:border-[#586059] focus:ring-0 pl-0 pr-8 py-3 font-label text-[11px] uppercase tracking-[0.18em] text-[#2C2C2C] cursor-pointer transition-colors"
+            >
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+            <span className="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-[#586059]/40 text-sm pointer-events-none">
+              expand_more
+            </span>
+          </div>
 
           {/* Search */}
           <div className="relative w-full md:w-72">

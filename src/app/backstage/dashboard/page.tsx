@@ -21,6 +21,14 @@ const panels = [
     count: "Edit Hero Panels",
   },
   {
+    icon: "person",
+    title: "About Salim",
+    description:
+      "Edit the public biography, career highlights, profile image, and philosophical statement on the About page.",
+    href: "/backstage/about",
+    count: "Edit Biography",
+  },
+  {
     icon: "storefront",
     title: "Shop Settings",
     description:
@@ -80,7 +88,7 @@ export default function BackstageDashboard() {
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {panels.map((panel) => (
             <Link
               key={panel.title}

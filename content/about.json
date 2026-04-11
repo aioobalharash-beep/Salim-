@@ -1,0 +1,47 @@
+{
+  "heroTag": "The Narrative",
+  "heroTitle": "Between Silence & Sound.",
+  "heroSubtitle": "An exploration of heritage through the lens of orchestral composition and the preservation of intangible cultural wealth.",
+  "portraitUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuB4ZEQYY7Ri_chR0QDOeR52SkaGDmUOz6t4MNGlHfuUh8XwVUoD19NQ8gP3QTN8-1sPXZE4zEPlhTb7zpQTrK33vt8O29vxkz74OM3ammZ41Luu017AVfBczImYwRoxtZd5woER6l9BGVScyUaegpTkUWdcPiqUXD7tPmYcDnqUar2cNExw2oFgjZjsvwR81ZRkYe456wcCNXjbzSV_S8i5CTOR00w4nSbnQB-Y7lrSyMESnCllIWuu6PF7QkXrYDleAVoBeiL3c7g",
+  "portraitAlt": "Portrait of Salim Dada in a dark suit against a minimalist architectural background",
+  "biographyTitle": "The Orchestration of History",
+  "biographyParagraphs": [
+    "Salim Dada stands at the confluence of diverse musical worlds. As a composer, conductor, and musicologist, his work is an ongoing dialogue between the formal rigor of Western polyphony and the profound modal traditions of the Mediterranean.",
+    "Born with an innate curiosity for the \"unwritten,\" Dada has spent decades transcribing the ephemeral — capturing the nuances of traditional Algerian music and elevating them to the symphonic stage. His compositions are not merely pieces of music; they are archival acts.",
+    "His academic journey across the conservatories of Paris and Algiers provided the technical foundation for what would become a signature style: a harmonic language that is simultaneously ancient and avant-garde."
+  ],
+  "pullQuote": "The baton does not just direct the orchestra; it directs the memory of a people back into the present air.",
+  "unescoCards": [
+    {
+      "icon": "account_balance",
+      "title": "Committee Governance",
+      "description": "Serving as a pivotal voice in the evaluation of cultural assets, ensuring the preservation of oral traditions and performing arts across North Africa."
+    },
+    {
+      "icon": "history_edu",
+      "title": "Scholarly Missions",
+      "description": "Leading documentation projects that translate endangered auditory heritages into modern notation for future generations of scholars and performers."
+    }
+  ],
+  "milestones": [
+    {
+      "year": "2012",
+      "title": "Orchestre Symphonique National",
+      "description": "Appointed as Resident Composer, premiering 'The Symphony of Sand' to international acclaim."
+    },
+    {
+      "year": "2018",
+      "title": "UNESCO ICH Expert",
+      "description": "Formal induction into the International Committee for the Safeguarding of Intangible Cultural Heritage."
+    },
+    {
+      "year": "2023",
+      "title": "Global Merit Award",
+      "description": "Recognition for a lifetime of work bridging musical diplomacy and archival science across three continents."
+    }
+  ],
+  "philosophyTitle": "The Philosophy of the Score",
+  "philosophyText": "I believe that every culture possesses a 'silent rhythm' — a pulse that dictates its movement through history. My role is to listen to that silence until it becomes a note.",
+  "philosophyImageUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuBI1LvBLWn5oWCm60ZKhC00uqz56akM9Qli2XyiNTHS0JmBwgulorSf9lE1yI_qdeyBY_WsZffQ9x2PanqOJcMZA1hy192ZH24nDeyyIzqY5wfaCnbS5SQuEFDiZ6sjKZ9m5OUj0PqiZgbdu6Knm-00yHl4PlM9RSfajyvPxfqULMYY45WJIQhe3s2ACPG9gRQnjzTrenEe-Ml5-z_j86kQgQN1GMA5-kPmQixazRVFoU-jI4ytJxGcVin3t8_IhM2Z0lGQYxqlPsg",
+  "philosophyImageAlt": "Hand-written musical score with complex notations on aged paper"
+}
