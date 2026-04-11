@@ -37,7 +37,10 @@ export const aboutQuery = groq`
   *[_type == "about"][0] {
     profileImage,
     bio,
+    mainBio,
     shortIntro,
-    pullQuote
+    pullQuote,
+    achievements,
+    philosophy
   }
 `;

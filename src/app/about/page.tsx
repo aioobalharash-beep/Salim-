@@ -13,6 +13,16 @@ export const metadata: Metadata = {
 
 export const revalidate = 60;
 
+interface AboutData {
+  profileImage?: SanityImageSource;
+  bio?: PortableTextBlock[];
+  mainBio?: PortableTextBlock[];
+  shortIntro?: string;
+  pullQuote?: string;
+  achievements?: string[];
+  philosophy?: string;
+}
+
 // Seed data used when Sanity has no About document yet
 const seed = {
   shortIntro:
@@ -26,47 +36,57 @@ const seed = {
   ],
   pullQuote:
     "The baton does not just direct the orchestra; it directs the memory of a people back into the present air.",
+  achievements: [
+    "Resident Composer, Orchestre Symphonique National (2012)",
+    "UNESCO ICH Expert \u2014 International Committee for the Safeguarding of Intangible Cultural Heritage (2018)",
+    "Global Merit Award for musical diplomacy and archival science (2023)",
+    "Committee governance for evaluation of cultural assets across North Africa",
+    "Led documentation projects translating endangered auditory heritage into modern notation",
+  ],
+  philosophy:
+    "I believe that every culture possesses a \u201csilent rhythm\u201d \u2014 a pulse that dictates its movement through history. My role is to listen to that silence until it becomes a note.",
+  philosophyImageUrl:
+    "https://lh3.googleusercontent.com/aida-public/AB6AXuBI1LvBLWn5oWCm60ZKhC00uqz56akM9Qli2XyiNTHS0JmBwgulorSf9lE1yI_qdeyBY_WsZffQ9x2PanqOJcMZA1hy192ZH24nDeyyIzqY5wfaCnbS5SQuEFDiZ6sjKZ9m5OUj0PqiZgbdu6Knm-00yHl4PlM9RSfajyvPxfqULMYY45WJIQhe3s2ACPG9gRQnjzTrenEe-Ml5-z_j86kQgQN1GMA5-kPmQixazRVFoU-jI4ytJxGcVin3t8_IhM2Z0lGQYxqlPsg",
 };
 
-// Static content not managed in Sanity
-const unescoCards = [
-  {
-    icon: "account_balance",
-    title: "Committee Governance",
-    description:
-      "Serving as a pivotal voice in the evaluation of cultural assets, ensuring the preservation of oral traditions and performing arts across North Africa.",
+// Shared PortableText components — scholarly serif typography matching Journal
+const richTextComponents = {
+  block: {
+    normal: ({ children }: { children?: React.ReactNode }) => (
+      <p className="font-headline text-[1.05rem] md:text-lg leading-[2] text-on-surface-variant/70 mb-7">
+        {children}
+      </p>
+    ),
+    h2: ({ children }: { children?: React.ReactNode }) => (
+      <h2 className="font-headline text-[1.75rem] md:text-[2rem] leading-snug mt-20 mb-8 text-on-surface">
+        {children}
+      </h2>
+    ),
+    h3: ({ children }: { children?: React.ReactNode }) => (
+      <h3 className="font-headline text-xl md:text-2xl leading-snug mt-16 mb-6 text-on-surface">
+        {children}
+      </h3>
+    ),
+    blockquote: ({ children }: { children?: React.ReactNode }) => (
+      <blockquote className="my-14 mx-0 md:-mx-4 pl-8 md:pl-10 border-l-[2px] border-primary/20 py-1">
+        <p className="font-headline italic text-xl md:text-[1.4rem] leading-relaxed text-primary/80">
+          {children}
+        </p>
+      </blockquote>
+    ),
   },
-  {
-    icon: "history_edu",
-    title: "Scholarly Missions",
-    description:
-      "Leading documentation projects that translate endangered auditory heritages into modern notation for future generations of scholars and performers.",
+  marks: {
+    strong: ({ children }: { children?: React.ReactNode }) => (
+      <strong className="font-medium text-on-surface">{children}</strong>
+    ),
+    em: ({ children }: { children?: React.ReactNode }) => (
+      <em className="text-on-surface/70">{children}</em>
+    ),
   },
-];
-
-const milestones = [
-  {
-    year: "2012",
-    title: "Orchestre Symphonique National",
-    description:
-      "Appointed as Resident Composer, premiering 'The Symphony of Sand' to international acclaim.",
-  },
-  {
-    year: "2018",
-    title: "UNESCO ICH Expert",
-    description:
-      "Formal induction into the International Committee for the Safeguarding of Intangible Cultural Heritage.",
-  },
-  {
-    year: "2023",
-    title: "Global Merit Award",
-    description:
-      "Recognition for a lifetime of work bridging musical diplomacy and archival science across three continents.",
-  },
-];
+};
 
 export default async function AboutPage() {
-  let about: { profileImage?: SanityImageSource; bio?: PortableTextBlock[]; shortIntro?: string; pullQuote?: string } | null = null;
+  let about: AboutData | null = null;
 
   try {
     about = await client.fetch(aboutQuery);
@@ -78,6 +98,12 @@ export default async function AboutPage() {
   const pullQuote = about?.pullQuote || seed.pullQuote;
   const hasSanityImage = !!about?.profileImage;
   const hasSanityBio = (about?.bio?.length ?? 0) > 0;
+  const hasSanityMainBio = (about?.mainBio?.length ?? 0) > 0;
+  const achievements =
+    about?.achievements && about.achievements.length > 0
+      ? about.achievements
+      : seed.achievements;
+  const philosophy = about?.philosophy || seed.philosophy;
 
   return (
     <div className="pt-32 pb-24">
@@ -140,60 +166,50 @@ export default async function AboutPage() {
               </h2>
 
               {hasSanityBio ? (
-                <div className="space-y-8 text-lg font-body leading-relaxed text-on-surface-variant">
+                <div>
                   <PortableText
                     value={about!.bio!}
-                    components={{
-                      block: {
-                        normal: ({ children }) => (
-                          <p className="mb-8">{children}</p>
-                        ),
-                        h2: ({ children }) => (
-                          <h2 className="font-serif-brand text-2xl mt-12 mb-6 text-on-surface">
-                            {children}
-                          </h2>
-                        ),
-                        h3: ({ children }) => (
-                          <h3 className="font-serif-brand text-xl mt-10 mb-4 text-on-surface">
-                            {children}
-                          </h3>
-                        ),
-                        blockquote: ({ children }) => (
-                          <blockquote className="italic text-primary border-l-2 border-primary-container pl-8 py-2">
-                            {children}
-                          </blockquote>
-                        ),
-                      },
-                      marks: {
-                        strong: ({ children }) => (
-                          <strong className="font-medium text-on-surface">
-                            {children}
-                          </strong>
-                        ),
-                        em: ({ children }) => (
-                          <em className="text-on-surface/70">{children}</em>
-                        ),
-                      },
-                    }}
+                    components={richTextComponents}
                   />
                 </div>
               ) : (
-                <div className="space-y-8 text-lg font-body leading-relaxed text-on-surface-variant">
+                <div>
                   {seed.biographyParagraphs.map((para, i) => (
-                    <p key={i}>{para}</p>
+                    <p
+                      key={i}
+                      className="font-headline text-[1.05rem] md:text-lg leading-[2] text-on-surface-variant/70 mb-7"
+                    >
+                      {para}
+                    </p>
                   ))}
                 </div>
               )}
 
-              <p className="italic text-primary border-l-2 border-primary-container pl-8 py-2 mt-8">
-                &ldquo;{pullQuote}&rdquo;
-              </p>
+              <blockquote className="my-14 mx-0 md:-mx-4 pl-8 md:pl-10 border-l-[2px] border-primary/20 py-1">
+                <p className="font-headline italic text-xl md:text-[1.4rem] leading-relaxed text-primary/80">
+                  &ldquo;{pullQuote}&rdquo;
+                </p>
+              </blockquote>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── UNESCO Involvement ── */}
+      {/* ── Long-Form Biography ── */}
+      {hasSanityMainBio && (
+        <section className="mb-48">
+          <div className="max-w-[700px] mx-auto px-6 md:px-8">
+            <div className="w-12 h-[1px] bg-on-surface/10 mb-20" />
+            <PortableText
+              value={about!.mainBio!}
+              components={richTextComponents}
+            />
+            <div className="w-12 h-[1px] bg-on-surface/10 mt-20" />
+          </div>
+        </section>
+      )}
+
+      {/* ── Achievements & UNESCO ── */}
       <section className="bg-surface-container-low py-32 px-6 md:px-12 mb-48">
         <div className="max-w-screen-2xl mx-auto">
           <div className="flex flex-col md:flex-row gap-16">
@@ -202,80 +218,21 @@ export default async function AboutPage() {
                 Global Stewardship
               </h3>
               <h2 className="font-serif-brand text-4xl leading-snug text-on-surface">
-                UNESCO &amp; The Protection of Intangible Heritage
+                Achievements &amp; Cultural Heritage
               </h2>
             </div>
-            <div className="md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-8">
-              {unescoCards.map((card) => (
-                <div
-                  key={card.title}
-                  className="bg-surface p-10 rounded-lg shadow-card border border-outline-variant/10"
-                >
-                  <span className="material-symbols-outlined text-primary mb-6 block">
-                    {card.icon}
-                  </span>
-                  <h4 className="font-label text-sm font-bold uppercase tracking-wider mb-4">
-                    {card.title}
-                  </h4>
-                  <p className="text-sm text-on-surface-variant leading-relaxed">
-                    {card.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Professional Milestones: Timeline ── */}
-      <section className="max-w-screen-2xl mx-auto px-6 md:px-12 mb-48">
-        <div className="mb-24 text-center">
-          <h2 className="font-serif-brand text-4xl italic">
-            A Chronology of Precision
-          </h2>
-        </div>
-        <div className="relative max-w-4xl mx-auto">
-          {/* Vertical line */}
-          <div className="absolute left-0 md:left-1/2 top-0 bottom-0 w-[1px] bg-outline-variant/20 md:-translate-x-1/2" />
-
-          <div className="space-y-32">
-            {milestones.map((item, i) => {
-              const isEven = i % 2 === 0;
-              return (
-                <div
-                  key={item.year}
-                  className="relative grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24"
-                >
-                  {/* Year */}
-                  <div className={isEven ? "md:text-right" : "md:order-2"}>
-                    <span className="font-serif-brand text-3xl text-primary-dim">
-                      {item.year}
-                    </span>
-                  </div>
-
-                  {/* Content */}
-                  <div
-                    className={`relative pl-8 md:pl-0 ${
-                      !isEven ? "md:text-right" : ""
-                    }`}
-                  >
-                    <div
-                      className={`absolute top-4 w-6 h-[1px] bg-primary ${
-                        isEven
-                          ? "left-0 md:-left-[13px]"
-                          : "left-0 md:left-auto md:-right-[13px]"
-                      }`}
-                    />
-                    <h4 className="font-label text-xs uppercase tracking-widest text-on-surface font-bold mb-2">
-                      {item.title}
-                    </h4>
-                    <p className="text-sm text-on-surface-variant">
-                      {item.description}
+            <div className="md:w-2/3">
+              <ul className="space-y-6">
+                {achievements.map((item, i) => (
+                  <li key={i} className="flex items-start gap-5 group">
+                    <span className="mt-2 w-1.5 h-1.5 rounded-full bg-primary/30 shrink-0" />
+                    <p className="font-headline text-[1.05rem] leading-relaxed text-on-surface-variant/70">
+                      {item}
                     </p>
-                  </div>
-                </div>
-              );
-            })}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
@@ -285,7 +242,7 @@ export default async function AboutPage() {
         <div className="bg-surface-container-highest p-12 md:p-24 flex flex-col md:flex-row items-center gap-16">
           <div className="w-full md:w-1/2 relative aspect-[4/3]">
             <Image
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBI1LvBLWn5oWCm60ZKhC00uqz56akM9Qli2XyiNTHS0JmBwgulorSf9lE1yI_qdeyBY_WsZffQ9x2PanqOJcMZA1hy192ZH24nDeyyIzqY5wfaCnbS5SQuEFDiZ6sjKZ9m5OUj0PqiZgbdu6Knm-00yHl4PlM9RSfajyvPxfqULMYY45WJIQhe3s2ACPG9gRQnjzTrenEe-Ml5-z_j86kQgQN1GMA5-kPmQixazRVFoU-jI4ytJxGcVin3t8_IhM2Z0lGQYxqlPsg"
+              src={seed.philosophyImageUrl}
               alt="Hand-written musical score with complex notations on aged paper"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -296,11 +253,8 @@ export default async function AboutPage() {
             <h3 className="font-serif-brand text-3xl mb-8">
               The Philosophy of the Score
             </h3>
-            <p className="text-on-surface-variant mb-8 leading-relaxed">
-              I believe that every culture possesses a &ldquo;silent
-              rhythm&rdquo; &mdash; a pulse that dictates its movement through
-              history. My role is to listen to that silence until it becomes a
-              note.
+            <p className="font-headline text-[1.05rem] md:text-lg leading-[2] text-on-surface-variant/70 mb-8">
+              {philosophy}
             </p>
             <a
               href="/media"
