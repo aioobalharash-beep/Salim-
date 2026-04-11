@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
 
-  const newArticle = {
+  const newArticle: Record<string, string> = {
     slug,
     date: new Date().toLocaleDateString("en-US", {
       month: "long",
@@ -46,6 +46,10 @@ export async function POST(req: NextRequest) {
     readTime: `${Math.max(1, Math.ceil((body.content || "").split(/\s+/).length / 200))} min read`,
     category: body.category,
   };
+
+  if (body.featuredImage) {
+    newArticle.featuredImage = body.featuredImage;
+  }
 
   articles.unshift(newArticle);
   await writeArticles(articles);

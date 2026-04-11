@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import ImageUpload from "@/components/ImageUpload";
 
 const categories = ["Musicology", "Pedagogy", "Cultural Heritage", "Composition"];
 
@@ -15,6 +16,7 @@ export default function NewArticlePage() {
     title: "",
     category: categories[0],
     excerpt: "",
+    featuredImage: "",
     content: "",
   });
 
@@ -125,6 +127,14 @@ export default function NewArticlePage() {
               className="bg-transparent border-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-sm leading-relaxed resize-none transition-colors placeholder:text-on-surface-variant/30"
             />
           </div>
+
+          {/* Featured Image */}
+          <ImageUpload
+            value={form.featuredImage}
+            onChange={(url) => update("featuredImage", url)}
+            label="Featured Image"
+            aspect="aspect-[21/9]"
+          />
 
           {/* Content */}
           <div className="flex flex-col space-y-3">
