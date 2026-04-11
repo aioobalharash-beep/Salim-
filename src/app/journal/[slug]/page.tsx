@@ -1,21 +1,23 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { kvGet } from "@/lib/kv";
+import { PortableText, type PortableTextBlock } from "next-sanity";
+import { client } from "@/sanity/client";
+import { journalBySlugQuery } from "@/sanity/queries";
 
-interface Article {
-  slug: string;
-  date: string;
+export const revalidate = 60;
+
+interface JournalArticle {
   title: string;
-  excerpt: string;
-  content: string;
-  readTime: string;
-  category: string;
+  slug: string;
+  category: string | null;
+  publishedAt: string | null;
+  excerpt: string | null;
+  body: PortableTextBlock[] | null;
 }
 
-async function getArticle(slug: string): Promise<Article | undefined> {
-  const articles = await kvGet<Article[]>("articles");
-  return articles.find((a) => a.slug === slug);
+async function getArticle(slug: string): Promise<JournalArticle | null> {
+  return client.fetch(journalBySlugQuery, { slug });
 }
 
 export async function generateMetadata({
@@ -27,59 +29,15 @@ export async function generateMetadata({
   if (!article) return { title: "Not Found" };
   return {
     title: `${article.title} — Salim Dada`,
-    description: article.excerpt,
+    description: article.excerpt || undefined,
   };
 }
 
-function renderMarkdown(md: string) {
-  const blocks = md.split("\n\n");
-  return blocks.map((block, i) => {
-    const trimmed = block.trim();
-    if (!trimmed) return null;
-
-    // Heading ##
-    if (trimmed.startsWith("## ")) {
-      return (
-        <h2
-          key={i}
-          className="font-headline text-[1.75rem] md:text-[2rem] leading-snug mt-20 mb-8 text-[#2C2C2C]"
-        >
-          {trimmed.replace("## ", "")}
-        </h2>
-      );
-    }
-
-    // Blockquote
-    if (trimmed.startsWith("> ")) {
-      const text = trimmed.replace(/^> /gm, "");
-      const html = text
-        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-        .replace(/\*(.+?)\*/g, "<em>$1</em>");
-      return (
-        <blockquote
-          key={i}
-          className="my-14 mx-0 md:-mx-4 pl-8 md:pl-10 border-l-[2px] border-[#586059]/20 py-1"
-        >
-          <p
-            className="font-headline italic text-xl md:text-[1.4rem] leading-relaxed text-[#586059]/80"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
-        </blockquote>
-      );
-    }
-
-    // Paragraph — inline bold + italic
-    const html = trimmed
-      .replace(/\*\*(.+?)\*\*/g, "<strong class='font-medium text-[#2C2C2C]'>$1</strong>")
-      .replace(/\*(.+?)\*/g, "<em class='text-[#2C2C2C]/70'>$1</em>");
-
-    return (
-      <p
-        key={i}
-        className="font-body text-[1.05rem] md:text-lg leading-[2] text-[#2C2C2C]/55 mb-7"
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
-    );
+function formatDate(iso: string | null) {
+  if (!iso) return "";
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
   });
 }
 
@@ -94,7 +52,7 @@ export default async function ArticlePage({
   return (
     <div className="min-h-screen bg-[#F5F5F0]">
       <article className="pt-44 pb-40">
-        {/* ── Back Link (subtle, fixed position feel) ── */}
+        {/* ── Back Link ── */}
         <div className="max-w-[700px] mx-auto px-6 md:px-8 mb-20">
           <Link
             href="/journal"
@@ -111,38 +69,80 @@ export default async function ArticlePage({
 
         {/* ── Header ── */}
         <header className="max-w-[700px] mx-auto px-6 md:px-8 mb-20">
-          {/* Meta */}
           <div className="flex items-center gap-3 mb-10">
             <span className="font-label text-[10px] uppercase tracking-[0.2em] text-[#2C2C2C]/30">
-              {article.date}
+              {formatDate(article.publishedAt)}
             </span>
-            <span className="w-[3px] h-[3px] rounded-full bg-[#2C2C2C]/10" />
-            <span className="font-label text-[10px] uppercase tracking-[0.2em] text-[#2C2C2C]/30">
-              {article.readTime}
-            </span>
-            <span className="w-[3px] h-[3px] rounded-full bg-[#2C2C2C]/10" />
-            <span className="font-label text-[10px] uppercase tracking-[0.2em] text-[#586059]/40">
-              {article.category}
-            </span>
+            {article.category && (
+              <>
+                <span className="w-[3px] h-[3px] rounded-full bg-[#2C2C2C]/10" />
+                <span className="font-label text-[10px] uppercase tracking-[0.2em] text-[#586059]/40">
+                  {article.category}
+                </span>
+              </>
+            )}
           </div>
 
-          {/* Title */}
           <h1 className="font-headline text-4xl md:text-[3.2rem] md:leading-[1.15] text-[#2C2C2C] mb-10">
             {article.title}
           </h1>
 
-          {/* Lede / Excerpt */}
-          <p className="font-headline italic text-xl md:text-[1.35rem] leading-relaxed text-[#2C2C2C]/40">
-            {article.excerpt}
-          </p>
+          {article.excerpt && (
+            <p className="font-headline italic text-xl md:text-[1.35rem] leading-relaxed text-[#2C2C2C]/40">
+              {article.excerpt}
+            </p>
+          )}
 
-          {/* Divider */}
           <div className="w-12 h-[1px] bg-[#2C2C2C]/10 mt-16" />
         </header>
 
-        {/* ── Body ── */}
-        <section className="max-w-[700px] mx-auto px-6 md:px-8">
-          {renderMarkdown(article.content)}
+        {/* ── Body (Portable Text) ── */}
+        <section className="max-w-[700px] mx-auto px-6 md:px-8 prose-salim">
+          {article.body ? (
+            <PortableText
+              value={article.body}
+              components={{
+                block: {
+                  h2: ({ children }) => (
+                    <h2 className="font-headline text-[1.75rem] md:text-[2rem] leading-snug mt-20 mb-8 text-[#2C2C2C]">
+                      {children}
+                    </h2>
+                  ),
+                  h3: ({ children }) => (
+                    <h3 className="font-headline text-xl md:text-2xl leading-snug mt-16 mb-6 text-[#2C2C2C]">
+                      {children}
+                    </h3>
+                  ),
+                  blockquote: ({ children }) => (
+                    <blockquote className="my-14 mx-0 md:-mx-4 pl-8 md:pl-10 border-l-[2px] border-[#586059]/20 py-1">
+                      <p className="font-headline italic text-xl md:text-[1.4rem] leading-relaxed text-[#586059]/80">
+                        {children}
+                      </p>
+                    </blockquote>
+                  ),
+                  normal: ({ children }) => (
+                    <p className="font-body text-[1.05rem] md:text-lg leading-[2] text-[#2C2C2C]/55 mb-7">
+                      {children}
+                    </p>
+                  ),
+                },
+                marks: {
+                  strong: ({ children }) => (
+                    <strong className="font-medium text-[#2C2C2C]">
+                      {children}
+                    </strong>
+                  ),
+                  em: ({ children }) => (
+                    <em className="text-[#2C2C2C]/70">{children}</em>
+                  ),
+                },
+              }}
+            />
+          ) : (
+            <p className="font-body text-sm text-[#2C2C2C]/30">
+              No content yet.
+            </p>
+          )}
         </section>
 
         {/* ── Article Footer ── */}
@@ -159,9 +159,11 @@ export default async function ArticlePage({
                 All Perspectives
               </span>
             </Link>
-            <span className="font-label text-[10px] uppercase tracking-[0.2em] text-[#2C2C2C]/15">
-              {article.category}
-            </span>
+            {article.category && (
+              <span className="font-label text-[10px] uppercase tracking-[0.2em] text-[#2C2C2C]/15">
+                {article.category}
+              </span>
+            )}
           </div>
         </footer>
       </article>
