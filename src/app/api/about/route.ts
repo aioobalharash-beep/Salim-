@@ -2,13 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { kvGet, kvSet } from "@/lib/kv";
 
 const KV_KEY = "about";
-const SEED_FILE = "about.json";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const about = await kvGet(KV_KEY, SEED_FILE);
-  return NextResponse.json(about);
+  try {
+    const about = await kvGet(KV_KEY);
+    return NextResponse.json(about);
+  } catch {
+    return NextResponse.json({ error: "Failed to load about data" }, { status: 500 });
+  }
 }
 
 export async function PUT(req: NextRequest) {
@@ -18,6 +21,6 @@ export async function PUT(req: NextRequest) {
   }
 
   const data = await req.json();
-  await kvSet(KV_KEY, data, SEED_FILE);
+  await kvSet(KV_KEY, data);
   return NextResponse.json({ ok: true });
 }

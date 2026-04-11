@@ -2,13 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { kvGet, kvSet } from "@/lib/kv";
 
 const KV_KEY = "articles";
-const SEED_FILE = "articles.json";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const articles = await kvGet<unknown[]>(KV_KEY, SEED_FILE);
-  return NextResponse.json(articles);
+  try {
+    const articles = await kvGet<unknown[]>(KV_KEY);
+    return NextResponse.json(articles);
+  } catch {
+    return NextResponse.json([], { status: 200 });
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -18,7 +21,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const articles = await kvGet<Record<string, string>[]>(KV_KEY, SEED_FILE);
+  const articles = await kvGet<Record<string, string>[]>(KV_KEY);
 
   const slug =
     body.slug ||
@@ -45,7 +48,7 @@ export async function POST(req: NextRequest) {
   }
 
   articles.unshift(newArticle);
-  await kvSet(KV_KEY, articles, SEED_FILE);
+  await kvSet(KV_KEY, articles);
 
   return NextResponse.json(newArticle, { status: 201 });
 }

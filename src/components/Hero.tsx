@@ -10,7 +10,7 @@ interface HeroPanel {
 }
 
 async function getHeroPanels(): Promise<HeroPanel[]> {
-  return kvGet<HeroPanel[]>("hero", "hero.json");
+  return kvGet<HeroPanel[]>("hero");
 }
 
 export default async function Hero() {

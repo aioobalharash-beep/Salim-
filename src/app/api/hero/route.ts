@@ -2,13 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { kvGet, kvSet } from "@/lib/kv";
 
 const KV_KEY = "hero";
-const SEED_FILE = "hero.json";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const panels = await kvGet(KV_KEY, SEED_FILE);
-  return NextResponse.json(panels);
+  try {
+    const panels = await kvGet(KV_KEY);
+    return NextResponse.json(panels);
+  } catch {
+    return NextResponse.json([], { status: 200 });
+  }
 }
 
 export async function PUT(req: NextRequest) {
@@ -18,6 +21,6 @@ export async function PUT(req: NextRequest) {
   }
 
   const panels = await req.json();
-  await kvSet(KV_KEY, panels, SEED_FILE);
+  await kvSet(KV_KEY, panels);
   return NextResponse.json({ ok: true });
 }
