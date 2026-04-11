@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* ── Google Fonts are loaded via <link> in layout.tsx ── */
 
 .material-symbols-outlined {
