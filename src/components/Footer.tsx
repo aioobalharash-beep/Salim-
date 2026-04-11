@@ -4,7 +4,7 @@ const footerLinks = [
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
   { href: "/#about", label: "UNESCO Relations" },
-  { href: "/blog", label: "Newsletter" },
+  { href: "/journal", label: "Newsletter" },
 ];
 
 export default function Footer() {

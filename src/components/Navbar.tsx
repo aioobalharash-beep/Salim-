@@ -8,8 +8,8 @@ const links = [
   { href: "/training", label: "Training" },
   { href: "/shop", label: "Shop" },
   { href: "/media", label: "Media" },
-  { href: "/blog", label: "Essays" },
-  { href: "/#about", label: "About" },
+  { href: "/journal", label: "Journal" },
+  { href: "/about", label: "About Salim" },
 ];
 
 export default function Navbar() {
@@ -50,7 +50,7 @@ export default function Navbar() {
 
         {/* CTA */}
         <Link
-          href="/#inquiry"
+          href="/#enquiry-section"
           className="font-serif-brand tracking-tight text-sm uppercase px-6 py-2 bg-primary text-on-primary rounded-sm transition-opacity active:opacity-70"
         >
           Inquiry
