@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import ImageUpload from "@/components/ImageUpload";
 
 interface HeroPanel {
   id: string;
@@ -139,16 +140,13 @@ export default function HeroEditorPage() {
                   />
                 </div>
 
-                {/* Image URL */}
-                <div className="flex flex-col space-y-2 md:col-span-2">
-                  <label className="font-label text-[10px] uppercase tracking-widest text-on-surface/50">
-                    Image URL
-                  </label>
-                  <input
-                    type="url"
+                {/* Image Upload */}
+                <div className="md:col-span-2">
+                  <ImageUpload
                     value={panel.src}
-                    onChange={(e) => updatePanel(i, "src", e.target.value)}
-                    className="bg-transparent border-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-xs text-on-surface-variant transition-colors"
+                    onChange={(url) => updatePanel(i, "src", url)}
+                    label={`Panel ${i + 1} Image`}
+                    aspect="aspect-[4/5]"
                   />
                 </div>
 
