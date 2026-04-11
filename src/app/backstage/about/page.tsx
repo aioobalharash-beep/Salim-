@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import ImageUpload from "@/components/ImageUpload";
 
 interface AboutData {
   heroTag: string;
@@ -176,17 +177,12 @@ export default function AboutEditorPage() {
             <h2 className="font-label text-[10px] uppercase tracking-widest text-primary/60 border-b border-outline-variant/10 pb-3">
               Profile Image
             </h2>
-            <div className="flex flex-col space-y-2">
-              <label className="font-label text-[10px] uppercase tracking-widest text-on-surface/50">
-                Image URL
-              </label>
-              <input
-                type="url"
-                value={data.portraitUrl}
-                onChange={(e) => update("portraitUrl", e.target.value)}
-                className="bg-transparent border-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-xs text-on-surface-variant transition-colors"
-              />
-            </div>
+            <ImageUpload
+              value={data.portraitUrl}
+              onChange={(url) => update("portraitUrl", url)}
+              label="Profile Photo"
+              aspect="aspect-[4/5]"
+            />
             <div className="flex flex-col space-y-2">
               <label className="font-label text-[10px] uppercase tracking-widest text-on-surface/50">
                 Alt Text
@@ -331,17 +327,12 @@ export default function AboutEditorPage() {
                 className="bg-surface-container-low border border-outline-variant/10 focus:border-primary/30 focus:ring-0 p-4 font-body text-sm leading-relaxed resize-y transition-colors"
               />
             </div>
-            <div className="flex flex-col space-y-2">
-              <label className="font-label text-[10px] uppercase tracking-widest text-on-surface/50">
-                Image URL
-              </label>
-              <input
-                type="url"
-                value={data.philosophyImageUrl}
-                onChange={(e) => update("philosophyImageUrl", e.target.value)}
-                className="bg-transparent border-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-xs text-on-surface-variant transition-colors"
-              />
-            </div>
+            <ImageUpload
+              value={data.philosophyImageUrl}
+              onChange={(url) => update("philosophyImageUrl", url)}
+              label="Philosophy Image"
+              aspect="aspect-[4/3]"
+            />
           </section>
         </div>
 
