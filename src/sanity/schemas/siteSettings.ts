@@ -8,27 +8,51 @@ export default defineType({
   fields: [
     defineField({
       name: "heroColumns",
-      title: "Hero Columns",
+      title: "Hero Panels",
       type: "array",
       of: [
         defineArrayMember({
           type: "object",
           fields: [
             defineField({
-              name: "subtitle",
-              title: "Subtitle",
-              type: "string",
-            }),
-            defineField({
               name: "title",
               title: "Title",
               type: "string",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "subtitle",
+              title: "Subtitle",
+              type: "string",
+              validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: "image",
-              title: "Image",
+              title: "Background Image",
               type: "image",
               options: { hotspot: true },
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "link",
+              title: "Link Destination",
+              type: "string",
+              options: {
+                list: [
+                  { title: "Home", value: "/" },
+                  { title: "Training", value: "/training" },
+                  { title: "Shop", value: "/shop" },
+                  { title: "Media", value: "/media" },
+                  { title: "Media — Audio", value: "/media/audio" },
+                  { title: "Media — Video", value: "/media/video" },
+                  { title: "Media — Press", value: "/media/press" },
+                  { title: "Media — Gallery", value: "/media/gallery" },
+                  { title: "Journal", value: "/journal" },
+                  { title: "About Salim", value: "/about" },
+                ],
+                layout: "dropdown",
+              },
+              description: "The page this panel links to when clicked.",
             }),
           ],
           preview: {
@@ -36,7 +60,8 @@ export default defineType({
           },
         }),
       ],
-      description: "The four identity columns on the homepage hero.",
+      description:
+        "The four identity panels on the homepage hero. Each panel is a full-height clickable column.",
       validation: (Rule) => Rule.max(4),
     }),
   ],

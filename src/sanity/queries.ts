@@ -28,7 +28,8 @@ export const heroSettingsQuery = groq`
     heroColumns[] {
       subtitle,
       title,
-      image
+      image,
+      link
     }
   }
 `;
