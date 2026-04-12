@@ -1,4 +1,4 @@
-import { defineType, defineField } from "sanity";
+import { defineType, defineField, defineArrayMember } from "sanity";
 
 export default defineType({
   name: "about",
@@ -87,6 +87,43 @@ export default defineType({
       rows: 6,
       description:
         "His artistic philosophy in his own words — shown in the Philosophy section.",
+    }),
+    defineField({
+      name: "chronology",
+      title: "Chronology of Precision",
+      type: "array",
+      of: [
+        defineArrayMember({
+          type: "object",
+          fields: [
+            defineField({
+              name: "year",
+              title: "Display Year",
+              type: "string",
+              description:
+                "e.g. '2012' or '2012 — 2018' for a period.",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "title",
+              title: "Event Title",
+              type: "string",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "description",
+              title: "Description",
+              type: "text",
+              rows: 3,
+            }),
+          ],
+          preview: {
+            select: { title: "title", subtitle: "year" },
+          },
+        }),
+      ],
+      description:
+        "Timeline entries displayed on the About page. Add as many as needed — they alternate left and right.",
     }),
   ],
   preview: {

@@ -13,6 +13,12 @@ export const metadata: Metadata = {
 
 export const revalidate = 60;
 
+interface ChronologyItem {
+  year: string;
+  title: string;
+  description?: string;
+}
+
 interface AboutData {
   profileImage?: SanityImageSource;
   bio?: PortableTextBlock[];
@@ -21,6 +27,7 @@ interface AboutData {
   pullQuote?: string;
   achievements?: string[];
   philosophy?: string;
+  chronology?: ChronologyItem[];
 }
 
 // Seed data used when Sanity has no About document yet
@@ -45,6 +52,26 @@ const seed = {
   ],
   philosophy:
     "I believe that every culture possesses a \u201csilent rhythm\u201d \u2014 a pulse that dictates its movement through history. My role is to listen to that silence until it becomes a note.",
+  chronology: [
+    {
+      year: "2012",
+      title: "Orchestre Symphonique National",
+      description:
+        "Appointed as Resident Composer, premiering \u2018The Symphony of Sand\u2019 to international acclaim.",
+    },
+    {
+      year: "2018",
+      title: "UNESCO ICH Expert",
+      description:
+        "Formal induction into the International Committee for the Safeguarding of Intangible Cultural Heritage.",
+    },
+    {
+      year: "2023",
+      title: "Global Merit Award",
+      description:
+        "Recognition for a lifetime of work bridging musical diplomacy and archival science across three continents.",
+    },
+  ],
   philosophyImageUrl:
     "https://lh3.googleusercontent.com/aida-public/AB6AXuBI1LvBLWn5oWCm60ZKhC00uqz56akM9Qli2XyiNTHS0JmBwgulorSf9lE1yI_qdeyBY_WsZffQ9x2PanqOJcMZA1hy192ZH24nDeyyIzqY5wfaCnbS5SQuEFDiZ6sjKZ9m5OUj0PqiZgbdu6Knm-00yHl4PlM9RSfajyvPxfqULMYY45WJIQhe3s2ACPG9gRQnjzTrenEe-Ml5-z_j86kQgQN1GMA5-kPmQixazRVFoU-jI4ytJxGcVin3t8_IhM2Z0lGQYxqlPsg",
 };
@@ -104,6 +131,10 @@ export default async function AboutPage() {
       ? about.achievements
       : seed.achievements;
   const philosophy = about?.philosophy || seed.philosophy;
+  const chronology =
+    about?.chronology && about.chronology.length > 0
+      ? about.chronology
+      : seed.chronology;
 
   return (
     <div className="pt-32 pb-24">
@@ -233,6 +264,115 @@ export default async function AboutPage() {
                 ))}
               </ul>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Chronology of Precision ── */}
+      <section className="max-w-screen-2xl mx-auto px-6 md:px-12 mb-48">
+        <div className="mb-24 text-center">
+          <p className="font-label text-[9px] uppercase tracking-[0.5em] text-primary/40 mb-5">
+            Career Timeline
+          </p>
+          <h2 className="font-serif-brand text-4xl md:text-5xl italic text-on-surface font-light">
+            A Chronology of Precision
+          </h2>
+        </div>
+
+        <div className="relative max-w-5xl mx-auto">
+          {/* Central vertical line */}
+          <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-primary/15 md:-translate-x-px" />
+
+          <div className="space-y-0">
+            {chronology.map((item, i) => {
+              const isLeft = i % 2 === 0;
+              return (
+                <div
+                  key={`${item.year}-${i}`}
+                  className="relative grid grid-cols-1 md:grid-cols-2"
+                >
+                  {/* ── Dot on the centre line ── */}
+                  <div className="absolute left-4 md:left-1/2 top-8 md:top-10 w-[7px] h-[7px] -translate-x-[3px] md:-translate-x-[3.5px] rounded-full bg-primary/25 ring-[3px] ring-surface z-10" />
+
+                  {/* ── LEFT column ── */}
+                  <div
+                    className={`pl-12 md:pl-0 ${
+                      isLeft
+                        ? "md:pr-16 md:text-right"
+                        : "md:pr-16 md:text-right md:order-1"
+                    } pb-16 md:pb-24`}
+                  >
+                    {isLeft ? (
+                      <>
+                        {/* Thin horizontal rule */}
+                        <div className="hidden md:flex justify-end mb-5">
+                          <div className="w-10 h-px bg-primary/15" />
+                        </div>
+                        <div className="w-10 h-px bg-primary/15 mb-5 md:hidden" />
+                        <span className="font-serif-brand text-2xl md:text-3xl text-primary/30 block mb-3">
+                          {item.year}
+                        </span>
+                        <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-3">
+                          {item.title}
+                        </h4>
+                        {item.description && (
+                          <p className="font-body text-sm leading-relaxed text-on-surface-variant/60 max-w-sm md:ml-auto">
+                            {item.description}
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      /* Spacer for right-side items on desktop */
+                      <div className="hidden md:block" />
+                    )}
+                  </div>
+
+                  {/* ── RIGHT column ── */}
+                  <div
+                    className={`hidden md:block ${
+                      isLeft
+                        ? "md:pl-16"
+                        : "md:pl-16 md:order-2"
+                    } pb-24`}
+                  >
+                    {!isLeft && (
+                      <>
+                        <div className="w-10 h-px bg-primary/15 mb-5" />
+                        <span className="font-serif-brand text-2xl md:text-3xl text-primary/30 block mb-3">
+                          {item.year}
+                        </span>
+                        <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-3">
+                          {item.title}
+                        </h4>
+                        {item.description && (
+                          <p className="font-body text-sm leading-relaxed text-on-surface-variant/60 max-w-sm">
+                            {item.description}
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
+
+                  {/* ── Mobile: right-side items render in left col ── */}
+                  {!isLeft && (
+                    <div className="md:hidden pl-12 pb-16 -mt-0">
+                      <div className="w-10 h-px bg-primary/15 mb-5" />
+                      <span className="font-serif-brand text-2xl text-primary/30 block mb-3">
+                        {item.year}
+                      </span>
+                      <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-3">
+                        {item.title}
+                      </h4>
+                      {item.description && (
+                        <p className="font-body text-sm leading-relaxed text-on-surface-variant/60 max-w-sm">
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
