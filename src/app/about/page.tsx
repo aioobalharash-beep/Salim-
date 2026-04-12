@@ -13,6 +13,21 @@ export const metadata: Metadata = {
 
 export const revalidate = 60;
 
+interface ChronologyItem {
+  year: string;
+  title: string;
+  description?: string;
+}
+
+interface AboutData {
+  profileImage?: SanityImageSource;
+  bio?: PortableTextBlock[];
+  mainBio?: PortableTextBlock[];
+  shortIntro?: string;
+  pullQuote?: string;
+  chronology?: ChronologyItem[];
+}
+
 // Seed data used when Sanity has no About document yet
 const seed = {
   shortIntro:
@@ -26,47 +41,66 @@ const seed = {
   ],
   pullQuote:
     "The baton does not just direct the orchestra; it directs the memory of a people back into the present air.",
+  chronology: [
+    {
+      year: "2012",
+      title: "Orchestre Symphonique National",
+      description:
+        "Appointed as Resident Composer, premiering \u2018The Symphony of Sand\u2019 to international acclaim.",
+    },
+    {
+      year: "2018",
+      title: "UNESCO ICH Expert",
+      description:
+        "Formal induction into the International Committee for the Safeguarding of Intangible Cultural Heritage.",
+    },
+    {
+      year: "2023",
+      title: "Global Merit Award",
+      description:
+        "Recognition for a lifetime of work bridging musical diplomacy and archival science across three continents.",
+    },
+  ],
 };
 
-// Static content not managed in Sanity
-const unescoCards = [
-  {
-    icon: "account_balance",
-    title: "Committee Governance",
-    description:
-      "Serving as a pivotal voice in the evaluation of cultural assets, ensuring the preservation of oral traditions and performing arts across North Africa.",
+// Shared PortableText components — scholarly serif typography matching Journal
+const richTextComponents = {
+  block: {
+    normal: ({ children }: { children?: React.ReactNode }) => (
+      <p className="font-headline text-[1.05rem] md:text-lg leading-[2] text-on-surface-variant/70 mb-7">
+        {children}
+      </p>
+    ),
+    h2: ({ children }: { children?: React.ReactNode }) => (
+      <h2 className="font-headline text-[1.75rem] md:text-[2rem] leading-snug mt-20 mb-8 text-on-surface">
+        {children}
+      </h2>
+    ),
+    h3: ({ children }: { children?: React.ReactNode }) => (
+      <h3 className="font-headline text-xl md:text-2xl leading-snug mt-16 mb-6 text-on-surface">
+        {children}
+      </h3>
+    ),
+    blockquote: ({ children }: { children?: React.ReactNode }) => (
+      <blockquote className="my-14 mx-0 md:-mx-4 pl-8 md:pl-10 border-l-[2px] border-primary/20 py-1">
+        <p className="font-headline italic text-xl md:text-[1.4rem] leading-relaxed text-primary/80">
+          {children}
+        </p>
+      </blockquote>
+    ),
   },
-  {
-    icon: "history_edu",
-    title: "Scholarly Missions",
-    description:
-      "Leading documentation projects that translate endangered auditory heritages into modern notation for future generations of scholars and performers.",
+  marks: {
+    strong: ({ children }: { children?: React.ReactNode }) => (
+      <strong className="font-medium text-on-surface">{children}</strong>
+    ),
+    em: ({ children }: { children?: React.ReactNode }) => (
+      <em className="text-on-surface/70">{children}</em>
+    ),
   },
-];
-
-const milestones = [
-  {
-    year: "2012",
-    title: "Orchestre Symphonique National",
-    description:
-      "Appointed as Resident Composer, premiering 'The Symphony of Sand' to international acclaim.",
-  },
-  {
-    year: "2018",
-    title: "UNESCO ICH Expert",
-    description:
-      "Formal induction into the International Committee for the Safeguarding of Intangible Cultural Heritage.",
-  },
-  {
-    year: "2023",
-    title: "Global Merit Award",
-    description:
-      "Recognition for a lifetime of work bridging musical diplomacy and archival science across three continents.",
-  },
-];
+};
 
 export default async function AboutPage() {
-  let about: { profileImage?: SanityImageSource; bio?: PortableTextBlock[]; shortIntro?: string; pullQuote?: string } | null = null;
+  let about: AboutData | null = null;
 
   try {
     about = await client.fetch(aboutQuery);
@@ -78,6 +112,11 @@ export default async function AboutPage() {
   const pullQuote = about?.pullQuote || seed.pullQuote;
   const hasSanityImage = !!about?.profileImage;
   const hasSanityBio = (about?.bio?.length ?? 0) > 0;
+  const hasSanityMainBio = (about?.mainBio?.length ?? 0) > 0;
+  const chronology =
+    about?.chronology && about.chronology.length > 0
+      ? about.chronology
+      : seed.chronology;
 
   return (
     <div className="pt-32 pb-24">
@@ -140,179 +179,152 @@ export default async function AboutPage() {
               </h2>
 
               {hasSanityBio ? (
-                <div className="space-y-8 text-lg font-body leading-relaxed text-on-surface-variant">
+                <div>
                   <PortableText
                     value={about!.bio!}
-                    components={{
-                      block: {
-                        normal: ({ children }) => (
-                          <p className="mb-8">{children}</p>
-                        ),
-                        h2: ({ children }) => (
-                          <h2 className="font-serif-brand text-2xl mt-12 mb-6 text-on-surface">
-                            {children}
-                          </h2>
-                        ),
-                        h3: ({ children }) => (
-                          <h3 className="font-serif-brand text-xl mt-10 mb-4 text-on-surface">
-                            {children}
-                          </h3>
-                        ),
-                        blockquote: ({ children }) => (
-                          <blockquote className="italic text-primary border-l-2 border-primary-container pl-8 py-2">
-                            {children}
-                          </blockquote>
-                        ),
-                      },
-                      marks: {
-                        strong: ({ children }) => (
-                          <strong className="font-medium text-on-surface">
-                            {children}
-                          </strong>
-                        ),
-                        em: ({ children }) => (
-                          <em className="text-on-surface/70">{children}</em>
-                        ),
-                      },
-                    }}
+                    components={richTextComponents}
                   />
                 </div>
               ) : (
-                <div className="space-y-8 text-lg font-body leading-relaxed text-on-surface-variant">
+                <div>
                   {seed.biographyParagraphs.map((para, i) => (
-                    <p key={i}>{para}</p>
+                    <p
+                      key={i}
+                      className="font-headline text-[1.05rem] md:text-lg leading-[2] text-on-surface-variant/70 mb-7"
+                    >
+                      {para}
+                    </p>
                   ))}
                 </div>
               )}
 
-              <p className="italic text-primary border-l-2 border-primary-container pl-8 py-2 mt-8">
-                &ldquo;{pullQuote}&rdquo;
-              </p>
+              <blockquote className="my-14 mx-0 md:-mx-4 pl-8 md:pl-10 border-l-[2px] border-primary/20 py-1">
+                <p className="font-headline italic text-xl md:text-[1.4rem] leading-relaxed text-primary/80">
+                  &ldquo;{pullQuote}&rdquo;
+                </p>
+              </blockquote>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── UNESCO Involvement ── */}
-      <section className="bg-surface-container-low py-32 px-6 md:px-12 mb-48">
-        <div className="max-w-screen-2xl mx-auto">
-          <div className="flex flex-col md:flex-row gap-16">
-            <div className="md:w-1/3">
-              <h3 className="font-label text-xs uppercase tracking-[0.3em] text-primary mb-6">
-                Global Stewardship
-              </h3>
-              <h2 className="font-serif-brand text-4xl leading-snug text-on-surface">
-                UNESCO &amp; The Protection of Intangible Heritage
-              </h2>
-            </div>
-            <div className="md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-8">
-              {unescoCards.map((card) => (
-                <div
-                  key={card.title}
-                  className="bg-surface p-10 rounded-lg shadow-card border border-outline-variant/10"
-                >
-                  <span className="material-symbols-outlined text-primary mb-6 block">
-                    {card.icon}
-                  </span>
-                  <h4 className="font-label text-sm font-bold uppercase tracking-wider mb-4">
-                    {card.title}
-                  </h4>
-                  <p className="text-sm text-on-surface-variant leading-relaxed">
-                    {card.description}
-                  </p>
-                </div>
-              ))}
-            </div>
+      {/* ── Long-Form Biography ── */}
+      {hasSanityMainBio && (
+        <section className="mb-48">
+          <div className="max-w-[700px] mx-auto px-6 md:px-8">
+            <div className="w-12 h-[1px] bg-on-surface/10 mb-20" />
+            <PortableText
+              value={about!.mainBio!}
+              components={richTextComponents}
+            />
+            <div className="w-12 h-[1px] bg-on-surface/10 mt-20" />
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* ── Professional Milestones: Timeline ── */}
-      <section className="max-w-screen-2xl mx-auto px-6 md:px-12 mb-48">
+      {/* ── Chronology of Precision ── */}
+      <section className="max-w-screen-2xl mx-auto px-6 md:px-12 pb-32">
         <div className="mb-24 text-center">
-          <h2 className="font-serif-brand text-4xl italic">
+          <p className="font-label text-[9px] uppercase tracking-[0.5em] text-primary/40 mb-5">
+            Career Timeline
+          </p>
+          <h2 className="font-serif-brand text-4xl md:text-5xl italic text-on-surface font-light">
             A Chronology of Precision
           </h2>
         </div>
-        <div className="relative max-w-4xl mx-auto">
-          {/* Vertical line */}
-          <div className="absolute left-0 md:left-1/2 top-0 bottom-0 w-[1px] bg-outline-variant/20 md:-translate-x-1/2" />
 
-          <div className="space-y-32">
-            {milestones.map((item, i) => {
-              const isEven = i % 2 === 0;
+        <div className="relative max-w-5xl mx-auto">
+          {/* Central vertical line */}
+          <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-primary/15 md:-translate-x-px" />
+
+          <div className="space-y-0">
+            {chronology.map((item, i) => {
+              const isLeft = i % 2 === 0;
               return (
                 <div
-                  key={item.year}
-                  className="relative grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24"
+                  key={`${item.year}-${i}`}
+                  className="relative grid grid-cols-1 md:grid-cols-2"
                 >
-                  {/* Year */}
-                  <div className={isEven ? "md:text-right" : "md:order-2"}>
-                    <span className="font-serif-brand text-3xl text-primary-dim">
-                      {item.year}
-                    </span>
+                  {/* ── Dot on the centre line ── */}
+                  <div className="absolute left-4 md:left-1/2 top-8 md:top-10 w-[7px] h-[7px] -translate-x-[3px] md:-translate-x-[3.5px] rounded-full bg-primary/25 ring-[3px] ring-surface z-10" />
+
+                  {/* ── LEFT column ── */}
+                  <div
+                    className={`pl-12 md:pl-0 ${
+                      isLeft
+                        ? "md:pr-16 md:text-right"
+                        : "md:pr-16 md:text-right md:order-1"
+                    } pb-16 md:pb-24`}
+                  >
+                    {isLeft ? (
+                      <>
+                        <div className="hidden md:flex justify-end mb-5">
+                          <div className="w-10 h-px bg-primary/15" />
+                        </div>
+                        <div className="w-10 h-px bg-primary/15 mb-5 md:hidden" />
+                        <span className="font-serif-brand text-2xl md:text-3xl text-primary/30 block mb-3">
+                          {item.year}
+                        </span>
+                        <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-3">
+                          {item.title}
+                        </h4>
+                        {item.description && (
+                          <p className="font-body text-sm leading-relaxed text-on-surface-variant/60 max-w-sm md:ml-auto">
+                            {item.description}
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <div className="hidden md:block" />
+                    )}
                   </div>
 
-                  {/* Content */}
+                  {/* ── RIGHT column ── */}
                   <div
-                    className={`relative pl-8 md:pl-0 ${
-                      !isEven ? "md:text-right" : ""
-                    }`}
+                    className={`hidden md:block ${
+                      isLeft
+                        ? "md:pl-16"
+                        : "md:pl-16 md:order-2"
+                    } pb-24`}
                   >
-                    <div
-                      className={`absolute top-4 w-6 h-[1px] bg-primary ${
-                        isEven
-                          ? "left-0 md:-left-[13px]"
-                          : "left-0 md:left-auto md:-right-[13px]"
-                      }`}
-                    />
-                    <h4 className="font-label text-xs uppercase tracking-widest text-on-surface font-bold mb-2">
-                      {item.title}
-                    </h4>
-                    <p className="text-sm text-on-surface-variant">
-                      {item.description}
-                    </p>
+                    {!isLeft && (
+                      <>
+                        <div className="w-10 h-px bg-primary/15 mb-5" />
+                        <span className="font-serif-brand text-2xl md:text-3xl text-primary/30 block mb-3">
+                          {item.year}
+                        </span>
+                        <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-3">
+                          {item.title}
+                        </h4>
+                        {item.description && (
+                          <p className="font-body text-sm leading-relaxed text-on-surface-variant/60 max-w-sm">
+                            {item.description}
+                          </p>
+                        )}
+                      </>
+                    )}
                   </div>
+
+                  {/* ── Mobile: right-side items render in left col ── */}
+                  {!isLeft && (
+                    <div className="md:hidden pl-12 pb-16">
+                      <div className="w-10 h-px bg-primary/15 mb-5" />
+                      <span className="font-serif-brand text-2xl text-primary/30 block mb-3">
+                        {item.year}
+                      </span>
+                      <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-3">
+                        {item.title}
+                      </h4>
+                      {item.description && (
+                        <p className="font-body text-sm leading-relaxed text-on-surface-variant/60 max-w-sm">
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Collaborative Philosophy ── */}
-      <section className="max-w-screen-xl mx-auto px-6 md:px-12 mb-32">
-        <div className="bg-surface-container-highest p-12 md:p-24 flex flex-col md:flex-row items-center gap-16">
-          <div className="w-full md:w-1/2 relative aspect-[4/3]">
-            <Image
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBI1LvBLWn5oWCm60ZKhC00uqz56akM9Qli2XyiNTHS0JmBwgulorSf9lE1yI_qdeyBY_WsZffQ9x2PanqOJcMZA1hy192ZH24nDeyyIzqY5wfaCnbS5SQuEFDiZ6sjKZ9m5OUj0PqiZgbdu6Knm-00yHl4PlM9RSfajyvPxfqULMYY45WJIQhe3s2ACPG9gRQnjzTrenEe-Ml5-z_j86kQgQN1GMA5-kPmQixazRVFoU-jI4ytJxGcVin3t8_IhM2Z0lGQYxqlPsg"
-              alt="Hand-written musical score with complex notations on aged paper"
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover grayscale brightness-95"
-            />
-          </div>
-          <div className="w-full md:w-1/2">
-            <h3 className="font-serif-brand text-3xl mb-8">
-              The Philosophy of the Score
-            </h3>
-            <p className="text-on-surface-variant mb-8 leading-relaxed">
-              I believe that every culture possesses a &ldquo;silent
-              rhythm&rdquo; &mdash; a pulse that dictates its movement through
-              history. My role is to listen to that silence until it becomes a
-              note.
-            </p>
-            <a
-              href="/media"
-              className="inline-flex items-center gap-4 group"
-            >
-              <span className="font-label text-xs uppercase tracking-widest border-b border-on-surface pb-1">
-                View Archive of Works
-              </span>
-              <span className="material-symbols-outlined text-sm transition-transform group-hover:translate-x-2">
-                arrow_forward
-              </span>
-            </a>
           </div>
         </div>
       </section>

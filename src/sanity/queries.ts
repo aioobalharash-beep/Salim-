@@ -28,7 +28,8 @@ export const heroSettingsQuery = groq`
     heroColumns[] {
       subtitle,
       title,
-      image
+      image,
+      link
     }
   }
 `;
@@ -37,7 +38,13 @@ export const aboutQuery = groq`
   *[_type == "about"][0] {
     profileImage,
     bio,
+    mainBio,
     shortIntro,
-    pullQuote
+    pullQuote,
+    chronology[] {
+      year,
+      title,
+      description
+    }
   }
 `;
