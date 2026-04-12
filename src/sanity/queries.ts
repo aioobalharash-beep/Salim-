@@ -41,8 +41,6 @@ export const aboutQuery = groq`
     mainBio,
     shortIntro,
     pullQuote,
-    achievements,
-    philosophy,
     chronology[] {
       year,
       title,

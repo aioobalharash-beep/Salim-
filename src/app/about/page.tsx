@@ -25,8 +25,6 @@ interface AboutData {
   mainBio?: PortableTextBlock[];
   shortIntro?: string;
   pullQuote?: string;
-  achievements?: string[];
-  philosophy?: string;
   chronology?: ChronologyItem[];
 }
 
@@ -43,15 +41,6 @@ const seed = {
   ],
   pullQuote:
     "The baton does not just direct the orchestra; it directs the memory of a people back into the present air.",
-  achievements: [
-    "Resident Composer, Orchestre Symphonique National (2012)",
-    "UNESCO ICH Expert \u2014 International Committee for the Safeguarding of Intangible Cultural Heritage (2018)",
-    "Global Merit Award for musical diplomacy and archival science (2023)",
-    "Committee governance for evaluation of cultural assets across North Africa",
-    "Led documentation projects translating endangered auditory heritage into modern notation",
-  ],
-  philosophy:
-    "I believe that every culture possesses a \u201csilent rhythm\u201d \u2014 a pulse that dictates its movement through history. My role is to listen to that silence until it becomes a note.",
   chronology: [
     {
       year: "2012",
@@ -72,8 +61,6 @@ const seed = {
         "Recognition for a lifetime of work bridging musical diplomacy and archival science across three continents.",
     },
   ],
-  philosophyImageUrl:
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuBI1LvBLWn5oWCm60ZKhC00uqz56akM9Qli2XyiNTHS0JmBwgulorSf9lE1yI_qdeyBY_WsZffQ9x2PanqOJcMZA1hy192ZH24nDeyyIzqY5wfaCnbS5SQuEFDiZ6sjKZ9m5OUj0PqiZgbdu6Knm-00yHl4PlM9RSfajyvPxfqULMYY45WJIQhe3s2ACPG9gRQnjzTrenEe-Ml5-z_j86kQgQN1GMA5-kPmQixazRVFoU-jI4ytJxGcVin3t8_IhM2Z0lGQYxqlPsg",
 };
 
 // Shared PortableText components — scholarly serif typography matching Journal
@@ -126,11 +113,6 @@ export default async function AboutPage() {
   const hasSanityImage = !!about?.profileImage;
   const hasSanityBio = (about?.bio?.length ?? 0) > 0;
   const hasSanityMainBio = (about?.mainBio?.length ?? 0) > 0;
-  const achievements =
-    about?.achievements && about.achievements.length > 0
-      ? about.achievements
-      : seed.achievements;
-  const philosophy = about?.philosophy || seed.philosophy;
   const chronology =
     about?.chronology && about.chronology.length > 0
       ? about.chronology
@@ -240,36 +222,8 @@ export default async function AboutPage() {
         </section>
       )}
 
-      {/* ── Achievements & UNESCO ── */}
-      <section className="bg-surface-container-low py-32 px-6 md:px-12 mb-48">
-        <div className="max-w-screen-2xl mx-auto">
-          <div className="flex flex-col md:flex-row gap-16">
-            <div className="md:w-1/3">
-              <h3 className="font-label text-xs uppercase tracking-[0.3em] text-primary mb-6">
-                Global Stewardship
-              </h3>
-              <h2 className="font-serif-brand text-4xl leading-snug text-on-surface">
-                Achievements &amp; Cultural Heritage
-              </h2>
-            </div>
-            <div className="md:w-2/3">
-              <ul className="space-y-6">
-                {achievements.map((item, i) => (
-                  <li key={i} className="flex items-start gap-5 group">
-                    <span className="mt-2 w-1.5 h-1.5 rounded-full bg-primary/30 shrink-0" />
-                    <p className="font-headline text-[1.05rem] leading-relaxed text-on-surface-variant/70">
-                      {item}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ── Chronology of Precision ── */}
-      <section className="max-w-screen-2xl mx-auto px-6 md:px-12 mb-48">
+      <section className="max-w-screen-2xl mx-auto px-6 md:px-12 pb-32">
         <div className="mb-24 text-center">
           <p className="font-label text-[9px] uppercase tracking-[0.5em] text-primary/40 mb-5">
             Career Timeline
@@ -304,7 +258,6 @@ export default async function AboutPage() {
                   >
                     {isLeft ? (
                       <>
-                        {/* Thin horizontal rule */}
                         <div className="hidden md:flex justify-end mb-5">
                           <div className="w-10 h-px bg-primary/15" />
                         </div>
@@ -322,7 +275,6 @@ export default async function AboutPage() {
                         )}
                       </>
                     ) : (
-                      /* Spacer for right-side items on desktop */
                       <div className="hidden md:block" />
                     )}
                   </div>
@@ -355,7 +307,7 @@ export default async function AboutPage() {
 
                   {/* ── Mobile: right-side items render in left col ── */}
                   {!isLeft && (
-                    <div className="md:hidden pl-12 pb-16 -mt-0">
+                    <div className="md:hidden pl-12 pb-16">
                       <div className="w-10 h-px bg-primary/15 mb-5" />
                       <span className="font-serif-brand text-2xl text-primary/30 block mb-3">
                         {item.year}
@@ -373,40 +325,6 @@ export default async function AboutPage() {
                 </div>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Collaborative Philosophy ── */}
-      <section className="max-w-screen-xl mx-auto px-6 md:px-12 mb-32">
-        <div className="bg-surface-container-highest p-12 md:p-24 flex flex-col md:flex-row items-center gap-16">
-          <div className="w-full md:w-1/2 relative aspect-[4/3]">
-            <Image
-              src={seed.philosophyImageUrl}
-              alt="Hand-written musical score with complex notations on aged paper"
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover grayscale brightness-95"
-            />
-          </div>
-          <div className="w-full md:w-1/2">
-            <h3 className="font-serif-brand text-3xl mb-8">
-              The Philosophy of the Score
-            </h3>
-            <p className="font-headline text-[1.05rem] md:text-lg leading-[2] text-on-surface-variant/70 mb-8">
-              {philosophy}
-            </p>
-            <a
-              href="/media"
-              className="inline-flex items-center gap-4 group"
-            >
-              <span className="font-label text-xs uppercase tracking-widest border-b border-on-surface pb-1">
-                View Archive of Works
-              </span>
-              <span className="material-symbols-outlined text-sm transition-transform group-hover:translate-x-2">
-                arrow_forward
-              </span>
-            </a>
           </div>
         </div>
       </section>

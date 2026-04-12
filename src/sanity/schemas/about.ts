@@ -73,22 +73,6 @@ export default defineType({
         "Extended narrative biography with full rich text — displayed in the dedicated long-form section.",
     }),
     defineField({
-      name: "achievements",
-      title: "Achievements & Highlights",
-      type: "array",
-      of: [{ type: "string" }],
-      description:
-        "Career highlights, UNESCO roles, awards — one per line. Displayed as a curated list.",
-    }),
-    defineField({
-      name: "philosophy",
-      title: "Musical Philosophy",
-      type: "text",
-      rows: 6,
-      description:
-        "His artistic philosophy in his own words — shown in the Philosophy section.",
-    }),
-    defineField({
       name: "chronology",
       title: "Chronology of Precision",
       type: "array",
