@@ -3,43 +3,63 @@
 import { useState } from "react";
 import LeadCaptureModal from "./LeadCaptureModal";
 
-const services = [
+interface ServiceItem {
+  _id: string;
+  title: string;
+  icon?: string;
+  description?: string;
+  duration?: string;
+  ctaLabel?: string;
+  ctaLink?: string;
+  action?: string;
+}
+
+// Seed data used when Sanity has no services
+const seedServices: ServiceItem[] = [
   {
-    icon: "school",
+    _id: "seed-1",
     title: "Training",
+    icon: "school",
     description:
       "Advanced masterclasses for orchestral conductors and soloists focusing on interpretive emotional depth and precision.",
-    cta: { label: "Guitar Course", href: "/training/classical-guitar-course" },
-    action: "link" as const,
+    ctaLabel: "Guitar Course",
+    ctaLink: "/training/classical-guitar-course",
+    action: "link",
   },
   {
-    icon: "edit_note",
+    _id: "seed-2",
     title: "Composition",
+    icon: "edit_note",
     description:
       "Bespoke commissions for cinematic scores, theatrical performances, and chamber ensembles bridging East and West.",
-    cta: { label: "Enquire", href: "/#enquiry-section" },
-    action: "link" as const,
+    ctaLabel: "Enquire",
+    ctaLink: "/#enquiry-section",
+    action: "link",
   },
   {
-    icon: "forum",
+    _id: "seed-3",
     title: "Consulting",
+    icon: "forum",
     description:
       "A complimentary 15-minute introductory session to explore your artistic vision and how we might collaborate.",
-    cta: { label: "Book Free Session", href: "" },
-    action: "modal" as const,
+    ctaLabel: "Book Free Session",
+    action: "modal",
   },
   {
-    icon: "public",
+    _id: "seed-4",
     title: "Full Consulting",
+    icon: "public",
     description:
       "Comprehensive artistic direction for international festivals, cultural institutions, and heritage preservation projects.",
-    cta: { label: "Begin Engagement", href: "/training/full-consulting" },
-    action: "link" as const,
+    ctaLabel: "Begin Engagement",
+    ctaLink: "/training/full-consulting",
+    action: "link",
   },
 ];
 
-export default function Services() {
+export default function Services({ items }: { items: ServiceItem[] }) {
   const [modalOpen, setModalOpen] = useState(false);
+  const services = items.length > 0 ? items : seedServices;
 
   return (
     <section className="py-32 bg-surface-container-low">
@@ -58,12 +78,14 @@ export default function Services() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-0 border-collapse">
           {services.map((service) => (
             <div
-              key={service.title}
+              key={service._id}
               className="p-12 border border-outline-variant/15 hover:bg-surface transition-colors duration-500 flex flex-col min-h-[400px]"
             >
-              <span className="material-symbols-outlined text-primary mb-8 text-3xl">
-                {service.icon}
-              </span>
+              {service.icon && (
+                <span className="material-symbols-outlined text-primary mb-8 text-3xl">
+                  {service.icon}
+                </span>
+              )}
               <h4 className="font-serif-brand text-2xl mb-6">
                 {service.title}
               </h4>
@@ -76,17 +98,17 @@ export default function Services() {
                   onClick={() => setModalOpen(true)}
                   className="font-label text-[10px] uppercase tracking-widest text-primary group mt-8 inline-block text-left"
                 >
-                  {service.cta.label}{" "}
+                  {service.ctaLabel || "Enquire"}{" "}
                   <span className="inline-block transition-transform group-hover:translate-x-1">
                     →
                   </span>
                 </button>
               ) : (
                 <a
-                  href={service.cta.href}
+                  href={service.ctaLink || "#"}
                   className="font-label text-[10px] uppercase tracking-widest text-primary group mt-8 inline-block"
                 >
-                  {service.cta.label}{" "}
+                  {service.ctaLabel || "Learn More"}{" "}
                   <span className="inline-block transition-transform group-hover:translate-x-1">
                     →
                   </span>

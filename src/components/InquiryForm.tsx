@@ -71,6 +71,7 @@ export default function InquiryForm() {
               <option>Composition Commission</option>
               <option>Masterclass Booking</option>
               <option>Academic Research</option>
+              <option>Others</option>
             </select>
           </div>
 

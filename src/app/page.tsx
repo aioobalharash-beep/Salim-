@@ -1,16 +1,31 @@
 import Hero from "@/components/Hero";
-import LatestWork from "@/components/LatestWork";
+import PortfolioSlider from "@/components/PortfolioSlider";
 import Services from "@/components/Services";
-import Testimonial from "@/components/Testimonial";
+import TestimonialSection from "@/components/TestimonialSection";
 import InquiryForm from "@/components/InquiryForm";
+import { client } from "@/sanity/client";
+import {
+  portfolioQuery,
+  servicesQuery,
+  testimonialsQuery,
+} from "@/sanity/queries";
 
-export default function HomePage() {
+export const revalidate = 60;
+
+export default async function HomePage() {
+  // Fetch all sections in parallel
+  const [portfolio, services, testimonials] = await Promise.all([
+    client.fetch(portfolioQuery).catch(() => []),
+    client.fetch(servicesQuery).catch(() => []),
+    client.fetch(testimonialsQuery).catch(() => []),
+  ]);
+
   return (
     <>
       <Hero />
-      <LatestWork />
-      <Services />
-      <Testimonial />
+      <PortfolioSlider items={portfolio ?? []} />
+      <Services items={services ?? []} />
+      <TestimonialSection items={testimonials ?? []} />
       <InquiryForm />
     </>
   );
