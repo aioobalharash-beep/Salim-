@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-primary: #fafaf5;
+  --bg-secondary: #f3f4ee;
+  --bg-tertiary: #ecefe7;
+  --text-primary: #2e342d;
+  --text-secondary: #5b6159;
+  --accent: #586059;
+  --accent-dim: #4d544d;
+  --accent-light: #dde5db;
+  --border: #aeb4aa;
+  --border-light: rgba(174, 180, 170, 0.15);
+}
+
 html {
   scroll-behavior: smooth;
 }

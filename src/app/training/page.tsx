@@ -1,51 +1,13 @@
-"use client";
-
-import { useState } from "react";
 import Image from "next/image";
 import PageHeader from "@/components/PageHeader";
-import LeadCaptureModal from "@/components/LeadCaptureModal";
+import TrainingGrid from "@/components/TrainingGrid";
+import { client } from "@/sanity/client";
+import { servicesQuery } from "@/sanity/queries";
 
-const masterclasses = [
-  {
-    title: "Classical Guitar Interpretation",
-    duration: "3 days",
-    description:
-      "Deep study of Mediterranean and North African guitar repertoire, focusing on tonal colour, microtonal sensitivity, and historical context.",
-    icon: "piano",
-    cta: { label: "View Course", href: "/training/classical-guitar-course" },
-    action: "link" as const,
-  },
-  {
-    title: "Composition Tutoring",
-    duration: "4 days",
-    description:
-      "A collaborative seminar on blending Western classical form with Maghrebi melodic traditions, covering orchestration, counterpoint, and sonic storytelling.",
-    icon: "edit_note",
-    cta: { label: "Enquire", href: "/#enquiry-section" },
-    action: "link" as const,
-  },
-  {
-    title: "Free 15-Min Consultation",
-    duration: "15 min",
-    description:
-      "A complimentary introductory session to explore your artistic vision, discuss your goals, and understand how we might collaborate.",
-    icon: "forum",
-    cta: { label: "Reserve Session", href: "" },
-    action: "modal" as const,
-  },
-  {
-    title: "Full Consulting Engagement",
-    duration: "Ongoing",
-    description:
-      "Comprehensive artistic direction for international festivals, cultural institutions, and heritage preservation projects. Bespoke pricing.",
-    icon: "workspace_premium",
-    cta: { label: "Begin Engagement", href: "/training/full-consulting" },
-    action: "link" as const,
-  },
-];
+export const revalidate = 60;
 
-export default function TrainingPage() {
-  const [modalOpen, setModalOpen] = useState(false);
+export default async function TrainingPage() {
+  const services = await client.fetch(servicesQuery).catch(() => []);
 
   return (
     <>
@@ -69,54 +31,7 @@ export default function TrainingPage() {
         </div>
       </section>
 
-      {/* Masterclass Grid */}
-      <section className="px-6 md:px-12 max-w-screen-2xl mx-auto pb-32">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-collapse">
-          {masterclasses.map((item) => (
-            <div
-              key={item.title}
-              className="p-12 border border-outline-variant/15 hover:bg-surface-container-low transition-colors duration-500 flex flex-col min-h-[320px]"
-            >
-              <div className="flex items-center justify-between mb-8">
-                <span className="material-symbols-outlined text-primary text-3xl">
-                  {item.icon}
-                </span>
-                <span className="font-label text-[10px] uppercase tracking-widest text-primary/60">
-                  {item.duration}
-                </span>
-              </div>
-              <h4 className="font-serif-brand text-2xl mb-4">{item.title}</h4>
-              <p className="font-body text-sm leading-relaxed text-on-surface-variant flex-grow">
-                {item.description}
-              </p>
-
-              {item.action === "modal" ? (
-                <button
-                  onClick={() => setModalOpen(true)}
-                  className="font-label text-[10px] uppercase tracking-widest text-primary group mt-8 inline-block text-left"
-                >
-                  {item.cta.label}{" "}
-                  <span className="inline-block transition-transform group-hover:translate-x-1">
-                    →
-                  </span>
-                </button>
-              ) : (
-                <a
-                  href={item.cta.href}
-                  className="font-label text-[10px] uppercase tracking-widest text-primary group mt-8 inline-block"
-                >
-                  {item.cta.label}{" "}
-                  <span className="inline-block transition-transform group-hover:translate-x-1">
-                    →
-                  </span>
-                </a>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <LeadCaptureModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <TrainingGrid items={services ?? []} />
     </>
   );
 }

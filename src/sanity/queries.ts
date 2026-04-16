@@ -48,3 +48,34 @@ export const aboutQuery = groq`
     }
   }
 `;
+
+export const portfolioQuery = groq`
+  *[_type == "portfolio"] | order(order asc) {
+    _id,
+    title,
+    type,
+    image,
+    link
+  }
+`;
+
+export const servicesQuery = groq`
+  *[_type == "service"] | order(order asc) {
+    _id,
+    title,
+    icon,
+    description,
+    duration,
+    ctaLabel,
+    ctaLink,
+    action
+  }
+`;
+
+export const testimonialsQuery = groq`
+  *[_type == "testimonial"] | order(order asc) {
+    _id,
+    name,
+    content
+  }
+`;
