@@ -6,6 +6,7 @@ import siteSettings from "./siteSettings";
 import portfolio from "./portfolio";
 import service from "./service";
 import testimonial from "./testimonial";
+import audio from "./audio";
 
 export const schemaTypes = [
   journal,
@@ -16,4 +17,5 @@ export const schemaTypes = [
   portfolio,
   service,
   testimonial,
+  audio,
 ];
