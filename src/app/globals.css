@@ -3,16 +3,32 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #fafaf5;
-  --bg-secondary: #f3f4ee;
-  --bg-tertiary: #ecefe7;
-  --text-primary: #2e342d;
-  --text-secondary: #5b6159;
-  --accent: #586059;
-  --accent-dim: #4d544d;
-  --accent-light: #dde5db;
-  --border: #aeb4aa;
-  --border-light: rgba(174, 180, 170, 0.15);
+  /* --- MASTER SWITCHES (Edit these to change the site) --- */
+  --bg-main: #F2EFE9;
+  --text-main: #2B2926;
+  --accent: #B59A5D;
+
+  /* --- THE MESSENGERS (Linking them to your switches) --- */
+  --background: var(--bg-main);
+  --foreground: var(--text-main);
+  --card: var(--bg-main);
+  --card-foreground: var(--text-main);
+  --popover: var(--bg-main);
+  --popover-foreground: var(--text-main);
+  --primary: var(--accent);
+  --primary-foreground: var(--bg-main);
+  --secondary: var(--bg-main);
+  --secondary-foreground: var(--text-main);
+  --muted: var(--bg-main);
+  --muted-foreground: var(--text-main);
+  --accent-ui: var(--accent);
+  --accent-foreground: var(--text-main);
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: var(--accent);
+  --input: var(--accent);
+  --ring: var(--accent);
+  --radius: 0rem;
 }
 
 html {
