@@ -79,3 +79,14 @@ export const testimonialsQuery = groq`
     content
   }
 `;
+
+export const audioListQuery = groq`
+  *[_type == "audio"] | order(publishDate desc) {
+    _id,
+    title,
+    description,
+    albumCover,
+    "audioUrl": audioFile.asset->url,
+    publishDate
+  }
+`;
