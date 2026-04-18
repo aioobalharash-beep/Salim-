@@ -93,34 +93,33 @@ export default function AudioPlayer({
       {/* Play / Pause */}
       <button
         onClick={togglePlay}
-        className="w-10 h-10 flex items-center justify-center shrink-0 border border-on-surface/15 hover:border-on-surface/30 transition-colors duration-300"
+        className="w-9 h-9 flex items-center justify-center shrink-0 border border-primary/20 hover:border-primary/40 transition-colors duration-300"
       >
-        <span className="material-symbols-outlined text-on-surface/60 text-lg">
+        <span className="material-symbols-outlined text-primary/50 text-base">
           {playing ? "pause" : "play_arrow"}
         </span>
       </button>
 
-      {/* Progress + times */}
       <div className="flex-1 flex flex-col gap-1.5">
         <div
           ref={progressRef}
           onClick={handleSeek}
-          className="w-full h-[3px] bg-on-surface/8 cursor-pointer relative group"
+          className="w-full h-[2px] bg-primary/10 cursor-pointer relative group"
         >
           <div
-            className="absolute inset-y-0 left-0 bg-primary/40 group-hover:bg-primary/60 transition-colors"
+            className="absolute inset-y-0 left-0 bg-primary/35 group-hover:bg-primary/50 transition-colors"
             style={{ width: `${progress}%` }}
           />
           <div
-            className="absolute top-1/2 -translate-y-1/2 w-[9px] h-[9px] bg-primary/50 group-hover:bg-primary opacity-0 group-hover:opacity-100 transition-opacity"
-            style={{ left: `calc(${progress}% - 4.5px)` }}
+            className="absolute top-1/2 -translate-y-1/2 w-2 h-2 bg-primary/40 group-hover:bg-primary/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-none"
+            style={{ left: `calc(${progress}% - 4px)` }}
           />
         </div>
         <div className="flex justify-between">
-          <span className="font-label text-[9px] tracking-wider text-on-surface/30">
+          <span className="font-label text-[9px] tracking-wider text-primary/30">
             {formatTime(currentTime)}
           </span>
-          <span className="font-label text-[9px] tracking-wider text-on-surface/30">
+          <span className="font-label text-[9px] tracking-wider text-primary/30">
             {formatTime(duration)}
           </span>
         </div>

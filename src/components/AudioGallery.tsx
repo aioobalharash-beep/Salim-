@@ -69,9 +69,9 @@ export default function AudioGallery({ tracks }: { tracks: AudioTrack[] }) {
         {paginated.map((track, i) => (
           <article
             key={track._id}
-            className={`py-14 ${
+            className={`py-20 ${
               i < paginated.length - 1
-                ? "border-b border-on-surface/[0.06]"
+                ? "border-b border-primary/15"
                 : ""
             }`}
           >
@@ -79,7 +79,7 @@ export default function AudioGallery({ tracks }: { tracks: AudioTrack[] }) {
               {/* Left: Cover + Player */}
               <div className="w-full md:w-[280px] shrink-0 space-y-6">
                 {/* Album Cover */}
-                <div className="aspect-square w-full bg-surface-container-low relative overflow-hidden">
+                <div className="aspect-square w-full bg-surface-container-low relative overflow-hidden rounded-none">
                   {track.albumCover && !useSeed ? (
                     <Image
                       src={urlFor(track.albumCover).width(560).height(560).url()}
@@ -107,14 +107,14 @@ export default function AudioGallery({ tracks }: { tracks: AudioTrack[] }) {
                   />
                 ) : (
                   <div className="flex items-center gap-5 w-full">
-                    <div className="w-10 h-10 flex items-center justify-center shrink-0 border border-on-surface/10">
-                      <span className="material-symbols-outlined text-on-surface/20 text-lg">
+                    <div className="w-9 h-9 flex items-center justify-center shrink-0 border border-primary/15">
+                      <span className="material-symbols-outlined text-primary/25 text-base">
                         play_arrow
                       </span>
                     </div>
                     <div className="flex-1">
-                      <div className="w-full h-[3px] bg-on-surface/[0.06]" />
-                      <p className="font-label text-[9px] tracking-wider text-on-surface/20 mt-1.5">
+                      <div className="w-full h-[2px] bg-primary/10" />
+                      <p className="font-label text-[9px] tracking-wider text-primary/25 mt-1.5">
                         Audio available in Backstage
                       </p>
                     </div>
@@ -125,15 +125,15 @@ export default function AudioGallery({ tracks }: { tracks: AudioTrack[] }) {
               {/* Right: Info */}
               <div className="flex-1 flex flex-col justify-center">
                 {track.publishDate && (
-                  <p className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface/25 mb-4">
+                  <p className="font-label text-[9px] uppercase tracking-[0.3em] text-primary/30 mb-4">
                     {formatDate(track.publishDate)}
                   </p>
                 )}
-                <h3 className="font-serif-brand text-2xl md:text-[1.75rem] text-on-surface mb-5 leading-snug">
+                <h3 className="font-serif-brand text-xl md:text-[1.4rem] text-on-surface/90 mb-5 leading-snug">
                   {track.title}
                 </h3>
                 {track.description && (
-                  <p className="font-body text-sm leading-[1.9] text-on-surface-variant/60 max-w-xl">
+                  <p className="font-body text-[13px] leading-[1.9] text-on-surface/40 max-w-xl">
                     {track.description}
                   </p>
                 )}
