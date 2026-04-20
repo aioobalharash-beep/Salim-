@@ -43,7 +43,7 @@ export default defineType({
                   { title: "Training", value: "/training" },
                   { title: "Shop", value: "/shop" },
                   { title: "Media", value: "/media" },
-                  { title: "Media — Audio", value: "/media/audio" },
+                  { title: "Media — Discography", value: "/media/discography" },
                   { title: "Media — Video", value: "/media/video" },
                   { title: "Media — Press", value: "/media/press" },
                   { title: "Media — Gallery", value: "/media/gallery" },

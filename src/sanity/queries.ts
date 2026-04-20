@@ -84,9 +84,19 @@ export const audioListQuery = groq`
   *[_type == "audio"] | order(publishDate desc) {
     _id,
     title,
+    releaseType,
     description,
     albumCover,
     "audioUrl": audioFile.asset->url,
+    tracks[]{
+      _key,
+      title,
+      "audioUrl": audioFile.asset->url
+    },
+    purchaseUrl,
+    shareUrl,
     publishDate
   }
 `;
+
+export const discographyListQuery = audioListQuery;

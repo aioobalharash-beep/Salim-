@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 import { client } from "@/sanity/client";
-import { audioListQuery } from "@/sanity/queries";
-import AudioGallery from "@/components/AudioGallery";
+import { discographyListQuery } from "@/sanity/queries";
+import Discography from "@/components/Discography";
 
 export const metadata: Metadata = {
   title: "Discography — Salim Dada",
   description:
-    "An archive of the Maestro's recordings — compositions, field recordings, and orchestral works.",
+    "Albums and singles by Salim Dada — compositions, field recordings, and orchestral works.",
 };
 
 export const revalidate = 60;
 
-export default async function AudioPage() {
-  let tracks = [];
+export default async function DiscographyPage() {
+  let releases = [];
   try {
-    tracks = (await client.fetch(audioListQuery)) ?? [];
+    releases = (await client.fetch(discographyListQuery)) ?? [];
   } catch {
     // Sanity unavailable — gallery will show seed data
   }
@@ -29,7 +29,7 @@ export default async function AudioPage() {
 
       <section className="max-w-3xl mx-auto px-6 md:px-8">
         <div className="border-t border-primary/15" />
-        <AudioGallery tracks={tracks} />
+        <Discography releases={releases} />
       </section>
     </div>
   );
