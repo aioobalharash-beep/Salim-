@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 
 const mediaSubLinks = [
-  { href: "/media/audio", label: "Audio" },
+  { href: "/media/discography", label: "Discography" },
   { href: "/media/video", label: "Video" },
   { href: "/media/press", label: "Press" },
   { href: "/media/gallery", label: "Gallery" },

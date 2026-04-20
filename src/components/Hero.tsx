@@ -24,7 +24,7 @@ const seedColumns = [
   {
     subtitle: "Creator",
     title: "Composer",
-    link: "/media/audio",
+    link: "/media/discography",
     staticSrc:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuBezL1hNpPExeneC53GAH2ui7zGWIvGICC5xICTBUMjSJNXKKl0uPnqEbKkZU1UJFM--_KF8d4wso313gBPmMxPKqscMID-n6hLDcwwv6E65CkMNhw_BPJI6orGOBKKkS6nMnyKnCfkJmZUTMYZwYxGejTo-TnaCEV0QqkTdze5ypKuhftkUfocOYIe2Y64HrZTgmAQaEOPb-bF4CXd1EvUJMp7BggaOCDRZc-h_sq2sFKLMG3S2G3wDNv8crUgY3vhsvygAQexC6I",
     alt: "Sheet music and piano desk",

@@ -25,7 +25,7 @@ const seedItems: PortfolioItem[] = [
     _id: "seed-2",
     title: "Echoes of Algiers",
     type: "work",
-    link: "/media/audio",
+    link: "/media/discography",
   },
   {
     _id: "seed-3",
