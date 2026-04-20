@@ -108,7 +108,6 @@ export default async function AboutPage() {
     // Sanity unavailable — use seed data
   }
 
-  const shortIntro = about?.shortIntro || seed.shortIntro;
   const pullQuote = about?.pullQuote || seed.pullQuote;
   const hasSanityImage = !!about?.profileImage;
   const hasSanityBio = (about?.bio?.length ?? 0) > 0;
@@ -120,25 +119,16 @@ export default async function AboutPage() {
 
   return (
     <div className="pt-32 pb-24">
-      {/* ── Hero: Editorial Asymmetry ── */}
+      {/* ── Hero: Centered Statement ── */}
       <section className="max-w-screen-2xl mx-auto px-6 md:px-12 mb-32">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-end">
-          <div className="md:col-span-8">
-            <span className="text-primary opacity-60 tracking-[0.2em] uppercase mb-4 block font-label text-xs">
-              The Narrative
-            </span>
-            <h1 className="font-serif-brand text-6xl md:text-8xl font-light leading-tight text-on-surface tracking-tighter">
-              Between <br />
-              <span className="italic pl-12 md:pl-24">
-                Silence &amp; Sound.
-              </span>
-            </h1>
-          </div>
-          <div className="md:col-span-4 pb-4">
-            <p className="text-on-surface-variant font-body leading-relaxed max-w-sm">
-              {shortIntro}
-            </p>
-          </div>
+        <div className="max-w-5xl mx-auto text-center py-16 md:py-24">
+          <span className="text-primary opacity-60 tracking-[0.2em] uppercase mb-6 block font-label text-xs">
+            The Narrative
+          </span>
+          <h1 className="font-serif-brand text-6xl md:text-8xl font-light leading-tight text-on-surface tracking-tighter">
+            Between <br />
+            <span className="italic">Silence &amp; Sound.</span>
+          </h1>
         </div>
       </section>
 
@@ -174,10 +164,6 @@ export default async function AboutPage() {
           {/* Biography Text */}
           <div className="md:col-span-7">
             <div className="max-w-2xl">
-              <h2 className="font-serif-brand text-3xl mb-12 text-on-surface">
-                The Orchestration of History
-              </h2>
-
               {hasSanityBio ? (
                 <div>
                   <PortableText
@@ -246,7 +232,7 @@ export default async function AboutPage() {
                   className="relative grid grid-cols-1 md:grid-cols-2"
                 >
                   {/* ── Dot on the centre line ── */}
-                  <div className="absolute left-4 md:left-1/2 top-8 md:top-10 w-[7px] h-[7px] -translate-x-[3px] md:-translate-x-[3.5px] rounded-full bg-primary/25 ring-[3px] ring-surface z-10" />
+                  <div className="absolute left-4 md:left-1/2 top-4 md:top-5 w-[7px] h-[7px] -translate-x-[3px] md:-translate-x-[3.5px] rounded-full bg-primary/25 ring-[3px] ring-surface z-10" />
 
                   {/* ── LEFT column ── */}
                   <div
@@ -254,18 +240,18 @@ export default async function AboutPage() {
                       isLeft
                         ? "md:pr-16 md:text-right"
                         : "md:pr-16 md:text-right md:order-1"
-                    } pb-16 md:pb-24`}
+                    } pb-8 md:pb-12`}
                   >
                     {isLeft ? (
                       <>
-                        <div className="hidden md:flex justify-end mb-5">
+                        <div className="hidden md:flex justify-end mb-3">
                           <div className="w-10 h-px bg-primary/15" />
                         </div>
-                        <div className="w-10 h-px bg-primary/15 mb-5 md:hidden" />
-                        <span className="font-serif-brand text-2xl md:text-3xl text-primary/30 block mb-3">
+                        <div className="w-10 h-px bg-primary/15 mb-3 md:hidden" />
+                        <span className="font-serif-brand text-2xl md:text-3xl text-primary/30 block mb-2">
                           {item.year}
                         </span>
-                        <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-3">
+                        <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-2">
                           {item.title}
                         </h4>
                         {item.description && (
@@ -285,15 +271,15 @@ export default async function AboutPage() {
                       isLeft
                         ? "md:pl-16"
                         : "md:pl-16 md:order-2"
-                    } pb-24`}
+                    } pb-12`}
                   >
                     {!isLeft && (
                       <>
-                        <div className="w-10 h-px bg-primary/15 mb-5" />
-                        <span className="font-serif-brand text-2xl md:text-3xl text-primary/30 block mb-3">
+                        <div className="w-10 h-px bg-primary/15 mb-3" />
+                        <span className="font-serif-brand text-2xl md:text-3xl text-primary/30 block mb-2">
                           {item.year}
                         </span>
-                        <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-3">
+                        <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-2">
                           {item.title}
                         </h4>
                         {item.description && (
@@ -307,12 +293,12 @@ export default async function AboutPage() {
 
                   {/* ── Mobile: right-side items render in left col ── */}
                   {!isLeft && (
-                    <div className="md:hidden pl-12 pb-16">
-                      <div className="w-10 h-px bg-primary/15 mb-5" />
-                      <span className="font-serif-brand text-2xl text-primary/30 block mb-3">
+                    <div className="md:hidden pl-12 pb-8">
+                      <div className="w-10 h-px bg-primary/15 mb-3" />
+                      <span className="font-serif-brand text-2xl text-primary/30 block mb-2">
                         {item.year}
                       </span>
-                      <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-3">
+                      <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-2">
                         {item.title}
                       </h4>
                       {item.description && (
