@@ -70,7 +70,7 @@ const seedReleases: Release[] = [
   },
 ];
 
-function CartIcon() {
+function MusicIcon() {
   return (
     <svg
       width="13"
@@ -79,13 +79,13 @@ function CartIcon() {
       fill="none"
       stroke="currentColor"
       strokeWidth="1.25"
-      strokeLinecap="square"
-      strokeLinejoin="miter"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path d="M3 4h3l2.5 11.5a2 2 0 0 0 2 1.5h7a2 2 0 0 0 2-1.5L21 8H6" />
-      <circle cx="10" cy="20.5" r="1.1" />
-      <circle cx="17" cy="20.5" r="1.1" />
+      <path d="M9 18V5l12-2v13" />
+      <circle cx="6" cy="18" r="3" />
+      <circle cx="18" cy="16" r="3" />
     </svg>
   );
 }
@@ -170,8 +170,8 @@ function ActionLinks({
           rel="noopener noreferrer"
           className="flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.2em] text-on-surface/50 hover:text-on-surface transition-colors"
         >
-          <CartIcon />
-          <span>Purchase</span>
+          <MusicIcon />
+          <span>Listen</span>
         </a>
       )}
       <button
@@ -217,12 +217,16 @@ function CoverArt({
 }
 
 function SpecsList({ release }: { release: Release }) {
+  const year = release.publishDate
+    ? String(new Date(release.publishDate).getFullYear())
+    : undefined;
   const items: { label: string; value?: string }[] = [
-    { label: "Album", value: release.album },
     { label: "Artist", value: release.artist },
+    { label: "Album", value: release.album },
     { label: "Instrumentation", value: release.instrumentation },
     { label: "Label", value: release.label },
     { label: "Country", value: release.country },
+    { label: "Year", value: year },
   ];
   const filtered = items.filter((i) => i.value);
   if (filtered.length === 0) return null;
@@ -250,28 +254,13 @@ function SingleRow({
   setActiveTrackId: (id: string) => void;
 }) {
   return (
-    <div className="flex flex-col md:flex-row gap-10">
-      <div className="w-full md:w-[280px] shrink-0 space-y-6">
+    <div className="flex flex-col md:flex-row gap-10 items-start">
+      <div className="w-full md:w-[280px] shrink-0">
         <CoverArt release={release} useSeed={useSeed} />
-        {release.audioUrl && !useSeed ? (
-          <AudioPlayer
-            src={release.audioUrl}
-            trackId={release._id}
-            activeTrackId={activeTrackId}
-            onPlay={setActiveTrackId}
-          />
-        ) : (
-          <PlaceholderPlayer />
-        )}
       </div>
 
-      <div className="flex-1 flex flex-col justify-center">
-        {release.publishDate && (
-          <p className="font-label text-[10px] uppercase tracking-[0.4em] text-on-surface/40 mb-3">
-            {new Date(release.publishDate).getFullYear()}
-          </p>
-        )}
-        <h3 className="font-serif-brand text-xl md:text-[1.4rem] text-on-surface/90 mb-5 leading-snug">
+      <div className="flex-1 flex flex-col">
+        <h3 className="font-serif-brand text-xl md:text-[1.4rem] text-on-surface/90 mb-5 leading-none">
           {release.title}
         </h3>
         <SpecsList release={release} />
@@ -280,6 +269,18 @@ function SingleRow({
           purchaseUrl={release.purchaseUrl}
           shareUrl={release.shareUrl}
         />
+        <div className="mt-8">
+          {release.audioUrl && !useSeed ? (
+            <AudioPlayer
+              src={release.audioUrl}
+              trackId={release._id}
+              activeTrackId={activeTrackId}
+              onPlay={setActiveTrackId}
+            />
+          ) : (
+            <PlaceholderPlayer />
+          )}
+        </div>
       </div>
     </div>
   );
@@ -300,18 +301,13 @@ function AlbumRow({
   const tracks = release.tracks ?? [];
 
   return (
-    <div className="flex flex-col md:flex-row gap-10">
+    <div className="flex flex-col md:flex-row gap-10 items-start">
       <div className="w-full md:w-[280px] shrink-0">
         <CoverArt release={release} useSeed={useSeed} />
       </div>
 
       <div className="flex-1 flex flex-col">
-        {release.publishDate && (
-          <p className="font-label text-[10px] uppercase tracking-[0.4em] text-on-surface/40 mb-3">
-            {new Date(release.publishDate).getFullYear()}
-          </p>
-        )}
-        <h3 className="font-serif-brand text-xl md:text-[1.4rem] text-on-surface/90 mb-5 leading-snug">
+        <h3 className="font-serif-brand text-xl md:text-[1.4rem] text-on-surface/90 mb-5 leading-none">
           {release.title}
         </h3>
         <div className="mb-8">
