@@ -16,7 +16,10 @@ interface Release {
   _id: string;
   title: string;
   releaseType?: "album" | "single";
-  description?: string;
+  artist?: string;
+  instrumentation?: string;
+  label?: string;
+  country?: string;
   albumCover?: { asset: { _ref: string } };
   audioUrl?: string;
   tracks?: Track[];
@@ -32,8 +35,10 @@ const seedReleases: Release[] = [
     _id: "seed-1",
     title: "Symphony of Sand",
     releaseType: "album",
-    description:
-      "The Mediterranean Symphony Cycle, premiered at the Orchestre Symphonique National in 2012. A three-movement meditation on the desert winds that carry ancient melodies across the Sahara.",
+    artist: "Orchestre Symphonique National",
+    instrumentation: "Full Orchestra",
+    label: "Éditions Andalouses",
+    country: "Algeria",
     publishDate: "2012-03-15",
     tracks: [
       { _key: "t1", title: "I. Sirocco" },
@@ -45,27 +50,23 @@ const seedReleases: Release[] = [
     _id: "seed-2",
     title: "Echoes of the Casbah",
     releaseType: "single",
-    description:
-      "Solo guitar recorded in the natural acoustics of Algiers' historic Casbah — a meditation on urban silence and the memory embedded in stone.",
+    artist: "Sergio Puccini",
+    instrumentation: "Solo Guitar",
+    label: "Independent",
+    country: "Algeria",
     publishDate: "2016-09-22",
   },
   {
     _id: "seed-3",
     title: "The Trans-Saharan Scale",
     releaseType: "single",
-    description:
-      "An archival field recording documenting the migration of microtonal melodies from the Sahel to the Mediterranean coast.",
+    artist: "Salim Dada",
+    instrumentation: "Field Recording",
+    label: "Archives du Sud",
+    country: "Algeria / Mali",
     publishDate: "2018-11-04",
   },
 ];
-
-function formatDate(iso?: string) {
-  if (!iso) return "";
-  return new Date(iso).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-  });
-}
 
 function CartIcon() {
   return (
@@ -191,23 +192,47 @@ function CoverArt({
   useSeed: boolean;
 }) {
   return (
-    <div className="aspect-square w-full bg-surface-container-low relative overflow-hidden rounded-none">
-      {release.albumCover && !useSeed ? (
-        <Image
-          src={urlFor(release.albumCover).width(640).height(640).url()}
-          alt={release.title}
-          fill
-          sizes="280px"
-          className="object-cover"
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center">
-          <span className="material-symbols-outlined text-on-surface/10 text-6xl">
-            album
-          </span>
-        </div>
-      )}
+    <div className="p-1.5 border border-primary/15 bg-surface-container-lowest rounded-sm">
+      <div className="aspect-square w-full bg-surface-container-low relative overflow-hidden rounded-sm">
+        {release.albumCover && !useSeed ? (
+          <Image
+            src={urlFor(release.albumCover).width(640).height(640).url()}
+            alt={release.title}
+            fill
+            sizes="280px"
+            className="object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="material-symbols-outlined text-on-surface/10 text-6xl">
+              album
+            </span>
+          </div>
+        )}
+      </div>
     </div>
+  );
+}
+
+function SpecsList({ release }: { release: Release }) {
+  const isAlbum = release.releaseType === "album";
+  const items: { label: string; value?: string }[] = [];
+  if (isAlbum) items.push({ label: "Album", value: release.title });
+  items.push({ label: "Artist", value: release.artist });
+  items.push({ label: "Instrumentation", value: release.instrumentation });
+  items.push({ label: "Label", value: release.label });
+  items.push({ label: "Country", value: release.country });
+  const filtered = items.filter((i) => i.value);
+  if (filtered.length === 0) return null;
+  return (
+    <dl className="font-body text-[12px] leading-[1.8] text-on-surface/70 space-y-1 max-w-xl">
+      {filtered.map((item) => (
+        <div key={item.label} className="flex gap-1.5">
+          <dt className="text-on-surface/40">{item.label}:</dt>
+          <dd className="text-on-surface/80">{item.value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -239,19 +264,10 @@ function SingleRow({
       </div>
 
       <div className="flex-1 flex flex-col justify-center">
-        {release.publishDate && (
-          <p className="font-label text-[9px] uppercase tracking-[0.3em] text-primary/30 mb-4">
-            Single · {formatDate(release.publishDate)}
-          </p>
-        )}
         <h3 className="font-serif-brand text-xl md:text-[1.4rem] text-on-surface/90 mb-5 leading-snug">
           {release.title}
         </h3>
-        {release.description && (
-          <p className="font-body text-[13px] leading-[1.9] text-on-surface/40 max-w-xl">
-            {release.description}
-          </p>
-        )}
+        <SpecsList release={release} />
         <ActionLinks
           title={release.title}
           purchaseUrl={release.purchaseUrl}
@@ -275,7 +291,6 @@ function AlbumRow({
 }) {
   const [open, setOpen] = useState(false);
   const tracks = release.tracks ?? [];
-  const trackCount = tracks.length;
 
   return (
     <div className="flex flex-col md:flex-row gap-10">
@@ -284,20 +299,12 @@ function AlbumRow({
       </div>
 
       <div className="flex-1 flex flex-col">
-        {release.publishDate && (
-          <p className="font-label text-[9px] uppercase tracking-[0.3em] text-primary/30 mb-4">
-            Album · {formatDate(release.publishDate)}
-            {trackCount > 0 ? ` · ${trackCount} tracks` : ""}
-          </p>
-        )}
         <h3 className="font-serif-brand text-xl md:text-[1.4rem] text-on-surface/90 mb-5 leading-snug">
           {release.title}
         </h3>
-        {release.description && (
-          <p className="font-body text-[13px] leading-[1.9] text-on-surface/40 max-w-xl mb-8">
-            {release.description}
-          </p>
-        )}
+        <div className="mb-8">
+          <SpecsList release={release} />
+        </div>
 
         <button
           type="button"
