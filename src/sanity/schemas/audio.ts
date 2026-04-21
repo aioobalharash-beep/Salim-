@@ -28,6 +28,13 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: "album",
+      title: "Album",
+      type: "string",
+      description:
+        "Album name this release belongs to (leave empty for standalone releases).",
+    }),
+    defineField({
       name: "artist",
       title: "Artist",
       type: "string",
