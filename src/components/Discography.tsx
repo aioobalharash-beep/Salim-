@@ -266,6 +266,11 @@ function SingleRow({
       </div>
 
       <div className="flex-1 flex flex-col justify-center">
+        {release.publishDate && (
+          <p className="font-label text-[10px] uppercase tracking-[0.4em] text-on-surface/40 mb-3">
+            {new Date(release.publishDate).getFullYear()}
+          </p>
+        )}
         <h3 className="font-serif-brand text-xl md:text-[1.4rem] text-on-surface/90 mb-5 leading-snug">
           {release.title}
         </h3>
@@ -301,6 +306,11 @@ function AlbumRow({
       </div>
 
       <div className="flex-1 flex flex-col">
+        {release.publishDate && (
+          <p className="font-label text-[10px] uppercase tracking-[0.4em] text-on-surface/40 mb-3">
+            {new Date(release.publishDate).getFullYear()}
+          </p>
+        )}
         <h3 className="font-serif-brand text-xl md:text-[1.4rem] text-on-surface/90 mb-5 leading-snug">
           {release.title}
         </h3>
