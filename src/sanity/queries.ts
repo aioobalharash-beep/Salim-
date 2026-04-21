@@ -85,7 +85,10 @@ export const audioListQuery = groq`
     _id,
     title,
     releaseType,
-    description,
+    artist,
+    instrumentation,
+    label,
+    country,
     albumCover,
     "audioUrl": audioFile.asset->url,
     tracks[]{

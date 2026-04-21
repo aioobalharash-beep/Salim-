@@ -28,11 +28,24 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: "description",
-      title: "Description",
-      type: "text",
-      rows: 4,
-      description: "Background info about this release.",
+      name: "artist",
+      title: "Artist",
+      type: "string",
+    }),
+    defineField({
+      name: "instrumentation",
+      title: "Instrumentation",
+      type: "string",
+    }),
+    defineField({
+      name: "label",
+      title: "Label",
+      type: "string",
+    }),
+    defineField({
+      name: "country",
+      title: "Country",
+      type: "string",
     }),
     defineField({
       name: "albumCover",
