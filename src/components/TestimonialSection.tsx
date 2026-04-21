@@ -77,11 +77,8 @@ export default function TestimonialSection({
                   key={t._id}
                   className="p-10 border border-outline-variant/15 bg-surface flex flex-col min-h-[260px]"
                 >
-                  <span className="material-symbols-outlined text-primary/25 text-3xl mb-6">
-                    format_quote
-                  </span>
-                  <p className="font-headline text-sm leading-[1.9] text-on-surface-variant/70 flex-grow italic">
-                    &ldquo;{t.content}&rdquo;
+                  <p className="font-headline text-sm leading-[1.9] text-on-surface-variant/70 flex-grow">
+                    {t.content}
                   </p>
                   <div className="mt-8 pt-6 border-t border-outline-variant/10">
                     <p className="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface/60">
