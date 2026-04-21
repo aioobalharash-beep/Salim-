@@ -16,6 +16,7 @@ interface Release {
   _id: string;
   title: string;
   releaseType?: "album" | "single";
+  album?: string;
   artist?: string;
   instrumentation?: string;
   label?: string;
@@ -35,6 +36,7 @@ const seedReleases: Release[] = [
     _id: "seed-1",
     title: "Symphony of Sand",
     releaseType: "album",
+    album: "Symphony of Sand",
     artist: "Orchestre Symphonique National",
     instrumentation: "Full Orchestra",
     label: "Éditions Andalouses",
@@ -215,13 +217,13 @@ function CoverArt({
 }
 
 function SpecsList({ release }: { release: Release }) {
-  const isAlbum = release.releaseType === "album";
-  const items: { label: string; value?: string }[] = [];
-  if (isAlbum) items.push({ label: "Album", value: release.title });
-  items.push({ label: "Artist", value: release.artist });
-  items.push({ label: "Instrumentation", value: release.instrumentation });
-  items.push({ label: "Label", value: release.label });
-  items.push({ label: "Country", value: release.country });
+  const items: { label: string; value?: string }[] = [
+    { label: "Album", value: release.album },
+    { label: "Artist", value: release.artist },
+    { label: "Instrumentation", value: release.instrumentation },
+    { label: "Label", value: release.label },
+    { label: "Country", value: release.country },
+  ];
   const filtered = items.filter((i) => i.value);
   if (filtered.length === 0) return null;
   return (

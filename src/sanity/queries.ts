@@ -85,6 +85,7 @@ export const audioListQuery = groq`
     _id,
     title,
     releaseType,
+    album,
     artist,
     instrumentation,
     label,
