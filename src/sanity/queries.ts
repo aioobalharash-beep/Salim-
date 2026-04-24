@@ -109,6 +109,7 @@ export const galleryListQuery = groq`
   *[_type == "gallery" && defined(image)] {
     _id,
     image,
-    description
+    description,
+    ratio
   }
 `;
