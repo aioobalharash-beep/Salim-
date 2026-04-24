@@ -5,10 +5,13 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { urlFor, type SanityImageSource } from "@/sanity/image";
 
+export type GalleryRatio = "landscape" | "balanced" | "portrait";
+
 export type GalleryItem = {
   _id: string;
   image: SanityImageSource;
   description?: string;
+  ratio?: GalleryRatio;
 };
 
 type RowType = "A" | "B" | "C";
@@ -19,16 +22,31 @@ type Row = {
   items: GalleryItem[];
 };
 
-const ROW_SIZE: Record<RowType, number> = { A: 1, B: 2, C: 3 };
-const ROW_ASPECT: Record<RowType, string> = {
-  A: "aspect-[16/9]",
-  B: "aspect-[4/3]",
-  C: "aspect-[3/4]",
-};
-const ROW_SIZES: Record<RowType, string> = {
-  A: "100vw",
-  B: "50vw",
-  C: "33vw",
+const ROW_FOR: Record<
+  RowType,
+  { pool: GalleryRatio; size: number; aspect: string; cols: string; sizes: string }
+> = {
+  A: {
+    pool: "landscape",
+    size: 1,
+    aspect: "aspect-[16/9]",
+    cols: "md:grid-cols-1",
+    sizes: "100vw",
+  },
+  B: {
+    pool: "balanced",
+    size: 2,
+    aspect: "aspect-[4/3]",
+    cols: "md:grid-cols-2",
+    sizes: "(max-width: 768px) 100vw, 50vw",
+  },
+  C: {
+    pool: "portrait",
+    size: 3,
+    aspect: "aspect-[3/4]",
+    cols: "md:grid-cols-3",
+    sizes: "(max-width: 768px) 100vw, 33vw",
+  },
 };
 
 function shuffle<T>(input: T[]): T[] {
@@ -41,23 +59,41 @@ function shuffle<T>(input: T[]): T[] {
 }
 
 function buildRows(items: GalleryItem[]): Row[] {
-  const pool = shuffle(items);
+  const pools: Record<GalleryRatio, GalleryItem[]> = {
+    landscape: shuffle(items.filter((i) => i.ratio === "landscape")),
+    balanced: shuffle(items.filter((i) => i.ratio === "balanced")),
+    portrait: shuffle(items.filter((i) => i.ratio === "portrait")),
+  };
+
   const rows: Row[] = [];
-  let cursor = 0;
   let rowIndex = 0;
 
-  while (cursor < pool.length) {
-    const remaining = pool.length - cursor;
-    const candidates: RowType[] =
-      remaining >= 3 ? ["A", "B", "C"] : remaining === 2 ? ["A", "B"] : ["A"];
-    const type = candidates[Math.floor(Math.random() * candidates.length)];
-    const size = ROW_SIZE[type];
+  while (pools.landscape.length || pools.balanced.length || pools.portrait.length) {
+    const available: RowType[] = [];
+    if (pools.landscape.length >= 1) available.push("A");
+    if (pools.balanced.length >= 2) available.push("B");
+    if (pools.portrait.length >= 3) available.push("C");
+
+    let type: RowType;
+    if (available.length) {
+      type = available[Math.floor(Math.random() * available.length)];
+    } else if (pools.balanced.length) {
+      type = "B";
+    } else if (pools.portrait.length) {
+      type = "C";
+    } else {
+      break;
+    }
+
+    const { pool, size } = ROW_FOR[type];
+    const take = Math.min(size, pools[pool].length);
+    if (take === 0) break;
+
     rows.push({
       key: `row-${rowIndex}-${type}`,
       type,
-      items: pool.slice(cursor, cursor + size),
+      items: pools[pool].splice(0, take),
     });
-    cursor += size;
     rowIndex += 1;
   }
 
@@ -76,7 +112,7 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
   const active = activeIndex !== null ? flat[activeIndex] ?? null : null;
 
   useEffect(() => {
-    if (active === null) return;
+    if (!active) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setActiveIndex(null);
     };
@@ -108,12 +144,9 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
         {rows.map((row) => {
           const rowStart = runningIndex;
           runningIndex += row.items.length;
+          const { aspect, cols, sizes } = ROW_FOR[row.type];
           return (
-            <div
-              key={row.key}
-              className={`grid gap-0 w-full`}
-              style={{ gridTemplateColumns: `repeat(${row.items.length}, minmax(0, 1fr))` }}
-            >
+            <div key={row.key} className={`grid grid-cols-1 ${cols} gap-0 w-full`}>
               {row.items.map((item, i) => {
                 const index = rowStart + i;
                 return (
@@ -121,7 +154,7 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
                     key={item._id}
                     type="button"
                     onClick={() => setActiveIndex(index)}
-                    className={`relative overflow-hidden ${ROW_ASPECT[row.type]} block w-full cursor-zoom-in focus:outline-none`}
+                    className={`relative overflow-hidden ${aspect} block w-full cursor-zoom-in focus:outline-none`}
                     aria-label={item.description || "Open image"}
                   >
                     <motion.div
@@ -133,7 +166,7 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
                         src={urlFor(item.image).width(1800).quality(85).url()}
                         alt={item.description || "Gallery image"}
                         fill
-                        sizes={ROW_SIZES[row.type]}
+                        sizes={sizes}
                         className="object-cover"
                       />
                     </motion.div>
@@ -166,17 +199,15 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative">
-                <Image
-                  src={urlFor(active.image).width(2200).quality(90).url()}
-                  alt={active.description || "Gallery image"}
-                  width={2200}
-                  height={1500}
-                  sizes="92vw"
-                  className="max-h-[80vh] w-auto h-auto object-contain rounded-sm"
-                  priority
-                />
-              </div>
+              <Image
+                src={urlFor(active.image).width(2200).quality(90).url()}
+                alt={active.description || "Gallery image"}
+                width={2200}
+                height={1500}
+                sizes="92vw"
+                className="max-h-[80vh] w-auto h-auto object-contain rounded-sm"
+                priority
+              />
               {active.description && (
                 <figcaption className="font-body text-sm md:text-base text-surface/90 text-center max-w-2xl leading-relaxed">
                   {active.description}
