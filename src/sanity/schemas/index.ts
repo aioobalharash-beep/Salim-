@@ -8,6 +8,7 @@ import service from "./service";
 import testimonial from "./testimonial";
 import audio from "./audio";
 import gallery from "./gallery";
+import press from "./press";
 
 export const schemaTypes = [
   journal,
@@ -20,4 +21,5 @@ export const schemaTypes = [
   testimonial,
   audio,
   gallery,
+  press,
 ];
