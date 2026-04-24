@@ -113,3 +113,12 @@ export const galleryListQuery = groq`
     ratio
   }
 `;
+
+export const pressListQuery = groq`
+  *[_type == "press"] | order(date desc) {
+    _id,
+    content,
+    sourceText,
+    date
+  }
+`;
