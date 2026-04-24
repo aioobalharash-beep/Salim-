@@ -104,3 +104,11 @@ export const audioListQuery = groq`
 `;
 
 export const discographyListQuery = audioListQuery;
+
+export const galleryListQuery = groq`
+  *[_type == "gallery" && defined(image)] {
+    _id,
+    image,
+    description
+  }
+`;
