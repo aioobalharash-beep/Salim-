@@ -11,21 +11,14 @@ const config: Config = {
     extend: {
       /* ── Stitch Design Tokens ─────────────────────────────────── */
       colors: {
-        // — Primary (Sage Gray) —
-        primary: {
-          DEFAULT: "#586059",
-          dim: "#4d544d",
-          container: "#dde5db",
-          fixed: "#dde5db",
-          "fixed-dim": "#cfd7cd",
-        },
+        // — Primary → Bronze/Gold accent (Palette #3) —
+        primary: 'var(--accent)',
         "on-primary": {
-          DEFAULT: "#f2faf0",
+          DEFAULT: "var(--bg-main)",
           container: "#4c544d",
           fixed: "#3a413b",
           "fixed-variant": "#565d56",
         },
-        "inverse-primary": "#f4fcf2",
 
         // — Secondary —
         secondary: {
@@ -68,37 +61,38 @@ const config: Config = {
           container: "#752121",
         },
 
-        // — Surface (Warm Alabaster) —
+        // — Surface (Warm Ivory — Palette #3) —
         surface: {
-          DEFAULT: "#fafaf5",
-          dim: "#d5dcd0",
-          bright: "#fafaf5",
-          variant: "#dee4da",
-          tint: "#586059",
+          DEFAULT: "#F4F1EA",
+          dim: "#dedad1",
+          bright: "#F4F1EA",
+          variant: "#e5e0d5",
+          tint: "#8C7851",
           container: {
-            DEFAULT: "#ecefe7",
+            DEFAULT: "#ece8df",
             lowest: "#ffffff",
-            low: "#f3f4ee",
-            high: "#e5eae0",
-            highest: "#dee4da",
+            low: "#f2efe8",
+            high: "#e5e0d5",
+            highest: "#dedad1",
           },
         },
         "on-surface": {
-          DEFAULT: "#2e342d",
-          variant: "#5b6159",
+          DEFAULT: "#1A1A1A",
+          variant: "#5b5649",
         },
-        "inverse-surface": "#0d0f0c",
-        "inverse-on-surface": "#9c9d99",
+        "inverse-surface": "#1A1A1A",
+        "inverse-on-surface": "#9c9a96",
 
         // — Outline —
         outline: {
-          DEFAULT: "#767c74",
-          variant: "#aeb4aa",
+          DEFAULT: "#7a7468",
+          variant: "#b5afa4",
         },
 
-        // — Background alias —
-        background: "#fafaf5",
-        "on-background": "#2e342d",
+        // — Background & Foreground (CSS-variable-driven) —
+        background: 'var(--bg-main)',
+        foreground: 'var(--text-main)',
+        "on-background": "#1A1A1A",
       },
 
       borderRadius: {

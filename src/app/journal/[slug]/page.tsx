@@ -50,7 +50,7 @@ export default async function ArticlePage({
   if (!article) notFound();
 
   return (
-    <div className="min-h-screen bg-[#F5F5F0]">
+    <div className="min-h-screen bg-background">
       <article className="pt-44 pb-40">
         {/* ── Back Link ── */}
         <div className="max-w-[700px] mx-auto px-6 md:px-8 mb-20">

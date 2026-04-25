@@ -20,7 +20,7 @@ export default async function JournalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F0] pt-44 pb-40">
+    <div className="min-h-screen bg-background pt-44 pb-40">
       {/* ── Header ── */}
       <section className="max-w-3xl mx-auto px-6 md:px-8 mb-20">
         <p className="font-label text-[10px] uppercase tracking-[0.5em] text-[#586059]/50 mb-8">

@@ -91,7 +91,7 @@ export default function Navbar() {
                   {/* Dropdown */}
                   {mediaOpen && (
                     <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3">
-                      <div className="bg-[#F5F5F0] shadow-lg shadow-on-surface/[0.06] py-3 px-2 min-w-[160px]">
+                      <div className="bg-background shadow-lg shadow-on-surface/[0.06] py-3 px-2 min-w-[160px]">
                         {link.children.map((sub) => {
                           const subActive = pathname.startsWith(sub.href);
                           return (
@@ -167,7 +167,7 @@ export default function Navbar() {
 
       {/* ── Mobile Menu ── */}
       {mobileOpen && (
-        <div className="md:hidden bg-[#F5F5F0] border-t border-outline-variant/10 px-6 pb-8 pt-4">
+        <div className="md:hidden bg-background border-t border-outline-variant/10 px-6 pb-8 pt-4">
           <div className="flex flex-col gap-1">
             {links.map((link) => {
               const isActive =
