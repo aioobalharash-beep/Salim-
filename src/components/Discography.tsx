@@ -90,26 +90,6 @@ function MusicIcon() {
   );
 }
 
-function ShareIcon() {
-  return (
-    <svg
-      width="13"
-      height="13"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="square"
-      strokeLinejoin="miter"
-      aria-hidden="true"
-    >
-      <path d="M12 3v13" />
-      <path d="M7 8l5-5 5 5" />
-      <path d="M5 14v6h14v-6" />
-    </svg>
-  );
-}
-
 function ChevronIcon({ open }: { open: boolean }) {
   return (
     <motion.svg
@@ -129,59 +109,20 @@ function ChevronIcon({ open }: { open: boolean }) {
   );
 }
 
-function ActionLinks({
-  title,
-  purchaseUrl,
-  shareUrl,
-}: {
-  title: string;
-  purchaseUrl?: string;
-  shareUrl?: string;
-}) {
-  const handleShare = async () => {
-    const url =
-      shareUrl ?? (typeof window !== "undefined" ? window.location.href : "");
-    if (!url) return;
-    if (typeof navigator !== "undefined" && navigator.share) {
-      try {
-        await navigator.share({ title, url });
-        return;
-      } catch {
-        // fall through to clipboard
-      }
-    }
-    if (typeof navigator !== "undefined" && navigator.clipboard) {
-      try {
-        await navigator.clipboard.writeText(url);
-      } catch {
-        // no-op
-      }
-    }
-  };
-
-  if (!purchaseUrl && !shareUrl) return null;
+function ActionLinks({ purchaseUrl }: { purchaseUrl?: string }) {
+  if (!purchaseUrl) return null;
 
   return (
-    <div className="flex items-center gap-5 mt-6">
-      {purchaseUrl && (
-        <a
-          href={purchaseUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.2em] text-on-surface/50 hover:text-on-surface transition-colors"
-        >
-          <MusicIcon />
-          <span>Listen</span>
-        </a>
-      )}
-      <button
-        type="button"
-        onClick={handleShare}
+    <div className="flex items-center gap-5 mt-8">
+      <a
+        href={purchaseUrl}
+        target="_blank"
+        rel="noopener noreferrer"
         className="flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.2em] text-on-surface/50 hover:text-on-surface transition-colors"
       >
-        <ShareIcon />
-        <span>Share</span>
-      </button>
+        <MusicIcon />
+        <span>Full Album</span>
+      </a>
     </div>
   );
 }
@@ -264,11 +205,6 @@ function SingleRow({
           {release.title}
         </h3>
         <SpecsList release={release} />
-        <ActionLinks
-          title={release.title}
-          purchaseUrl={release.purchaseUrl}
-          shareUrl={release.shareUrl}
-        />
         <div className="mt-8">
           {release.audioUrl && !useSeed ? (
             <AudioPlayer
@@ -281,6 +217,7 @@ function SingleRow({
             <PlaceholderPlayer />
           )}
         </div>
+        <ActionLinks purchaseUrl={release.purchaseUrl} />
       </div>
     </div>
   );
@@ -320,7 +257,7 @@ function AlbumRow({
           aria-expanded={open}
           className="self-start flex items-center gap-3 px-4 py-2.5 border border-primary/20 hover:border-primary/40 transition-colors font-label text-[10px] uppercase tracking-[0.2em] text-on-surface/60 hover:text-on-surface"
         >
-          <span>{open ? "Hide Tracklist" : "View Tracklist"}</span>
+          <span>Track List</span>
           <ChevronIcon open={open} />
         </button>
 
@@ -366,11 +303,7 @@ function AlbumRow({
           </ol>
         </motion.div>
 
-        <ActionLinks
-          title={release.title}
-          purchaseUrl={release.purchaseUrl}
-          shareUrl={release.shareUrl}
-        />
+        <ActionLinks purchaseUrl={release.purchaseUrl} />
       </div>
     </div>
   );
