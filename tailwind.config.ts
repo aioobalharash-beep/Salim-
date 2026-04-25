@@ -12,7 +12,8 @@ const config: Config = {
       /* ── Stitch Design Tokens ─────────────────────────────────── */
       colors: {
         // — Primary → Bronze/Gold accent (Palette #3) —
-        primary: 'var(--accent)',
+        // Uses <alpha-value> so opacity modifiers (bg-primary/15 etc.) work.
+        primary: 'rgb(var(--accent-rgb) / <alpha-value>)',
         "on-primary": {
           DEFAULT: "var(--bg-main)",
           container: "#4c544d",
@@ -89,10 +90,10 @@ const config: Config = {
           variant: "#b5afa4",
         },
 
-        // — Background & Foreground (CSS-variable-driven) —
-        background: 'var(--bg-main)',
-        foreground: 'var(--text-main)',
-        "on-background": "#1A1A1A",
+        // — Background & Foreground (CSS-variable-driven, opacity-aware) —
+        background: 'rgb(var(--bg-main-rgb) / <alpha-value>)',
+        foreground: 'rgb(var(--text-main-rgb) / <alpha-value>)',
+        "on-background": 'rgb(var(--text-main-rgb) / <alpha-value>)',
       },
 
       borderRadius: {

@@ -88,16 +88,16 @@ export default async function Hero() {
 
               {/* Text — pinned to bottom */}
               <div className="absolute bottom-10 left-10 md:bottom-14 md:left-14">
-                <p className="font-label text-[9px] uppercase tracking-[0.4em] text-[#F5F5F0]/40 mb-3 transition-colors duration-700 group-hover:text-[#F5F5F0]/60">
+                <p className="font-label text-[9px] uppercase tracking-[0.4em] text-background/40 mb-3 transition-colors duration-700 group-hover:text-background/60">
                   {panel.subtitle}
                 </p>
-                <h2 className="font-serif-brand text-3xl md:text-4xl text-[#F5F5F0] font-light tracking-tight transition-transform duration-700 group-hover:translate-x-1">
+                <h2 className="font-serif-brand text-3xl md:text-4xl text-background font-light tracking-tight transition-transform duration-700 group-hover:translate-x-1">
                   {panel.title}
                 </h2>
               </div>
 
               {/* Hover arrow */}
-              <span className="absolute bottom-10 right-10 md:bottom-14 md:right-14 text-[#F5F5F0]/0 group-hover:text-[#F5F5F0]/40 transition-all duration-700 group-hover:translate-x-1 text-sm">
+              <span className="absolute bottom-10 right-10 md:bottom-14 md:right-14 text-background/0 group-hover:text-background/40 transition-all duration-700 group-hover:translate-x-1 text-sm">
                 →
               </span>
             </Link>
@@ -126,16 +126,16 @@ export default async function Hero() {
 
               {/* Text — pinned to bottom */}
               <div className="absolute bottom-10 left-10 md:bottom-14 md:left-14">
-                <p className="font-label text-[9px] uppercase tracking-[0.4em] text-[#F5F5F0]/40 mb-3 transition-colors duration-700 group-hover:text-[#F5F5F0]/60">
+                <p className="font-label text-[9px] uppercase tracking-[0.4em] text-background/40 mb-3 transition-colors duration-700 group-hover:text-background/60">
                   {col.subtitle}
                 </p>
-                <h2 className="font-serif-brand text-3xl md:text-4xl text-[#F5F5F0] font-light tracking-tight transition-transform duration-700 group-hover:translate-x-1">
+                <h2 className="font-serif-brand text-3xl md:text-4xl text-background font-light tracking-tight transition-transform duration-700 group-hover:translate-x-1">
                   {col.title}
                 </h2>
               </div>
 
               {/* Hover arrow */}
-              <span className="absolute bottom-10 right-10 md:bottom-14 md:right-14 text-[#F5F5F0]/0 group-hover:text-[#F5F5F0]/40 transition-all duration-700 group-hover:translate-x-1 text-sm">
+              <span className="absolute bottom-10 right-10 md:bottom-14 md:right-14 text-background/0 group-hover:text-background/40 transition-all duration-700 group-hover:translate-x-1 text-sm">
                 →
               </span>
             </Link>
