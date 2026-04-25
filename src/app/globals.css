@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 :root {
-  /* --- MASTER SWITCHES (Edit these to change the site) --- */
-  --bg-main: #F2EFE9;
-  --text-main: #2B2926;
-  --accent: #B59A5D;
+  /* --- MASTER SWITCHES — Palette #3: Ivory & Ebony --- */
+  --bg-main: #F4F1EA;     /* Warm Ivory */
+  --text-main: #1A1A1A;   /* Deep Ebony */
+  --accent: #8C7851;      /* Muted Bronze/Gold */
 
   /* --- THE MESSENGERS (Linking them to your switches) --- */
   --background: var(--bg-main);
@@ -42,8 +42,8 @@ html {
 }
 
 body {
-  background-color: #fafaf5;
-  color: #2e342d;
+  background-color: var(--bg-main);
+  color: var(--text-main);
   font-family: "Inter", sans-serif;
   -webkit-font-smoothing: antialiased;
 }

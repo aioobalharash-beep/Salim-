@@ -151,7 +151,7 @@ export default async function AboutPage() {
                   alt="Portrait of Salim Dada"
                   fill
                   sizes="(max-width: 768px) 100vw, 40vw"
-                  className="object-cover grayscale opacity-90 contrast-[1.1]"
+                  className="object-cover"
                   priority
                 />
               </div>

@@ -77,12 +77,14 @@ export default async function Hero() {
                 alt={panel.alt}
                 fill
                 sizes="(max-width: 768px) 100vw, 25vw"
-                className="object-cover transition-all duration-1000 ease-out group-hover:scale-105 brightness-[0.35] group-hover:brightness-[0.45]"
+                className="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
                 priority
               />
 
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+              {/* Subtle Ebony→Transparent overlay (Palette #3) — keeps image colour intact while ensuring text legibility */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/70 via-[#1A1A1A]/15 to-transparent" />
+              {/* Whisper-soft bronze tint to harmonise with the Ivory canvas */}
+              <div className="absolute inset-0 bg-[#8C7851]/10 mix-blend-multiply pointer-events-none" />
 
               {/* Text — pinned to bottom */}
               <div className="absolute bottom-10 left-10 md:bottom-14 md:left-14">
@@ -112,13 +114,15 @@ export default async function Hero() {
                   alt={col.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 25vw"
-                  className="object-cover transition-all duration-1000 ease-out group-hover:scale-105 brightness-[0.35] group-hover:brightness-[0.45]"
+                  className="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
                   priority
                 />
               )}
 
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+              {/* Subtle Ebony→Transparent overlay (Palette #3) — keeps image colour intact while ensuring text legibility */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/70 via-[#1A1A1A]/15 to-transparent" />
+              {/* Whisper-soft bronze tint to harmonise with the Ivory canvas */}
+              <div className="absolute inset-0 bg-[#8C7851]/10 mix-blend-multiply pointer-events-none" />
 
               {/* Text — pinned to bottom */}
               <div className="absolute bottom-10 left-10 md:bottom-14 md:left-14">
