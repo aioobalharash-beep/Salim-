@@ -77,25 +77,27 @@ export default async function Hero() {
                 alt={panel.alt}
                 fill
                 sizes="(max-width: 768px) 100vw, 25vw"
-                className="object-cover transition-all duration-1000 ease-out group-hover:scale-105 brightness-[0.35] group-hover:brightness-[0.45]"
+                className="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
                 priority
               />
 
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+              {/* Subtle Ebony→Transparent overlay (Palette #3) — keeps image colour intact while ensuring text legibility */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/70 via-[#1A1A1A]/15 to-transparent" />
+              {/* Whisper-soft bronze tint to harmonise with the Ivory canvas */}
+              <div className="absolute inset-0 bg-[#8C7851]/10 mix-blend-multiply pointer-events-none" />
 
               {/* Text — pinned to bottom */}
               <div className="absolute bottom-10 left-10 md:bottom-14 md:left-14">
-                <p className="font-label text-[9px] uppercase tracking-[0.4em] text-[#F5F5F0]/40 mb-3 transition-colors duration-700 group-hover:text-[#F5F5F0]/60">
+                <p className="font-label text-[9px] uppercase tracking-[0.4em] text-background/40 mb-3 transition-colors duration-700 group-hover:text-background/60">
                   {panel.subtitle}
                 </p>
-                <h2 className="font-serif-brand text-3xl md:text-4xl text-[#F5F5F0] font-light tracking-tight transition-transform duration-700 group-hover:translate-x-1">
+                <h2 className="font-serif-brand text-3xl md:text-4xl text-background font-light tracking-tight transition-transform duration-700 group-hover:translate-x-1">
                   {panel.title}
                 </h2>
               </div>
 
               {/* Hover arrow */}
-              <span className="absolute bottom-10 right-10 md:bottom-14 md:right-14 text-[#F5F5F0]/0 group-hover:text-[#F5F5F0]/40 transition-all duration-700 group-hover:translate-x-1 text-sm">
+              <span className="absolute bottom-10 right-10 md:bottom-14 md:right-14 text-background/0 group-hover:text-background/40 transition-all duration-700 group-hover:translate-x-1 text-sm">
                 →
               </span>
             </Link>
@@ -112,26 +114,28 @@ export default async function Hero() {
                   alt={col.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 25vw"
-                  className="object-cover transition-all duration-1000 ease-out group-hover:scale-105 brightness-[0.35] group-hover:brightness-[0.45]"
+                  className="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
                   priority
                 />
               )}
 
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+              {/* Subtle Ebony→Transparent overlay (Palette #3) — keeps image colour intact while ensuring text legibility */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/70 via-[#1A1A1A]/15 to-transparent" />
+              {/* Whisper-soft bronze tint to harmonise with the Ivory canvas */}
+              <div className="absolute inset-0 bg-[#8C7851]/10 mix-blend-multiply pointer-events-none" />
 
               {/* Text — pinned to bottom */}
               <div className="absolute bottom-10 left-10 md:bottom-14 md:left-14">
-                <p className="font-label text-[9px] uppercase tracking-[0.4em] text-[#F5F5F0]/40 mb-3 transition-colors duration-700 group-hover:text-[#F5F5F0]/60">
+                <p className="font-label text-[9px] uppercase tracking-[0.4em] text-background/40 mb-3 transition-colors duration-700 group-hover:text-background/60">
                   {col.subtitle}
                 </p>
-                <h2 className="font-serif-brand text-3xl md:text-4xl text-[#F5F5F0] font-light tracking-tight transition-transform duration-700 group-hover:translate-x-1">
+                <h2 className="font-serif-brand text-3xl md:text-4xl text-background font-light tracking-tight transition-transform duration-700 group-hover:translate-x-1">
                   {col.title}
                 </h2>
               </div>
 
               {/* Hover arrow */}
-              <span className="absolute bottom-10 right-10 md:bottom-14 md:right-14 text-[#F5F5F0]/0 group-hover:text-[#F5F5F0]/40 transition-all duration-700 group-hover:translate-x-1 text-sm">
+              <span className="absolute bottom-10 right-10 md:bottom-14 md:right-14 text-background/0 group-hover:text-background/40 transition-all duration-700 group-hover:translate-x-1 text-sm">
                 →
               </span>
             </Link>

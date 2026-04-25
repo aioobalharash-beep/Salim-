@@ -151,7 +151,7 @@ export default async function AboutPage() {
                   alt="Portrait of Salim Dada"
                   fill
                   sizes="(max-width: 768px) 100vw, 40vw"
-                  className="object-cover grayscale opacity-90 contrast-[1.1]"
+                  className="object-cover"
                   priority
                 />
               </div>
@@ -228,8 +228,8 @@ export default async function AboutPage() {
         </div>
 
         <div className="relative max-w-5xl mx-auto">
-          {/* Central vertical line */}
-          <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-primary/15 md:-translate-x-px" />
+          {/* Central vertical line — Bronze (var(--accent)) at 40% for clear visibility on Ivory */}
+          <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-primary/40 md:-translate-x-px" />
 
           <div className="space-y-0">
             {chronology.map((item, i) => {
@@ -239,8 +239,8 @@ export default async function AboutPage() {
                   key={`${item.year}-${i}`}
                   className="relative grid grid-cols-1 md:grid-cols-2"
                 >
-                  {/* ── Dot on the centre line ── */}
-                  <div className="absolute left-4 md:left-1/2 top-4 md:top-5 w-[7px] h-[7px] -translate-x-[3px] md:-translate-x-[3.5px] rounded-full bg-primary/25 ring-[3px] ring-surface z-10" />
+                  {/* ── Dot on the centre line — solid Bronze (var(--accent)) ringed by Ivory ── */}
+                  <div className="absolute left-4 md:left-1/2 top-4 md:top-5 w-[7px] h-[7px] -translate-x-[3px] md:-translate-x-[3.5px] rounded-full bg-primary ring-[3px] ring-background z-10" />
 
                   {/* ── LEFT column ── */}
                   <div
@@ -253,10 +253,10 @@ export default async function AboutPage() {
                     {isLeft ? (
                       <>
                         <div className="hidden md:flex justify-end mb-3">
-                          <div className="w-10 h-px bg-primary/15" />
+                          <div className="w-10 h-px bg-primary/40" />
                         </div>
-                        <div className="w-10 h-px bg-primary/15 mb-3 md:hidden" />
-                        <span className="font-serif-brand text-2xl md:text-3xl text-primary/30 block mb-2">
+                        <div className="w-10 h-px bg-primary/40 mb-3 md:hidden" />
+                        <span className="font-serif-brand text-2xl md:text-3xl text-primary/60 block mb-2">
                           {item.year}
                         </span>
                         <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-2">
@@ -283,8 +283,8 @@ export default async function AboutPage() {
                   >
                     {!isLeft && (
                       <>
-                        <div className="w-10 h-px bg-primary/15 mb-3" />
-                        <span className="font-serif-brand text-2xl md:text-3xl text-primary/30 block mb-2">
+                        <div className="w-10 h-px bg-primary/40 mb-3" />
+                        <span className="font-serif-brand text-2xl md:text-3xl text-primary/60 block mb-2">
                           {item.year}
                         </span>
                         <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-2">
@@ -302,8 +302,8 @@ export default async function AboutPage() {
                   {/* ── Mobile: right-side items render in left col ── */}
                   {!isLeft && (
                     <div className="md:hidden pl-12 pb-8">
-                      <div className="w-10 h-px bg-primary/15 mb-3" />
-                      <span className="font-serif-brand text-2xl text-primary/30 block mb-2">
+                      <div className="w-10 h-px bg-primary/40 mb-3" />
+                      <span className="font-serif-brand text-2xl text-primary/60 block mb-2">
                         {item.year}
                       </span>
                       <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-2">
