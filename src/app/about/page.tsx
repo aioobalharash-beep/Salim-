@@ -21,6 +21,8 @@ interface ChronologyItem {
 
 interface AboutData {
   profileImage?: SanityImageSource;
+  heroTitle?: string;
+  bioTitle?: string;
   bio?: PortableTextBlock[];
   mainBio?: PortableTextBlock[];
   shortIntro?: string;
@@ -109,6 +111,8 @@ export default async function AboutPage() {
   }
 
   const pullQuote = about?.pullQuote || seed.pullQuote;
+  const heroTitle = about?.heroTitle || "Between Silence & Sound.";
+  const bioTitle = about?.bioTitle;
   const hasSanityImage = !!about?.profileImage;
   const hasSanityBio = (about?.bio?.length ?? 0) > 0;
   const hasSanityMainBio = (about?.mainBio?.length ?? 0) > 0;
@@ -125,9 +129,8 @@ export default async function AboutPage() {
           <span className="text-primary opacity-60 tracking-[0.2em] uppercase mb-6 block font-label text-xs">
             The Narrative
           </span>
-          <h1 className="font-serif-brand text-6xl md:text-8xl font-light leading-tight text-on-surface tracking-tighter">
-            Between <br />
-            <span className="italic">Silence &amp; Sound.</span>
+          <h1 className="font-serif-brand text-6xl md:text-8xl font-light leading-tight text-on-surface tracking-tighter italic">
+            {heroTitle}
           </h1>
         </div>
       </section>
@@ -164,6 +167,11 @@ export default async function AboutPage() {
           {/* Biography Text */}
           <div className="md:col-span-7">
             <div className="max-w-2xl">
+              {bioTitle && (
+                <h2 className="font-serif-brand text-3xl md:text-4xl font-light leading-tight text-on-surface tracking-tight mb-10">
+                  {bioTitle}
+                </h2>
+              )}
               {hasSanityBio ? (
                 <div>
                   <PortableText

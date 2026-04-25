@@ -13,6 +13,20 @@ export default defineType({
       options: { hotspot: true },
     }),
     defineField({
+      name: "heroTitle",
+      title: "Hero Title",
+      type: "string",
+      description:
+        "The big centered quote/heading at the top of the About page.",
+    }),
+    defineField({
+      name: "bioTitle",
+      title: "Biography Title",
+      type: "string",
+      description:
+        "Heading shown directly above the biography text, next to the portrait.",
+    }),
+    defineField({
       name: "shortIntro",
       title: "Short Introduction",
       type: "text",
