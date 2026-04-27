@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
 import PageHeader from "@/components/PageHeader";
-import PressGrid, { type PressItem } from "@/components/PressGrid";
+import ReviewsGrid, { type ReviewItem } from "@/components/ReviewsGrid";
 import { client } from "@/sanity/client";
-import { pressListQuery } from "@/sanity/queries";
+import { reviewsListQuery } from "@/sanity/queries";
 
 export const metadata: Metadata = {
-  title: "Press — Salim Dada",
+  title: "Reviews — Salim Dada",
   description:
-    "Selected press quotes and coverage of Salim Dada's work across publications.",
+    "Selected reviews and coverage of Salim Dada's work across publications.",
 };
 
 export const revalidate = 60;
 
-export default async function PressPage() {
-  let items: PressItem[] = [];
+export default async function ReviewsPage() {
+  let items: ReviewItem[] = [];
   try {
-    items = (await client.fetch<PressItem[]>(pressListQuery)) ?? [];
+    items = (await client.fetch<ReviewItem[]>(reviewsListQuery)) ?? [];
   } catch {
     items = [];
   }
@@ -23,13 +23,13 @@ export default async function PressPage() {
   return (
     <>
       <PageHeader
-        tag="Press"
-        title="Press"
+        tag="Reviews"
+        title="Reviews"
         description="Selected quotes and coverage — reflections on the work from across publications and stages."
       />
 
       <section className="px-6 md:px-12 max-w-screen-2xl mx-auto pb-32">
-        <PressGrid items={items} />
+        <ReviewsGrid items={items} />
       </section>
     </>
   );

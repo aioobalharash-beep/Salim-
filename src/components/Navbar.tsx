@@ -7,7 +7,7 @@ import { useState, useRef, useEffect } from "react";
 const mediaSubLinks = [
   { href: "/media/discography", label: "Discography" },
   { href: "/media/video", label: "Video" },
-  { href: "/media/press", label: "Press" },
+  { href: "/media/reviews", label: "Reviews" },
   { href: "/media/gallery", label: "Gallery" },
 ];
 
