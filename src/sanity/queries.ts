@@ -116,12 +116,13 @@ export const galleryListQuery = groq`
   }
 `;
 
-export const pressListQuery = groq`
-  *[_type == "press"] | order(date desc) {
+export const reviewsListQuery = groq`
+  *[_type == "reviews"] | order(year desc) {
     _id,
     content,
     sourceText,
-    date
+    place,
+    year
   }
 `;
 

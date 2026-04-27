@@ -45,7 +45,7 @@ export default defineType({
                   { title: "Media", value: "/media" },
                   { title: "Media — Discography", value: "/media/discography" },
                   { title: "Media — Video", value: "/media/video" },
-                  { title: "Media — Press", value: "/media/press" },
+                  { title: "Media — Reviews", value: "/media/reviews" },
                   { title: "Media — Gallery", value: "/media/gallery" },
                   { title: "Journal", value: "/journal" },
                   { title: "About Salim", value: "/about" },
