@@ -120,6 +120,7 @@ export const reviewsListQuery = groq`
   *[_type == "reviews"] | order(year desc) {
     _id,
     content,
+    translation,
     sourceText,
     place,
     year
