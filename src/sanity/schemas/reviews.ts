@@ -11,14 +11,22 @@ export default defineType({
       title: "Content",
       type: "text",
       rows: 4,
-      description: "The main review snippet.",
+      description: "The main review snippet (original language).",
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "translation",
+      title: "Translation",
+      type: "text",
+      rows: 4,
+      description:
+        "Optional — English or Arabic translation of the original quote. Shown on hover/click of the translate icon.",
     }),
     defineField({
       name: "sourceText",
       title: "Author / Source",
       type: "string",
-      description: "Author or publication (italicised at the bottom).",
+      description: "Author or publication (italicised in the metadata line).",
       validation: (Rule) => Rule.required(),
     }),
     defineField({
