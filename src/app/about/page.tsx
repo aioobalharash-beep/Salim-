@@ -21,6 +21,7 @@ interface ChronologyItem {
 
 interface AboutData {
   profileImage?: SanityImageSource;
+  imageCaption?: string;
   heroTitle?: string;
   heroSubtitle?: string;
   bioTitle?: string;
@@ -117,6 +118,7 @@ export default async function AboutPage() {
   const heroSubtitle = about?.heroSubtitle;
   const bioTitle = about?.bioTitle;
   const timelineTitle = about?.timelineTitle || "A Chronology of Precision";
+  const imageCaption = about?.imageCaption || "Biographical Archive 001";
   const hasSanityImage = !!about?.profileImage;
   const hasSanityBio = (about?.bio?.length ?? 0) > 0;
   const hasSanityMainBio = (about?.mainBio?.length ?? 0) > 0;
@@ -168,7 +170,7 @@ export default async function AboutPage() {
               <div className="mt-8 flex items-center gap-4">
                 <div className="h-[1px] w-12 bg-outline-variant/30" />
                 <span className="font-label text-[10px] uppercase tracking-widest text-primary">
-                  Biographical Archive 001
+                  {imageCaption}
                 </span>
               </div>
             </div>
@@ -249,8 +251,8 @@ export default async function AboutPage() {
                   key={`${item.year}-${i}`}
                   className="relative grid grid-cols-1 md:grid-cols-2"
                 >
-                  {/* ── Dot on the centre line — solid Bronze (var(--accent)) ringed by Ivory ── */}
-                  <div className="absolute left-4 md:left-1/2 top-4 md:top-5 w-[7px] h-[7px] -translate-x-[3px] md:-translate-x-[3.5px] rounded-full bg-primary ring-[3px] ring-background z-10" />
+                  {/* ── Dot on the centre line — vertically centered with the Year text ── */}
+                  <div className="absolute left-4 md:left-1/2 top-[14px] md:top-[18px] w-[7px] h-[7px] -translate-x-[3px] md:-translate-x-[3.5px] rounded-full bg-primary ring-[3px] ring-background z-10" />
 
                   {/* ── LEFT column ── */}
                   <div
@@ -258,15 +260,11 @@ export default async function AboutPage() {
                       isLeft
                         ? "md:pr-16 md:text-right"
                         : "md:pr-16 md:text-right md:order-1"
-                    } pb-8 md:pb-12`}
+                    } pb-5 md:pb-7`}
                   >
                     {isLeft ? (
                       <>
-                        <div className="hidden md:flex justify-end mb-3">
-                          <div className="w-10 h-px bg-primary/40" />
-                        </div>
-                        <div className="w-10 h-px bg-primary/40 mb-3 md:hidden" />
-                        <span className="font-serif-brand text-2xl md:text-3xl text-primary/60 block mb-2">
+                        <span className="font-serif-brand font-bold text-2xl md:text-3xl text-primary block leading-none mb-2">
                           {item.year}
                         </span>
                         <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-2">
@@ -289,12 +287,11 @@ export default async function AboutPage() {
                       isLeft
                         ? "md:pl-16"
                         : "md:pl-16 md:order-2"
-                    } pb-12`}
+                    } pb-7`}
                   >
                     {!isLeft && (
                       <>
-                        <div className="w-10 h-px bg-primary/40 mb-3" />
-                        <span className="font-serif-brand text-2xl md:text-3xl text-primary/60 block mb-2">
+                        <span className="font-serif-brand font-bold text-2xl md:text-3xl text-primary block leading-none mb-2">
                           {item.year}
                         </span>
                         <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-2">
@@ -311,9 +308,8 @@ export default async function AboutPage() {
 
                   {/* ── Mobile: right-side items render in left col ── */}
                   {!isLeft && (
-                    <div className="md:hidden pl-12 pb-8">
-                      <div className="w-10 h-px bg-primary/40 mb-3" />
-                      <span className="font-serif-brand text-2xl text-primary/60 block mb-2">
+                    <div className="md:hidden pl-12 pb-5">
+                      <span className="font-serif-brand font-bold text-2xl text-primary block leading-none mb-2">
                         {item.year}
                       </span>
                       <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-2">

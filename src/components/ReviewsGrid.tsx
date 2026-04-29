@@ -21,6 +21,44 @@ function shuffle<T>(input: T[]): T[] {
   return arr;
 }
 
+// Detect script of the review text so we can apply the correct font:
+//  - Arabic block (U+0600–U+06FF, U+0750–U+077F, U+08A0–U+08FF, U+FB50–U+FDFF, U+FE70–U+FEFF) → Aref Ruqaa 400
+//  - Latin (default)                                                                          → Playfair Display 400 Italic
+//  - Anything else (Cyrillic, etc.)                                                           → system font fallback
+type Script = "arabic" | "latin" | "other";
+
+const ARABIC_RE =
+  /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/;
+const CYRILLIC_RE = /[Ѐ-ӿԀ-ԯ]/;
+
+function detectScript(text: string): Script {
+  if (ARABIC_RE.test(text)) return "arabic";
+  // Cyrillic — fall back to system serif rather than forcing Playfair Italic
+  if (CYRILLIC_RE.test(text)) return "other";
+  return "latin";
+}
+
+function fontClassForScript(script: Script): string {
+  switch (script) {
+    case "arabic":
+      return "font-arabic-serif font-normal not-italic";
+    case "latin":
+      return "font-serif-brand font-normal italic";
+    case "other":
+    default:
+      return "font-headline font-normal";
+  }
+}
+
+function langForScript(script: Script): string | undefined {
+  if (script === "arabic") return "ar";
+  return undefined;
+}
+
+function dirForScript(script: Script): "rtl" | "ltr" {
+  return script === "arabic" ? "rtl" : "ltr";
+}
+
 function ReviewCard({ review }: { review: ReviewItem }) {
   const [translated, setTranslated] = useState(false);
   const hasTranslation = Boolean(review.translation?.trim());
@@ -29,6 +67,10 @@ function ReviewCard({ review }: { review: ReviewItem }) {
   const meta = [review.sourceText, review.place, review.year]
     .filter(Boolean)
     .join(", ");
+  const script = detectScript(text);
+  const fontClass = fontClassForScript(script);
+  const lang = langForScript(script);
+  const dir = dirForScript(script);
 
   return (
     <article
@@ -39,11 +81,13 @@ function ReviewCard({ review }: { review: ReviewItem }) {
       <AnimatePresence mode="wait" initial={false}>
         <motion.p
           key={showing}
+          lang={lang}
+          dir={dir}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.35, ease: "easeOut" }}
-          className="font-headline text-lg md:text-xl leading-[2] text-on-surface-variant/80 max-w-3xl mx-auto"
+          className={`${fontClass} text-2xl md:text-3xl leading-[1.7] text-on-surface/85 max-w-3xl mx-auto text-center`}
         >
           {text}
         </motion.p>

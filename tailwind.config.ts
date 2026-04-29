@@ -108,6 +108,7 @@ const config: Config = {
         body: ["Inter", "sans-serif"],
         label: ["Inter", "sans-serif"],
         "serif-brand": ['"Playfair Display"', "serif"],
+        "arabic-serif": ['"Aref Ruqaa"', "serif"],
       },
 
       boxShadow: {

@@ -13,6 +13,13 @@ export default defineType({
       options: { hotspot: true },
     }),
     defineField({
+      name: "imageCaption",
+      title: "Image Caption / Photographer Credit",
+      type: "string",
+      description:
+        "Small caption shown below the profile image (e.g. photographer credit or archive label).",
+    }),
+    defineField({
       name: "heroTitle",
       title: "Hero Title",
       type: "string",
