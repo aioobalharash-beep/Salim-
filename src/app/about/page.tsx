@@ -22,11 +22,13 @@ interface ChronologyItem {
 interface AboutData {
   profileImage?: SanityImageSource;
   heroTitle?: string;
+  heroSubtitle?: string;
   bioTitle?: string;
   bio?: PortableTextBlock[];
   mainBio?: PortableTextBlock[];
   shortIntro?: string;
   pullQuote?: string;
+  timelineTitle?: string;
   chronology?: ChronologyItem[];
 }
 
@@ -112,7 +114,9 @@ export default async function AboutPage() {
 
   const pullQuote = about?.pullQuote || seed.pullQuote;
   const heroTitle = about?.heroTitle || "Between Silence & Sound.";
+  const heroSubtitle = about?.heroSubtitle;
   const bioTitle = about?.bioTitle;
+  const timelineTitle = about?.timelineTitle || "A Chronology of Precision";
   const hasSanityImage = !!about?.profileImage;
   const hasSanityBio = (about?.bio?.length ?? 0) > 0;
   const hasSanityMainBio = (about?.mainBio?.length ?? 0) > 0;
@@ -132,6 +136,11 @@ export default async function AboutPage() {
           <h1 className="font-serif-brand text-6xl md:text-8xl font-light leading-tight text-on-surface tracking-tighter italic">
             {heroTitle}
           </h1>
+          {heroSubtitle && (
+            <p className="font-headline text-lg md:text-xl leading-relaxed text-on-surface-variant/70 mt-8 max-w-2xl mx-auto">
+              {heroSubtitle}
+            </p>
+          )}
         </div>
       </section>
 
@@ -141,17 +150,18 @@ export default async function AboutPage() {
           {/* Sticky Portrait */}
           <div className="md:col-span-5">
             <div className="sticky top-40">
-              <div className="aspect-[4/5] bg-surface-container-low overflow-hidden rounded-lg relative">
+              <div className="bg-surface-container-low rounded-lg relative">
                 <Image
                   src={
                     hasSanityImage
-                      ? urlFor(about!.profileImage!).width(800).height(1000).url()
+                      ? urlFor(about!.profileImage!).width(1200).url()
                       : seed.portraitUrl
                   }
                   alt="Portrait of Salim Dada"
-                  fill
+                  width={1200}
+                  height={1500}
                   sizes="(max-width: 768px) 100vw, 40vw"
-                  className="object-cover"
+                  className="w-full h-auto object-contain rounded-lg"
                   priority
                 />
               </div>
@@ -223,7 +233,7 @@ export default async function AboutPage() {
             Career Timeline
           </p>
           <h2 className="font-serif-brand text-4xl md:text-5xl italic text-on-surface font-light">
-            A Chronology of Precision
+            {timelineTitle}
           </h2>
         </div>
 

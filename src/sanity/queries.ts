@@ -38,11 +38,13 @@ export const aboutQuery = groq`
   *[_type == "about"][0] {
     profileImage,
     heroTitle,
+    heroSubtitle,
     bioTitle,
     bio,
     mainBio,
     shortIntro,
     pullQuote,
+    timelineTitle,
     chronology[] {
       year,
       title,
