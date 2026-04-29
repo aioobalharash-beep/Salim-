@@ -31,21 +31,34 @@ function ReviewCard({ review }: { review: ReviewItem }) {
     .join(", ");
 
   return (
-    <article className="group relative p-8 bg-surface-container-low border border-primary/20 flex flex-col min-h-[220px]">
-      <div className="relative flex-1 pr-4 pb-20">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.p
-            key={showing}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
-            className="font-body text-sm leading-[1.8] text-on-surface-variant/80"
-          >
-            {text}
-          </motion.p>
-        </AnimatePresence>
-      </div>
+    <article
+      className="group relative text-center"
+      onMouseEnter={() => hasTranslation && setTranslated(true)}
+      onMouseLeave={() => hasTranslation && setTranslated(false)}
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.p
+          key={showing}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+          className="font-headline text-lg md:text-xl leading-[2] text-on-surface-variant/80 max-w-3xl mx-auto"
+        >
+          {text}
+        </motion.p>
+      </AnimatePresence>
+
+      <p className="mt-8 font-body text-xs text-on-surface/70 text-center">
+        <span className="italic">{review.sourceText}</span>
+        {(review.place || review.year) && (
+          <span className="text-on-surface/55 not-italic">
+            {review.place ? `, ${review.place}` : ""}
+            {review.year ? `, ${review.year}` : ""}
+          </span>
+        )}
+        <span className="sr-only">{meta}</span>
+      </p>
 
       {hasTranslation && (
         <button
@@ -55,7 +68,7 @@ function ReviewCard({ review }: { review: ReviewItem }) {
             showing === "translation" ? "Show original" : "Show translation"
           }
           aria-pressed={showing === "translation"}
-          className={`absolute top-5 right-5 w-8 h-8 flex items-center justify-center text-on-surface/60 hover:text-primary transition-all duration-300 focus:outline-none focus-visible:opacity-100 ${
+          className={`absolute top-0 right-0 w-8 h-8 flex items-center justify-center text-on-surface/60 hover:text-primary transition-all duration-300 focus:outline-none focus-visible:opacity-100 ${
             showing === "translation"
               ? "opacity-100 text-primary"
               : "opacity-0 group-hover:opacity-100"
@@ -66,17 +79,6 @@ function ReviewCard({ review }: { review: ReviewItem }) {
           </span>
         </button>
       )}
-
-      <p className="absolute bottom-6 right-6 text-right font-body text-xs text-on-surface/70">
-        <span className="italic">{review.sourceText}</span>
-        {(review.place || review.year) && (
-          <span className="text-on-surface/55 not-italic">
-            {review.place ? `, ${review.place}` : ""}
-            {review.year ? `, ${review.year}` : ""}
-          </span>
-        )}
-        <span className="sr-only">{meta}</span>
-      </p>
     </article>
   );
 }
@@ -91,7 +93,7 @@ export default function ReviewsGrid({ items }: { items: ReviewItem[] }) {
   if (ordered.length === 0) return null;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div className="flex flex-col items-center gap-32 md:gap-48 py-16">
       {ordered.map((r) => (
         <ReviewCard key={r._id} review={r} />
       ))}

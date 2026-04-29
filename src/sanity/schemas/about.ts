@@ -20,6 +20,14 @@ export default defineType({
         "The big centered quote/heading at the top of the About page.",
     }),
     defineField({
+      name: "heroSubtitle",
+      title: "Hero Subtitle",
+      type: "text",
+      rows: 2,
+      description:
+        "Subtitle rendered directly underneath the big centered hero title.",
+    }),
+    defineField({
       name: "bioTitle",
       title: "Biography Title",
       type: "string",
@@ -85,6 +93,13 @@ export default defineType({
       ],
       description:
         "Extended narrative biography with full rich text — displayed in the dedicated long-form section.",
+    }),
+    defineField({
+      name: "timelineTitle",
+      title: "Timeline Title",
+      type: "string",
+      description:
+        "Heading shown above the chronology timeline (replaces the hardcoded 'A Chronology of Precision').",
     }),
     defineField({
       name: "chronology",
