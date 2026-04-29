@@ -37,6 +37,7 @@ export const heroSettingsQuery = groq`
 export const aboutQuery = groq`
   *[_type == "about"][0] {
     profileImage,
+    imageCaption,
     heroTitle,
     heroSubtitle,
     bioTitle,
