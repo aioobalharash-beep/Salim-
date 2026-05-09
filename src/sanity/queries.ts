@@ -1,7 +1,7 @@
 import { groq } from "next-sanity";
 
-export const journalListQuery = groq`
-  *[_type == "journal"] | order(publishedAt desc) {
+export const articlesListQuery = groq`
+  *[_type == "articles"] | order(publishedAt desc) {
     title,
     "slug": slug.current,
     category,
@@ -11,8 +11,8 @@ export const journalListQuery = groq`
   }
 `;
 
-export const journalBySlugQuery = groq`
-  *[_type == "journal" && slug.current == $slug][0] {
+export const articlesBySlugQuery = groq`
+  *[_type == "articles" && slug.current == $slug][0] {
     title,
     "slug": slug.current,
     category,
@@ -104,6 +104,7 @@ export const audioListQuery = groq`
     },
     purchaseUrl,
     shareUrl,
+    watchUrl,
     publishDate
   }
 `;

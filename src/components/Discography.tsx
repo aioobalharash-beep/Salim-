@@ -26,6 +26,7 @@ interface Release {
   tracks?: Track[];
   purchaseUrl?: string;
   shareUrl?: string;
+  watchUrl?: string;
   publishDate?: string;
 }
 
@@ -109,20 +110,57 @@ function ChevronIcon({ open }: { open: boolean }) {
   );
 }
 
-function ActionLinks({ purchaseUrl }: { purchaseUrl?: string }) {
-  if (!purchaseUrl) return null;
+function WatchIcon() {
+  return (
+    <svg
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <polygon points="5 3 19 12 5 21 5 3" />
+    </svg>
+  );
+}
+
+function ActionLinks({
+  purchaseUrl,
+  watchUrl,
+}: {
+  purchaseUrl?: string;
+  watchUrl?: string;
+}) {
+  if (!purchaseUrl && !watchUrl) return null;
 
   return (
     <div className="flex items-center gap-5 mt-8">
-      <a
-        href={purchaseUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.2em] text-on-surface/50 hover:text-on-surface transition-colors"
-      >
-        <MusicIcon />
-        <span>Full Album</span>
-      </a>
+      {purchaseUrl && (
+        <a
+          href={purchaseUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.2em] text-on-surface/50 hover:text-on-surface transition-colors"
+        >
+          <MusicIcon />
+          <span>Full Album</span>
+        </a>
+      )}
+      {watchUrl && (
+        <a
+          href={watchUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.2em] text-on-surface/50 hover:text-on-surface transition-colors"
+        >
+          <WatchIcon />
+          <span>Watch</span>
+        </a>
+      )}
     </div>
   );
 }
@@ -217,7 +255,10 @@ function SingleRow({
             <PlaceholderPlayer />
           )}
         </div>
-        <ActionLinks purchaseUrl={release.purchaseUrl} />
+        <ActionLinks
+          purchaseUrl={release.purchaseUrl}
+          watchUrl={release.watchUrl}
+        />
       </div>
     </div>
   );
@@ -275,6 +316,10 @@ function AlbumRow({
           <ol className="mt-6 divide-y divide-primary/10 border-t border-primary/15">
             {tracks.map((track, idx) => {
               const trackKey = `${release._id}:${track._key}`;
+              const nextTrack = tracks[idx + 1];
+              const nextTrackKey = nextTrack
+                ? `${release._id}:${nextTrack._key}`
+                : null;
               return (
                 <li key={track._key} className="py-4">
                   <div className="flex items-start gap-4">
@@ -291,6 +336,11 @@ function AlbumRow({
                           trackId={trackKey}
                           activeTrackId={activeTrackId}
                           onPlay={setActiveTrackId}
+                          onEnded={
+                            nextTrackKey
+                              ? () => setActiveTrackId(nextTrackKey)
+                              : undefined
+                          }
                         />
                       ) : (
                         <PlaceholderPlayer />
@@ -303,7 +353,10 @@ function AlbumRow({
           </ol>
         </motion.div>
 
-        <ActionLinks purchaseUrl={release.purchaseUrl} />
+        <ActionLinks
+          purchaseUrl={release.purchaseUrl}
+          watchUrl={release.watchUrl}
+        />
       </div>
     </div>
   );

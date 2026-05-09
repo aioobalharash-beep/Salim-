@@ -1,4 +1,4 @@
-import journal from "./journal";
+import articles from "./articles";
 import media from "./media";
 import shop from "./shop";
 import about from "./about";
@@ -13,7 +13,7 @@ import video from "./video";
 import catalogue from "./catalogue";
 
 export const schemaTypes = [
-  journal,
+  articles,
   media,
   shop,
   about,

@@ -3,11 +3,11 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PortableText, type PortableTextBlock } from "next-sanity";
 import { client } from "@/sanity/client";
-import { journalBySlugQuery } from "@/sanity/queries";
+import { articlesBySlugQuery } from "@/sanity/queries";
 
 export const revalidate = 60;
 
-interface JournalArticle {
+interface Article {
   title: string;
   slug: string;
   category: string | null;
@@ -16,8 +16,8 @@ interface JournalArticle {
   body: PortableTextBlock[] | null;
 }
 
-async function getArticle(slug: string): Promise<JournalArticle | null> {
-  return client.fetch(journalBySlugQuery, { slug });
+async function getArticle(slug: string): Promise<Article | null> {
+  return client.fetch(articlesBySlugQuery, { slug });
 }
 
 export async function generateMetadata({
@@ -55,14 +55,14 @@ export default async function ArticlePage({
         {/* ── Back Link ── */}
         <div className="max-w-[700px] mx-auto px-6 md:px-8 mb-20">
           <Link
-            href="/journal"
+            href="/articles"
             className="inline-flex items-center gap-2.5 group"
           >
             <span className="text-primary/30 group-hover:text-primary/60 group-hover:-translate-x-0.5 transition-all duration-300 text-xs">
               ←
             </span>
             <span className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/30 group-hover:text-primary/60 transition-colors duration-300">
-              Journal
+              Articles
             </span>
           </Link>
         </div>
@@ -149,7 +149,7 @@ export default async function ArticlePage({
         <footer className="max-w-[700px] mx-auto px-6 md:px-8 mt-28 pt-14 border-t border-foreground/[0.04]">
           <div className="flex items-center justify-between">
             <Link
-              href="/journal"
+              href="/articles"
               className="inline-flex items-center gap-3 group"
             >
               <span className="text-primary/30 group-hover:text-primary/60 group-hover:-translate-x-0.5 transition-all duration-300 text-xs">

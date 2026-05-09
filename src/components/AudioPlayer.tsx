@@ -7,6 +7,7 @@ interface AudioPlayerProps {
   trackId: string;
   activeTrackId: string | null;
   onPlay: (id: string) => void;
+  onEnded?: () => void;
 }
 
 function formatTime(seconds: number): string {
@@ -21,6 +22,7 @@ export default function AudioPlayer({
   trackId,
   activeTrackId,
   onPlay,
+  onEnded,
 }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
@@ -28,11 +30,20 @@ export default function AudioPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  // Pause when another track starts
+  // Pause when another track starts; auto-play when this track becomes active externally
   useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
     if (activeTrackId !== trackId && playing) {
-      audioRef.current?.pause();
+      audio.pause();
       setPlaying(false);
+    } else if (activeTrackId === trackId && !playing) {
+      const result = audio.play();
+      if (result && typeof result.then === "function") {
+        result.then(() => setPlaying(true)).catch(() => {});
+      } else {
+        setPlaying(true);
+      }
     }
   }, [activeTrackId, trackId, playing]);
 
@@ -65,6 +76,7 @@ export default function AudioPlayer({
   const handleEnded = () => {
     setPlaying(false);
     setCurrentTime(0);
+    onEnded?.();
   };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {

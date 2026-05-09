@@ -40,7 +40,7 @@ const seedColumns = [
   {
     subtitle: "UNESCO Envoy",
     title: "Scholar",
-    link: "/journal",
+    link: "/articles",
     staticSrc:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuCk-OdmolduAlsd69H6AUxodi5LAFdUWqVvgd5F9zcIzTBybFdtW7ihCAM_-EDKaBz0ZmrmEtY6sHWeEmBwlYhdLNoWxl4dyEJhZ2rDCTF90fi5YUomNszfRv_UgPXDcX0Bdcn5Bj8vm8yUadzNVSJtudcZFadwvr6WBdaAtUo5_bY9sdbI8Hj6dOoA9orzrXqjteSjko-mOTa1vaIqymhp_LQVqtSStpw1ZCaC0LP0W4h5WiMY2Hs53Zfw3sqRlQ4ju6kk4srj5sc",
     alt: "Library with antique books",

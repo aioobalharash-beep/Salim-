@@ -138,6 +138,15 @@ export default defineType({
         Rule.uri({ scheme: ["http", "https"], allowRelative: false }),
     }),
     defineField({
+      name: "watchUrl",
+      title: "Watch URL",
+      type: "url",
+      description:
+        "External video link (YouTube, Vimeo, etc.). When set, a Watch button appears next to Full Album.",
+      validation: (Rule) =>
+        Rule.uri({ scheme: ["http", "https"], allowRelative: false }),
+    }),
+    defineField({
       name: "publishDate",
       title: "Publish Date",
       type: "date",

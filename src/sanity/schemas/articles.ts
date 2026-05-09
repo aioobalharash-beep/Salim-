@@ -1,8 +1,8 @@
 import { defineType, defineField } from "sanity";
 
 export default defineType({
-  name: "journal",
-  title: "Journal",
+  name: "articles",
+  title: "Articles",
   type: "document",
   icon: () => "📝",
   fields: [
@@ -51,7 +51,7 @@ export default defineType({
       title: "Excerpt",
       type: "text",
       rows: 3,
-      description: "A brief summary shown on the Journal listing page.",
+      description: "A brief summary shown on the Articles listing page.",
     }),
     defineField({
       name: "body",

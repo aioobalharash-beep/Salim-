@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 import { client } from "@/sanity/client";
-import { journalListQuery } from "@/sanity/queries";
-import JournalFilter from "@/components/JournalFilter";
+import { articlesListQuery } from "@/sanity/queries";
+import ArticlesFilter from "@/components/ArticlesFilter";
 
 export const metadata: Metadata = {
-  title: "Journal — Salim Dada",
+  title: "Articles — Salim Dada",
   description:
     "Long-form reflections on musicology, cultural preservation, pedagogy, and Mediterranean musical traditions.",
 };
 
 export const revalidate = 60;
 
-export default async function JournalPage() {
+export default async function ArticlesPage() {
   let articles = [];
   try {
-    articles = (await client.fetch(journalListQuery)) ?? [];
+    articles = (await client.fetch(articlesListQuery)) ?? [];
   } catch {
     // Sanity unavailable — show empty list
   }
@@ -27,7 +27,7 @@ export default async function JournalPage() {
           Perspectives
         </p>
         <h1 className="font-headline text-5xl md:text-7xl font-light text-foreground leading-[1.1] mb-8">
-          Journal
+          Articles
         </h1>
         <p className="font-body text-base leading-relaxed text-foreground/50 max-w-xl">
           Long-form reflections on musicology, cultural preservation, pedagogy,
@@ -35,7 +35,7 @@ export default async function JournalPage() {
         </p>
       </section>
 
-      <JournalFilter articles={articles ?? []} />
+      <ArticlesFilter articles={articles ?? []} />
     </div>
   );
 }
