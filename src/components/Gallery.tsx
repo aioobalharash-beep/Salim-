@@ -28,24 +28,24 @@ const ROW_FOR: Record<
 > = {
   A: {
     pool: "landscape",
-    size: 1,
+    size: 2,
     aspect: "aspect-[16/9]",
-    cols: "md:grid-cols-1",
-    sizes: "100vw",
+    cols: "sm:grid-cols-2",
+    sizes: "(max-width: 640px) 100vw, 50vw",
   },
   B: {
     pool: "balanced",
-    size: 2,
+    size: 4,
     aspect: "aspect-[4/3]",
-    cols: "md:grid-cols-2",
-    sizes: "(max-width: 768px) 100vw, 50vw",
+    cols: "sm:grid-cols-2 md:grid-cols-4",
+    sizes: "(max-width: 640px) 100vw, (max-width: 768px) 50vw, 25vw",
   },
   C: {
     pool: "portrait",
-    size: 3,
+    size: 8,
     aspect: "aspect-[3/4]",
-    cols: "md:grid-cols-3",
-    sizes: "(max-width: 768px) 100vw, 33vw",
+    cols: "sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8",
+    sizes: "(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 12.5vw",
   },
 };
 
@@ -70,13 +70,15 @@ function buildRows(items: GalleryItem[]): Row[] {
 
   while (pools.landscape.length || pools.balanced.length || pools.portrait.length) {
     const available: RowType[] = [];
-    if (pools.landscape.length >= 1) available.push("A");
-    if (pools.balanced.length >= 2) available.push("B");
-    if (pools.portrait.length >= 3) available.push("C");
+    if (pools.landscape.length >= 2) available.push("A");
+    if (pools.balanced.length >= 4) available.push("B");
+    if (pools.portrait.length >= 8) available.push("C");
 
     let type: RowType;
     if (available.length) {
       type = available[Math.floor(Math.random() * available.length)];
+    } else if (pools.landscape.length) {
+      type = "A";
     } else if (pools.balanced.length) {
       type = "B";
     } else if (pools.portrait.length) {
@@ -137,7 +139,7 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
   return (
     <>
       <motion.div
-        className="w-full flex flex-col gap-0"
+        className="w-full flex flex-col gap-4 md:gap-6 p-4 md:p-6"
         animate={{ opacity: active ? 0.35 : 1 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
       >
@@ -146,7 +148,7 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
           runningIndex += row.items.length;
           const { aspect, cols, sizes } = ROW_FOR[row.type];
           return (
-            <div key={row.key} className={`grid grid-cols-1 ${cols} gap-0 w-full`}>
+            <div key={row.key} className={`grid grid-cols-1 ${cols} gap-4 md:gap-6 w-full`}>
               {row.items.map((item, i) => {
                 const index = rowStart + i;
                 return (
@@ -192,7 +194,7 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
             aria-modal="true"
           >
             <motion.figure
-              className="relative flex flex-col items-center gap-5 max-w-[92vw] max-h-[92vh]"
+              className="relative flex flex-col items-center gap-5 max-w-[90vw] max-h-[90vh]"
               initial={{ scale: 0.94, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.96, opacity: 0 }}
@@ -204,8 +206,8 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
                 alt={active.description || "Gallery image"}
                 width={2200}
                 height={1500}
-                sizes="92vw"
-                className="max-h-[80vh] w-auto h-auto object-contain rounded-sm"
+                sizes="90vw"
+                className="max-h-[90vh] max-w-[90vw] w-auto h-auto object-contain rounded-sm"
                 priority
               />
               {active.description && (

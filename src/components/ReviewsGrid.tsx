@@ -87,14 +87,14 @@ function ReviewCard({ review }: { review: ReviewItem }) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.35, ease: "easeOut" }}
-          className={`${fontClass} text-2xl md:text-3xl leading-[1.7] text-on-surface/85 max-w-3xl mx-auto text-center`}
+          className={`${fontClass} text-base md:text-lg leading-[1.7] text-on-surface/85 max-w-3xl mx-auto text-center`}
         >
           {text}
         </motion.p>
       </AnimatePresence>
 
       <p className="mt-8 font-body text-xs text-on-surface/70 text-center">
-        <span className="italic">{review.sourceText}</span>
+        <span className="font-bold not-italic">{review.sourceText}</span>
         {(review.place || review.year) && (
           <span className="text-on-surface/55 not-italic">
             {review.place ? `, ${review.place}` : ""}
