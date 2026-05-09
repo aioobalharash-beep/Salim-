@@ -13,6 +13,7 @@ const mediaSubLinks = [
 
 const links = [
   { href: "/", label: "Home" },
+  { href: "/catalogue", label: "Catalogue" },
   { href: "/training", label: "Training" },
   { href: "/shop", label: "Shop" },
   { href: "/media", label: "Media", children: mediaSubLinks },

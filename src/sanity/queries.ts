@@ -130,6 +130,26 @@ export const reviewsListQuery = groq`
   }
 `;
 
+export const catalogueListQuery = groq`
+  *[_type == "catalogue" && published == true] | order(year desc, title asc) {
+    _id,
+    title,
+    subtitle,
+    description,
+    year,
+    instrumentation,
+    genre,
+    durationMinutes,
+    durationDisplay,
+    published,
+    premiereDate,
+    premierePlace,
+    performers,
+    watchLink,
+    "audioUrl": audioFile.asset->url
+  }
+`;
+
 export const videoListQuery = groq`
   *[_type == "video"] | order(order asc, _createdAt desc) {
     _id,

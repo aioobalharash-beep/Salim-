@@ -10,6 +10,7 @@ import audio from "./audio";
 import gallery from "./gallery";
 import reviews from "./reviews";
 import video from "./video";
+import catalogue from "./catalogue";
 
 export const schemaTypes = [
   journal,
@@ -24,4 +25,5 @@ export const schemaTypes = [
   gallery,
   reviews,
   video,
+  catalogue,
 ];
