@@ -27,7 +27,7 @@ function formatDate(iso: string | null) {
   });
 }
 
-export default function JournalFilter({ articles }: { articles: Article[] }) {
+export default function ArticlesFilter({ articles }: { articles: Article[] }) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
 
@@ -115,7 +115,7 @@ export default function JournalFilter({ articles }: { articles: Article[] }) {
 
             <h2 className="mb-6">
               <Link
-                href={`/journal/${article.slug}`}
+                href={`/articles/${article.slug}`}
                 className="font-headline text-3xl md:text-[2.6rem] md:leading-[1.2] text-foreground group-hover:text-primary transition-colors duration-500"
               >
                 {article.title}
@@ -129,7 +129,7 @@ export default function JournalFilter({ articles }: { articles: Article[] }) {
             )}
 
             <Link
-              href={`/journal/${article.slug}`}
+              href={`/articles/${article.slug}`}
               className="inline-flex items-center gap-4 group/link"
             >
               <span className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/60 group-hover/link:text-primary transition-colors duration-300">

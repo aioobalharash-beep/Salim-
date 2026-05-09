@@ -68,7 +68,7 @@ const seed = {
   ],
 };
 
-// Shared PortableText components — scholarly serif typography matching Journal
+// Shared PortableText components — scholarly serif typography matching Articles
 const richTextComponents = {
   block: {
     normal: ({ children }: { children?: React.ReactNode }) => (

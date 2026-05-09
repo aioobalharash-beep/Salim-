@@ -3,7 +3,7 @@ import Link from "next/link";
 const footerLinks = [
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
-  { href: "/journal", label: "Journal" },
+  { href: "/articles", label: "Articles" },
 ];
 
 const socialLinks = [

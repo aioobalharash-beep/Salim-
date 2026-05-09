@@ -47,7 +47,7 @@ export default defineType({
                   { title: "Media — Video", value: "/media/video" },
                   { title: "Media — Reviews", value: "/media/reviews" },
                   { title: "Media — Gallery", value: "/media/gallery" },
-                  { title: "Journal", value: "/journal" },
+                  { title: "Articles", value: "/articles" },
                   { title: "About Salim", value: "/about" },
                 ],
                 layout: "dropdown",
