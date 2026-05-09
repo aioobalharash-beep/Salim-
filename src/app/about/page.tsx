@@ -132,9 +132,6 @@ export default async function AboutPage() {
       {/* ── Hero: Centered Statement ── */}
       <section className="max-w-screen-2xl mx-auto px-6 md:px-12 mb-32">
         <div className="max-w-5xl mx-auto text-center py-16 md:py-24">
-          <span className="text-primary opacity-60 tracking-[0.2em] uppercase mb-6 block font-label text-xs">
-            The Narrative
-          </span>
           <h1 className="font-serif-brand text-6xl md:text-8xl font-light leading-tight text-on-surface tracking-tighter italic">
             {heroTitle}
           </h1>

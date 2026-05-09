@@ -85,7 +85,7 @@ export default function ArticlesFilter({ articles }: { articles: Article[] }) {
         {filtered.length === 0 && (
           <div className="py-32 text-center">
             <p className="font-body text-sm text-foreground/30">
-              No perspectives match your search.
+              No articles match your search.
             </p>
           </div>
         )}

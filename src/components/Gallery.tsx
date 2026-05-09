@@ -30,22 +30,22 @@ const ROW_FOR: Record<
     pool: "landscape",
     size: 2,
     aspect: "aspect-[16/9]",
-    cols: "sm:grid-cols-2",
-    sizes: "(max-width: 640px) 100vw, 50vw",
+    cols: "grid-cols-2",
+    sizes: "(max-width: 640px) 50vw, 50vw",
   },
   B: {
     pool: "balanced",
     size: 4,
     aspect: "aspect-[4/3]",
-    cols: "sm:grid-cols-2 md:grid-cols-4",
-    sizes: "(max-width: 640px) 100vw, (max-width: 768px) 50vw, 25vw",
+    cols: "grid-cols-2 md:grid-cols-4",
+    sizes: "(max-width: 640px) 50vw, (max-width: 768px) 50vw, 25vw",
   },
   C: {
     pool: "portrait",
     size: 8,
     aspect: "aspect-[3/4]",
-    cols: "sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8",
-    sizes: "(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 12.5vw",
+    cols: "grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8",
+    sizes: "(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 25vw, 12.5vw",
   },
 };
 
@@ -148,7 +148,7 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
           runningIndex += row.items.length;
           const { aspect, cols, sizes } = ROW_FOR[row.type];
           return (
-            <div key={row.key} className={`grid grid-cols-1 ${cols} gap-4 md:gap-6 w-full`}>
+            <div key={row.key} className={`grid ${cols} gap-2 sm:gap-4 md:gap-6 w-full`}>
               {row.items.map((item, i) => {
                 const index = rowStart + i;
                 return (
@@ -184,7 +184,8 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
         {active && (
           <motion.div
             key="lightbox"
-            className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/80 backdrop-blur-sm p-6 md:p-12"
+            className="fixed inset-0 z-50 bg-foreground/95 backdrop-blur-sm"
+            style={{ width: "100vw", height: "100vh" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -194,31 +195,30 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
             aria-modal="true"
           >
             <motion.figure
-              className="relative flex flex-col items-center gap-5 max-w-[90vw] max-h-[90vh]"
-              initial={{ scale: 0.94, opacity: 0 }}
+              className="relative w-screen h-screen m-0"
+              initial={{ scale: 0.98, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.96, opacity: 0 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              exit={{ scale: 0.98, opacity: 0 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
             >
               <Image
-                src={urlFor(active.image).width(2200).quality(90).url()}
+                src={urlFor(active.image).width(2000).url()}
                 alt={active.description || "Gallery image"}
-                width={2200}
-                height={1500}
-                sizes="90vw"
-                className="max-h-[90vh] max-w-[90vw] w-auto h-auto object-contain rounded-sm"
+                fill
+                sizes="100vw"
+                className="object-contain"
                 priority
               />
               {active.description && (
-                <figcaption className="font-body text-sm md:text-base text-surface/90 text-center max-w-2xl leading-relaxed">
+                <figcaption className="absolute bottom-0 inset-x-0 px-6 py-5 text-center font-body text-sm md:text-base text-surface/90 bg-gradient-to-t from-foreground/70 to-transparent">
                   {active.description}
                 </figcaption>
               )}
               <button
                 type="button"
                 onClick={() => setActiveIndex(null)}
-                className="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-10 h-10 rounded-full bg-surface text-on-surface flex items-center justify-center shadow-card"
+                className="absolute top-4 right-4 md:top-6 md:right-6 w-10 h-10 rounded-full bg-surface text-on-surface flex items-center justify-center shadow-card"
                 aria-label="Close"
               >
                 <span className="text-xl leading-none">×</span>
