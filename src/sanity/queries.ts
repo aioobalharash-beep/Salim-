@@ -158,6 +158,13 @@ export const catalogueListQuery = groq`
   }
 `;
 
+export const legalQuery = groq`
+  *[_type == "legal"][0] {
+    title,
+    content
+  }
+`;
+
 export const videoListQuery = groq`
   *[_type == "video"] | order(order asc, _createdAt desc) {
     _id,

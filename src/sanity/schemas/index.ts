@@ -11,6 +11,7 @@ import gallery from "./gallery";
 import reviews from "./reviews";
 import video from "./video";
 import catalogue from "./catalogue";
+import legal from "./legal";
 
 export const schemaTypes = [
   articles,
@@ -26,4 +27,5 @@ export const schemaTypes = [
   reviews,
   video,
   catalogue,
+  legal,
 ];
