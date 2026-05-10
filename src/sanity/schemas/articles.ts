@@ -48,6 +48,13 @@ export default defineType({
       initialValue: () => new Date().toISOString(),
     }),
     defineField({
+      name: "byline",
+      title: "Byline",
+      type: "string",
+      description:
+        "Optional metadata line shown beneath the title (e.g. 'Le Monde · Salim Dada · March 2024').",
+    }),
+    defineField({
       name: "featuredImage",
       title: "Featured Image",
       type: "image",
