@@ -20,6 +20,7 @@ type Row = {
   key: string;
   type: RowType;
   items: GalleryItem[];
+  isRemainder?: boolean;
 };
 
 const ROW_FOR: Record<
@@ -68,35 +69,43 @@ function buildRows(items: GalleryItem[]): Row[] {
   const rows: Row[] = [];
   let rowIndex = 0;
 
-  while (pools.landscape.length || pools.balanced.length || pools.portrait.length) {
+  // Phase 1 — emit only complete rows so every full row keeps its
+  // intended cadence and aspect ratio.
+  while (true) {
     const available: RowType[] = [];
-    if (pools.landscape.length >= 2) available.push("A");
-    if (pools.balanced.length >= 4) available.push("B");
-    if (pools.portrait.length >= 8) available.push("C");
+    if (pools.landscape.length >= ROW_FOR.A.size) available.push("A");
+    if (pools.balanced.length >= ROW_FOR.B.size) available.push("B");
+    if (pools.portrait.length >= ROW_FOR.C.size) available.push("C");
+    if (!available.length) break;
 
-    let type: RowType;
-    if (available.length) {
-      type = available[Math.floor(Math.random() * available.length)];
-    } else if (pools.landscape.length) {
-      type = "A";
-    } else if (pools.balanced.length) {
-      type = "B";
-    } else if (pools.portrait.length) {
-      type = "C";
-    } else {
-      break;
-    }
-
+    const type = available[Math.floor(Math.random() * available.length)];
     const { pool, size } = ROW_FOR[type];
-    const take = Math.min(size, pools[pool].length);
-    if (take === 0) break;
-
     rows.push({
       key: `row-${rowIndex}-${type}`,
       type,
-      items: pools[pool].splice(0, take),
+      items: pools[pool].splice(0, size),
     });
     rowIndex += 1;
+  }
+
+  // Phase 2 — Safety Row. Sweep every leftover (any ratio) into a single
+  // final row that flex-grows to fill the entire width with no gaps.
+  const remainder = [...pools.landscape, ...pools.balanced, ...pools.portrait];
+  if (remainder.length > 0) {
+    // Keep a stable visual cadence by sorting the safety row by ratio so
+    // similar shapes sit next to each other.
+    const order: GalleryRatio[] = ["landscape", "balanced", "portrait"];
+    remainder.sort(
+      (a, b) =>
+        order.indexOf(a.ratio ?? "balanced") -
+        order.indexOf(b.ratio ?? "balanced"),
+    );
+    rows.push({
+      key: `row-${rowIndex}-remainder`,
+      type: "B", // unused for remainder rendering; placeholder
+      items: remainder,
+      isRemainder: true,
+    });
   }
 
   return rows;
@@ -153,16 +162,19 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
         {rows.map((row) => {
           const rowStart = runningIndex;
           runningIndex += row.items.length;
-          const { aspect, cols, sizes, size } = ROW_FOR[row.type];
-          const isPartial = row.items.length < size;
-          // Partial rows: override responsive cols so the remaining items
-          // stretch to fill the row width — no holes in the collage.
-          const gridStyle = isPartial
+          const baseRow = ROW_FOR[row.type];
+          // Safety row: every leftover image flexes to fill the row width
+          // with a uniform aspect so no gap or hole appears.
+          const aspect = row.isRemainder ? "aspect-[4/3]" : baseRow.aspect;
+          const sizes = row.isRemainder
+            ? `(max-width: 640px) ${Math.round(100 / row.items.length)}vw, ${Math.round(100 / row.items.length)}vw`
+            : baseRow.sizes;
+          const gridStyle = row.isRemainder
             ? {
                 gridTemplateColumns: `repeat(${row.items.length}, minmax(0, 1fr))`,
               }
             : undefined;
-          const gridClass = isPartial ? "grid" : `grid ${cols}`;
+          const gridClass = row.isRemainder ? "grid" : `grid ${baseRow.cols}`;
           return (
             <div
               key={row.key}

@@ -18,7 +18,11 @@ export const articlesBySlugQuery = groq`
     category,
     publishedAt,
     excerpt,
-    featuredImage,
+    featuredImage{
+      ...,
+      "alt": coalesce(alt, asset->altText, ""),
+      asset
+    },
     body
   }
 `;

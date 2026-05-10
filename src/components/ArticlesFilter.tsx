@@ -13,10 +13,14 @@ interface Article {
 
 const categories = [
   "All",
-  "Musicology",
-  "Pedagogy",
-  "Cultural Heritage",
+  "Arts",
   "Composition",
+  "Music & Technology",
+  "Conducting",
+  "Diversity of Cultural Expressions",
+  "Guitar",
+  "Musicology",
+  "Other",
 ];
 
 function formatDate(iso: string | null) {
