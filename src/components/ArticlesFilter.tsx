@@ -137,7 +137,7 @@ export default function ArticlesFilter({ articles }: { articles: Article[] }) {
               className="inline-flex items-center gap-4 group/link"
             >
               <span className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/60 group-hover/link:text-primary transition-colors duration-300">
-                Read Perspective
+                Read Article
               </span>
               <span className="text-primary/30 group-hover/link:text-primary/60 group-hover/link:translate-x-1 transition-all duration-300 text-xs">
                 →
