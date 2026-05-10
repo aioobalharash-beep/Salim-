@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import PublicShell from "@/components/PublicShell";
 import "./globals.css";
+
+const GA_MEASUREMENT_ID =
+  process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-XRS82SKPKY";
 
 export const metadata: Metadata = {
   title: "Salim Dada — Conductor · Composer · Guitarist · Scholar",
@@ -32,6 +36,22 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container font-body">
+        {GA_MEASUREMENT_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_MEASUREMENT_ID}');
+              `}
+            </Script>
+          </>
+        )}
         <PublicShell>{children}</PublicShell>
       </body>
     </html>
