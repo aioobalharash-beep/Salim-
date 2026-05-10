@@ -14,8 +14,14 @@ interface Article {
   slug: string;
   category: string | null;
   publishedAt: string | null;
+  byline: string | null;
   excerpt: string | null;
-  featuredImage: (SanityImageSource & { alt?: string }) | null;
+  featuredImage:
+    | (SanityImageSource & {
+        alt?: string;
+        dimensions?: { width: number; height: number; aspectRatio: number };
+      })
+    | null;
   body: PortableTextBlock[] | null;
 }
 
@@ -71,7 +77,7 @@ export default async function ArticlePage({
         </div>
 
         {/* ── Header ── */}
-        <header className="max-w-[700px] mx-auto px-6 md:px-8 mb-20">
+        <header className="max-w-[700px] mx-auto px-6 md:px-8 mb-16">
           <div className="flex items-center gap-3 mb-10">
             <span className="font-label text-[10px] uppercase tracking-[0.2em] text-foreground/30">
               {formatDate(article.publishedAt)}
@@ -86,12 +92,18 @@ export default async function ArticlePage({
             )}
           </div>
 
-          <h1 className="font-headline text-4xl md:text-[3.2rem] md:leading-[1.15] text-foreground mb-10">
+          <h1 className="font-headline text-4xl md:text-[3.2rem] md:leading-[1.15] text-foreground mb-6">
             {article.title}
           </h1>
 
+          {article.byline && (
+            <p className="font-label text-[12px] md:text-[13px] tracking-[0.08em] text-primary/80 mb-10">
+              {article.byline}
+            </p>
+          )}
+
           {article.excerpt && (
-            <p className="font-headline italic text-xl md:text-[1.35rem] leading-relaxed text-foreground/40">
+            <p className="font-headline italic text-xl md:text-[1.35rem] leading-relaxed text-foreground/40 mt-2">
               {article.excerpt}
             </p>
           )}
@@ -99,26 +111,36 @@ export default async function ArticlePage({
           <div className="w-12 h-[1px] bg-foreground/10 mt-16" />
         </header>
 
-        {/* ── Featured Image ── */}
-        {article.featuredImage && (
-          <figure className="max-w-[960px] mx-auto px-6 md:px-8 mb-20">
-            <div className="relative w-full aspect-[16/9] overflow-hidden bg-foreground/[0.04]">
+        {/* ── Featured Image ── constrained to the text column, manual crop honored by Sanity */}
+        {article.featuredImage && (() => {
+          const dims = article.featuredImage.dimensions;
+          const renderedWidth = 1400; // 700px column @ 2x
+          const renderedHeight = dims
+            ? Math.round(renderedWidth / dims.aspectRatio)
+            : Math.round((renderedWidth * 2) / 3);
+          return (
+            <figure className="max-w-[700px] mx-auto px-6 md:px-8 mb-20">
               <Image
-                src={urlFor(article.featuredImage).width(1920).quality(90).url()}
+                src={urlFor(article.featuredImage)
+                  .width(renderedWidth)
+                  .quality(90)
+                  .auto("format")
+                  .url()}
                 alt={article.featuredImage.alt || article.title}
-                fill
-                sizes="(max-width: 960px) 100vw, 960px"
+                width={renderedWidth}
+                height={renderedHeight}
+                sizes="(max-width: 700px) 100vw, 700px"
                 priority
-                className="object-cover"
+                className="w-full h-auto object-contain bg-foreground/[0.04]"
               />
-            </div>
-            {article.featuredImage.alt && (
-              <figcaption className="font-label text-[10px] uppercase tracking-[0.22em] text-foreground/35 text-center mt-4">
-                {article.featuredImage.alt}
-              </figcaption>
-            )}
-          </figure>
-        )}
+              {article.featuredImage.alt && (
+                <figcaption className="font-label text-[10px] uppercase tracking-[0.22em] text-foreground/35 text-center mt-4">
+                  {article.featuredImage.alt}
+                </figcaption>
+              )}
+            </figure>
+          );
+        })()}
 
         {/* ── Body (Portable Text) ── */}
         <section className="max-w-[700px] mx-auto px-6 md:px-8 prose-salim">

@@ -17,10 +17,12 @@ export const articlesBySlugQuery = groq`
     "slug": slug.current,
     category,
     publishedAt,
+    byline,
     excerpt,
     featuredImage{
       ...,
       "alt": coalesce(alt, asset->altText, ""),
+      "dimensions": asset->metadata.dimensions,
       asset
     },
     body
