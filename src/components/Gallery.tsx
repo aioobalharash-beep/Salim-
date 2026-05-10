@@ -115,12 +115,19 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
 
   useEffect(() => {
     if (!active) return;
+    const total = flat.length;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setActiveIndex(null);
+      if (e.key === "ArrowLeft") {
+        setActiveIndex((i) => (i === null ? null : (i - 1 + total) % total));
+      }
+      if (e.key === "ArrowRight") {
+        setActiveIndex((i) => (i === null ? null : (i + 1) % total));
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [active]);
+  }, [active, flat.length]);
 
   if (!rows) {
     return <div className="min-h-[60vh]" aria-hidden />;
@@ -146,9 +153,22 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
         {rows.map((row) => {
           const rowStart = runningIndex;
           runningIndex += row.items.length;
-          const { aspect, cols, sizes } = ROW_FOR[row.type];
+          const { aspect, cols, sizes, size } = ROW_FOR[row.type];
+          const isPartial = row.items.length < size;
+          // Partial rows: override responsive cols so the remaining items
+          // stretch to fill the row width — no holes in the collage.
+          const gridStyle = isPartial
+            ? {
+                gridTemplateColumns: `repeat(${row.items.length}, minmax(0, 1fr))`,
+              }
+            : undefined;
+          const gridClass = isPartial ? "grid" : `grid ${cols}`;
           return (
-            <div key={row.key} className={`grid ${cols} gap-2 sm:gap-4 md:gap-6 w-full`}>
+            <div
+              key={row.key}
+              className={`${gridClass} gap-2 sm:gap-4 md:gap-6 w-full`}
+              style={gridStyle}
+            >
               {row.items.map((item, i) => {
                 const index = rowStart + i;
                 return (
@@ -223,6 +243,61 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
               >
                 <span className="text-xl leading-none">×</span>
               </button>
+
+              {flat.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveIndex((i) =>
+                        i === null ? null : (i - 1 + flat.length) % flat.length,
+                      );
+                    }}
+                    className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-surface/80 hover:text-surface transition-colors"
+                    aria-label="Previous image"
+                  >
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.25"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveIndex((i) =>
+                        i === null ? null : (i + 1) % flat.length,
+                      );
+                    }}
+                    className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-surface/80 hover:text-surface transition-colors"
+                    aria-label="Next image"
+                  >
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.25"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </button>
+                </>
+              )}
             </motion.figure>
           </motion.div>
         )}
