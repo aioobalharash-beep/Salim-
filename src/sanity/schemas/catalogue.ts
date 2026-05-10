@@ -1,31 +1,31 @@
 import { defineType, defineField } from "sanity";
 
 export const INSTRUMENTATION_OPTIONS: { title: string; value: string }[] = [
-  { title: "Solo Instrument", value: "Solo Instrument" },
-  { title: "Duo", value: "Duo" },
-  { title: "Trio", value: "Trio" },
-  { title: "Quartet", value: "Quartet" },
-  { title: "Quintet", value: "Quintet" },
-  { title: "Chamber Ensemble", value: "Chamber Ensemble" },
-  { title: "Chamber Orchestra", value: "Chamber Orchestra" },
   { title: "Symphony Orchestra", value: "Symphony Orchestra" },
-  { title: "Voice & Instrument", value: "Voice & Instrument" },
-  { title: "Choir", value: "Choir" },
-  { title: "Vocal Ensemble", value: "Vocal Ensemble" },
-  { title: "Electronic / Electroacoustic", value: "Electronic / Electroacoustic" },
+  { title: "Wind & Military Orchestra", value: "Wind & Military Orchestra" },
+  { title: "Chamber Orchestra", value: "Chamber Orchestra" },
+  { title: "Strings", value: "Strings" },
+  { title: "Winds", value: "Winds" },
+  { title: "Voice", value: "Voice" },
+  { title: "Takht Arabi", value: "Takht Arabi" },
+  { title: "Hybrid Ensemble", value: "Hybrid Ensemble" },
+  { title: "Guitar", value: "Guitar" },
+  { title: "Piano", value: "Piano" },
+  { title: "Electronics", value: "Electronics" },
+  { title: "Other", value: "Other" },
 ];
 
 export const GENRE_OPTIONS: { title: string; value: string }[] = [
-  { title: "Classical", value: "Classical" },
-  { title: "Contemporary", value: "Contemporary" },
+  { title: "Symphonic Works", value: "Symphonic Works" },
   { title: "Chamber Music", value: "Chamber Music" },
-  { title: "Symphonic", value: "Symphonic" },
-  { title: "Sacred / Liturgical", value: "Sacred / Liturgical" },
-  { title: "Andalusian / Mediterranean", value: "Andalusian / Mediterranean" },
-  { title: "Folk / Traditional", value: "Folk / Traditional" },
-  { title: "Film / Stage Music", value: "Film / Stage Music" },
-  { title: "Vocal / Choral", value: "Vocal / Choral" },
-  { title: "Experimental", value: "Experimental" },
+  { title: "Vocal Forms", value: "Vocal Forms" },
+  { title: "Soundtrack", value: "Soundtrack" },
+  { title: "Solo Music", value: "Solo Music" },
+  { title: "Traditional & Mixed Ensemble", value: "Traditional & Mixed Ensemble" },
+  { title: "Contemporary Song", value: "Contemporary Song" },
+  { title: "Arrangement & Orchestration", value: "Arrangement & Orchestration" },
+  { title: "Didactic Music", value: "Didactic Music" },
+  { title: "Other", value: "Other" },
 ];
 
 export default defineType({
@@ -109,6 +109,14 @@ export default defineType({
       type: "string",
       group: "technical",
       description: "Human-readable duration shown on the card (e.g. '1h 20m', '12'').",
+    }),
+    defineField({
+      name: "movements",
+      title: "Movements",
+      type: "number",
+      group: "technical",
+      description: "Total number of movements in the work.",
+      validation: (Rule) => Rule.min(1).integer(),
     }),
     defineField({
       name: "published",
@@ -195,6 +203,16 @@ export default defineType({
       title: "Duration (Shortest)",
       name: "durationAsc",
       by: [{ field: "durationMinutes", direction: "asc" }],
+    },
+    {
+      title: "Movements (Most)",
+      name: "movementsDesc",
+      by: [{ field: "movements", direction: "desc" }],
+    },
+    {
+      title: "Movements (Fewest)",
+      name: "movementsAsc",
+      by: [{ field: "movements", direction: "asc" }],
     },
   ],
 });

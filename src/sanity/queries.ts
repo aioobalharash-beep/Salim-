@@ -142,6 +142,7 @@ export const catalogueListQuery = groq`
     genre,
     durationMinutes,
     durationDisplay,
+    movements,
     published,
     premiereDate,
     premierePlace,
