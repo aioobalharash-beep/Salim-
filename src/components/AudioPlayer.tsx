@@ -30,22 +30,25 @@ export default function AudioPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  // Pause when another track starts; auto-play when this track becomes active externally
+  // React only to which track is active. Reads audio.paused directly so a
+  // manual pause (which doesn't change activeTrackId) is never undone.
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    if (activeTrackId !== trackId && playing) {
-      audio.pause();
-      setPlaying(false);
-    } else if (activeTrackId === trackId && !playing) {
+    if (activeTrackId !== trackId) {
+      if (!audio.paused) {
+        audio.pause();
+        setPlaying(false);
+      }
+    } else if (audio.paused) {
       const result = audio.play();
       if (result && typeof result.then === "function") {
-        result.then(() => setPlaying(true)).catch(() => {});
+        result.then(() => setPlaying(true)).catch(() => setPlaying(false));
       } else {
         setPlaying(true);
       }
     }
-  }, [activeTrackId, trackId, playing]);
+  }, [activeTrackId, trackId]);
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
@@ -56,8 +59,12 @@ export default function AudioPlayer({
       setPlaying(false);
     } else {
       onPlay(trackId);
-      audio.play();
-      setPlaying(true);
+      const result = audio.play();
+      if (result && typeof result.then === "function") {
+        result.then(() => setPlaying(true)).catch(() => setPlaying(false));
+      } else {
+        setPlaying(true);
+      }
     }
   }, [playing, onPlay, trackId]);
 
