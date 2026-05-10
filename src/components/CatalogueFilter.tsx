@@ -5,31 +5,31 @@ import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 
 /* ── Option lists kept in lock-step with the Sanity schema ───────── */
 const INSTRUMENTATIONS = [
-  "Solo Instrument",
-  "Duo",
-  "Trio",
-  "Quartet",
-  "Quintet",
-  "Chamber Ensemble",
-  "Chamber Orchestra",
   "Symphony Orchestra",
-  "Voice & Instrument",
-  "Choir",
-  "Vocal Ensemble",
-  "Electronic / Electroacoustic",
+  "Wind & Military Orchestra",
+  "Chamber Orchestra",
+  "Strings",
+  "Winds",
+  "Voice",
+  "Takht Arabi",
+  "Hybrid Ensemble",
+  "Guitar",
+  "Piano",
+  "Electronics",
+  "Other",
 ] as const;
 
 const GENRES = [
-  "Classical",
-  "Contemporary",
+  "Symphonic Works",
   "Chamber Music",
-  "Symphonic",
-  "Sacred / Liturgical",
-  "Andalusian / Mediterranean",
-  "Folk / Traditional",
-  "Film / Stage Music",
-  "Vocal / Choral",
-  "Experimental",
+  "Vocal Forms",
+  "Soundtrack",
+  "Solo Music",
+  "Traditional & Mixed Ensemble",
+  "Contemporary Song",
+  "Arrangement & Orchestration",
+  "Didactic Music",
+  "Other",
 ] as const;
 
 const DURATION_MIN = 0;
@@ -40,7 +40,9 @@ type SortKey =
   | "yearAsc"
   | "titleAsc"
   | "durationDesc"
-  | "durationAsc";
+  | "durationAsc"
+  | "movementsDesc"
+  | "movementsAsc";
 
 const SORTS: { value: SortKey; label: string }[] = [
   { value: "yearDesc", label: "Year — Newest" },
@@ -48,6 +50,8 @@ const SORTS: { value: SortKey; label: string }[] = [
   { value: "titleAsc", label: "Alphabetical" },
   { value: "durationDesc", label: "Duration — Longest" },
   { value: "durationAsc", label: "Duration — Shortest" },
+  { value: "movementsDesc", label: "Movements — Most" },
+  { value: "movementsAsc", label: "Movements — Fewest" },
 ];
 
 export interface CatalogueWork {
@@ -60,6 +64,7 @@ export interface CatalogueWork {
   genre: string | null;
   durationMinutes: number | null;
   durationDisplay: string | null;
+  movements: number | null;
   published: boolean | null;
   premiereDate: string | null;
   premierePlace: string | null;
@@ -285,6 +290,9 @@ function EntryCard({
             }
           />
         )}
+        {typeof work.movements === "number" && (
+          <MetaRow label="Movements" value={String(work.movements)} />
+        )}
         {(premiereBits.length > 0 || work.performers) && (
           <div className="sm:col-span-2 pt-3 border-t border-foreground/[0.05]">
             <dt className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/50 mb-2">
@@ -415,6 +423,10 @@ export default function CatalogueFilter({
         case "durationAsc":
           return (a.durationMinutes ?? Infinity) -
             (b.durationMinutes ?? Infinity);
+        case "movementsDesc":
+          return (b.movements ?? -1) - (a.movements ?? -1);
+        case "movementsAsc":
+          return (a.movements ?? Infinity) - (b.movements ?? Infinity);
       }
     });
     return sorted;
