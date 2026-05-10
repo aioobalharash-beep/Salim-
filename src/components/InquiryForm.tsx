@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { sendInquiry, INQUIRY_SUBJECTS } from "@/app/actions/inquiry";
+import { sendInquiry } from "@/app/actions/inquiry";
+import { INQUIRY_SUBJECTS } from "@/app/actions/inquirySubjects";
 
 type Status = "idle" | "success" | "error";
 

@@ -1,16 +1,7 @@
 "use server";
 
 import { Resend } from "resend";
-
-const INQUIRY_SUBJECTS = [
-  "General Inquiry",
-  "Composition & Commissioning",
-  "Conducting & Masterclasses",
-  "Academic Research",
-  "Others",
-] as const;
-
-export type InquirySubject = (typeof INQUIRY_SUBJECTS)[number];
+import { INQUIRY_SUBJECTS, type InquirySubject } from "./inquirySubjects";
 
 export type InquiryResult = { ok: true } | { ok: false; error: string };
 
@@ -98,5 +89,3 @@ export async function sendInquiry(formData: FormData): Promise<InquiryResult> {
     return { ok: false, error: "Unexpected error sending inquiry." };
   }
 }
-
-export { INQUIRY_SUBJECTS };
