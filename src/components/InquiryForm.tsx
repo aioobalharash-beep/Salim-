@@ -1,6 +1,24 @@
 "use client";
 
+import { useState, useTransition } from "react";
+import { sendInquiry } from "@/app/actions/inquiry";
+import { INQUIRY_SUBJECTS } from "@/app/actions/inquirySubjects";
+
+type Status = "idle" | "success" | "error";
+
 export default function InquiryForm() {
+  const [status, setStatus] = useState<Status>("idle");
+  const [isPending, startTransition] = useTransition();
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    startTransition(async () => {
+      const result = await sendInquiry(formData);
+      setStatus(result.ok ? "success" : "error");
+    });
+  }
+
   return (
     <section
       id="enquiry-section"
@@ -37,62 +55,111 @@ export default function InquiryForm() {
           </div>
         </div>
 
-        {/* Right Column — Form */}
-        <form className="space-y-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div className="flex flex-col space-y-2">
-              <label className="font-label text-[10px] uppercase tracking-widest text-on-surface/50">
-                Full Name
-              </label>
-              <input
-                type="text"
-                placeholder="Enter your name"
-                className="bg-transparent border-t-0 border-x-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-sm transition-all"
-              />
-            </div>
-            <div className="flex flex-col space-y-2">
-              <label className="font-label text-[10px] uppercase tracking-widest text-on-surface/50">
-                Email Address
-              </label>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="bg-transparent border-t-0 border-x-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-sm transition-all"
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col space-y-2">
-            <label className="font-label text-[10px] uppercase tracking-widest text-on-surface/50">
-              Nature of Request
-            </label>
-            <select className="bg-transparent border-t-0 border-x-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-sm appearance-none transition-all">
-              <option>General Inquiry</option>
-              <option>Composition Commission</option>
-              <option>Masterclass Booking</option>
-              <option>Academic Research</option>
-              <option>Others</option>
-            </select>
-          </div>
-
-          <div className="flex flex-col space-y-2">
-            <label className="font-label text-[10px] uppercase tracking-widest text-on-surface/50">
-              Your Message
-            </label>
-            <textarea
-              placeholder="How can we assist you?"
-              rows={4}
-              className="bg-transparent border-t-0 border-x-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-sm transition-all resize-none"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full md:w-auto px-12 py-4 bg-primary text-on-primary font-serif-brand text-lg rounded-sm hover:opacity-90 transition-opacity uppercase tracking-widest"
+        {/* Right Column — Form / Feedback */}
+        {status === "success" ? (
+          <div
+            role="status"
+            aria-live="polite"
+            className="flex items-center md:items-start"
           >
-            Submit Request
-          </button>
-        </form>
+            <p className="font-headline text-3xl md:text-4xl font-light leading-snug text-on-surface">
+              Thank you. Your inquiry has been sent to the Maestro.
+            </p>
+          </div>
+        ) : (
+          <form className="space-y-10" onSubmit={handleSubmit} noValidate>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              <div className="flex flex-col space-y-2">
+                <label
+                  htmlFor="inquiry-name"
+                  className="font-label text-[10px] uppercase tracking-widest text-on-surface/50"
+                >
+                  Full Name
+                </label>
+                <input
+                  id="inquiry-name"
+                  name="name"
+                  type="text"
+                  required
+                  placeholder="Enter your name"
+                  className="bg-transparent border-t-0 border-x-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-sm transition-all"
+                />
+              </div>
+              <div className="flex flex-col space-y-2">
+                <label
+                  htmlFor="inquiry-email"
+                  className="font-label text-[10px] uppercase tracking-widest text-on-surface/50"
+                >
+                  Email Address
+                </label>
+                <input
+                  id="inquiry-email"
+                  name="email"
+                  type="email"
+                  required
+                  placeholder="Enter your email"
+                  className="bg-transparent border-t-0 border-x-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-sm transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col space-y-2">
+              <label
+                htmlFor="inquiry-subject"
+                className="font-label text-[10px] uppercase tracking-widest text-on-surface/50"
+              >
+                Nature of Request
+              </label>
+              <select
+                id="inquiry-subject"
+                name="subject"
+                required
+                defaultValue={INQUIRY_SUBJECTS[0]}
+                className="bg-transparent border-t-0 border-x-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-sm appearance-none transition-all"
+              >
+                {INQUIRY_SUBJECTS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col space-y-2">
+              <label
+                htmlFor="inquiry-message"
+                className="font-label text-[10px] uppercase tracking-widest text-on-surface/50"
+              >
+                Your Message
+              </label>
+              <textarea
+                id="inquiry-message"
+                name="message"
+                required
+                placeholder="How can we assist you?"
+                rows={4}
+                className="bg-transparent border-t-0 border-x-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-sm transition-all resize-none"
+              />
+            </div>
+
+            {status === "error" && (
+              <p
+                role="alert"
+                className="font-body text-sm text-[color:hsl(var(--destructive))]"
+              >
+                There was an issue sending your message. Please try again.
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={isPending}
+              className="w-full md:w-auto px-12 py-4 bg-primary text-on-primary font-serif-brand text-lg rounded-sm hover:opacity-90 transition-opacity uppercase tracking-widest disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isPending ? "Sending…" : "Submit Request"}
+            </button>
+          </form>
+        )}
       </div>
     </section>
   );
