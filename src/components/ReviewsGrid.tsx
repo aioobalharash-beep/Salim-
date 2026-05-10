@@ -22,7 +22,7 @@ function shuffle<T>(input: T[]): T[] {
 }
 
 // Detect script of the review text so we can apply the correct font:
-//  - Arabic block (U+0600–U+06FF, U+0750–U+077F, U+08A0–U+08FF, U+FB50–U+FDFF, U+FE70–U+FEFF) → Aref Ruqaa 400
+//  - Arabic block (U+0600–U+06FF, U+0750–U+077F, U+08A0–U+08FF, U+FB50–U+FDFF, U+FE70–U+FEFF) → Arabic Typesetting (with Noto Naskh Arabic fallback)
 //  - Latin (default)                                                                          → Playfair Display 400 Italic
 //  - Anything else (Cyrillic, etc.)                                                           → system font fallback
 type Script = "arabic" | "latin" | "other";
@@ -73,11 +73,7 @@ function ReviewCard({ review }: { review: ReviewItem }) {
   const dir = dirForScript(script);
 
   return (
-    <article
-      className="group relative text-center"
-      onMouseEnter={() => hasTranslation && setTranslated(true)}
-      onMouseLeave={() => hasTranslation && setTranslated(false)}
-    >
+    <article className="group relative">
       <AnimatePresence mode="wait" initial={false}>
         <motion.p
           key={showing}
@@ -93,36 +89,40 @@ function ReviewCard({ review }: { review: ReviewItem }) {
         </motion.p>
       </AnimatePresence>
 
-      <p className="mt-8 font-body text-xs text-on-surface/70 text-center">
-        <span className="font-bold not-italic">{review.sourceText}</span>
-        {(review.place || review.year) && (
-          <span className="text-on-surface/55 not-italic">
-            {review.place ? `, ${review.place}` : ""}
-            {review.year ? `, ${review.year}` : ""}
-          </span>
-        )}
-        <span className="sr-only">{meta}</span>
-      </p>
+      <div className="mt-8 max-w-3xl mx-auto flex items-baseline justify-between gap-6">
+        <div className="min-w-[5rem]">
+          {hasTranslation && (
+            <button
+              type="button"
+              onClick={() => setTranslated((t) => !t)}
+              onMouseEnter={() => setTranslated(true)}
+              onMouseLeave={() => setTranslated(false)}
+              aria-label={
+                showing === "translation" ? "Show original" : "Show translation"
+              }
+              aria-pressed={showing === "translation"}
+              className={`font-body text-xs lowercase tracking-wide transition-colors duration-300 focus:outline-none ${
+                showing === "translation"
+                  ? "text-primary"
+                  : "text-on-surface/50 hover:text-on-surface"
+              }`}
+            >
+              translate
+            </button>
+          )}
+        </div>
 
-      {hasTranslation && (
-        <button
-          type="button"
-          onClick={() => setTranslated((t) => !t)}
-          aria-label={
-            showing === "translation" ? "Show original" : "Show translation"
-          }
-          aria-pressed={showing === "translation"}
-          className={`absolute top-0 right-0 w-8 h-8 flex items-center justify-center text-on-surface/60 hover:text-primary transition-all duration-300 focus:outline-none focus-visible:opacity-100 ${
-            showing === "translation"
-              ? "opacity-100 text-primary"
-              : "opacity-0 group-hover:opacity-100"
-          }`}
-        >
-          <span className="material-symbols-outlined text-[18px]">
-            translate
-          </span>
-        </button>
-      )}
+        <p className="font-body text-xs text-on-surface/70 text-right">
+          <span className="font-bold not-italic">{review.sourceText}</span>
+          {(review.place || review.year) && (
+            <span className="text-on-surface/55 not-italic">
+              {review.place ? `, ${review.place}` : ""}
+              {review.year ? `, ${review.year}` : ""}
+            </span>
+          )}
+          <span className="sr-only">{meta}</span>
+        </p>
+      </div>
     </article>
   );
 }
