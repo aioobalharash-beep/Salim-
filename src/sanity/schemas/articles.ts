@@ -25,10 +25,17 @@ export default defineType({
       type: "string",
       options: {
         list: [
-          { title: "Musicology", value: "Musicology" },
-          { title: "Pedagogy", value: "Pedagogy" },
-          { title: "Cultural Heritage", value: "Cultural Heritage" },
+          { title: "Arts", value: "Arts" },
           { title: "Composition", value: "Composition" },
+          { title: "Music & Technology", value: "Music & Technology" },
+          { title: "Conducting", value: "Conducting" },
+          {
+            title: "Diversity of Cultural Expressions",
+            value: "Diversity of Cultural Expressions",
+          },
+          { title: "Guitar", value: "Guitar" },
+          { title: "Musicology", value: "Musicology" },
+          { title: "Other", value: "Other" },
         ],
         layout: "dropdown",
       },
@@ -45,6 +52,15 @@ export default defineType({
       title: "Featured Image",
       type: "image",
       options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          description:
+            "Short description of the image for accessibility and SEO.",
+        }),
+      ],
     }),
     defineField({
       name: "excerpt",

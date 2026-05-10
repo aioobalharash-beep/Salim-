@@ -1,8 +1,10 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PortableText, type PortableTextBlock } from "next-sanity";
 import { client } from "@/sanity/client";
+import { urlFor, type SanityImageSource } from "@/sanity/image";
 import { articlesBySlugQuery } from "@/sanity/queries";
 
 export const revalidate = 60;
@@ -13,6 +15,7 @@ interface Article {
   category: string | null;
   publishedAt: string | null;
   excerpt: string | null;
+  featuredImage: (SanityImageSource & { alt?: string }) | null;
   body: PortableTextBlock[] | null;
 }
 
@@ -95,6 +98,27 @@ export default async function ArticlePage({
 
           <div className="w-12 h-[1px] bg-foreground/10 mt-16" />
         </header>
+
+        {/* ── Featured Image ── */}
+        {article.featuredImage && (
+          <figure className="max-w-[960px] mx-auto px-6 md:px-8 mb-20">
+            <div className="relative w-full aspect-[16/9] overflow-hidden bg-foreground/[0.04]">
+              <Image
+                src={urlFor(article.featuredImage).width(1920).quality(90).url()}
+                alt={article.featuredImage.alt || article.title}
+                fill
+                sizes="(max-width: 960px) 100vw, 960px"
+                priority
+                className="object-cover"
+              />
+            </div>
+            {article.featuredImage.alt && (
+              <figcaption className="font-label text-[10px] uppercase tracking-[0.22em] text-foreground/35 text-center mt-4">
+                {article.featuredImage.alt}
+              </figcaption>
+            )}
+          </figure>
+        )}
 
         {/* ── Body (Portable Text) ── */}
         <section className="max-w-[700px] mx-auto px-6 md:px-8 prose-salim">
