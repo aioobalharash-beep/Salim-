@@ -42,7 +42,12 @@ export default function InquiryForm() {
               <span className="material-symbols-outlined text-primary">
                 mail
               </span>
-              <span className="font-body text-sm">office@salimdada.com</span>
+              <a
+                href="mailto:salimdadanet@gmail.com"
+                className="font-body text-sm hover:text-primary transition-colors duration-300"
+              >
+                salimdadanet@gmail.com
+              </a>
             </div>
             <div className="flex items-center gap-4">
               <span className="material-symbols-outlined text-primary">
