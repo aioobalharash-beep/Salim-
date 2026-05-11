@@ -33,26 +33,10 @@ export default function InquiryForm() {
           <h3 className="font-headline text-5xl font-light mb-12">
             Start a Collaboration
           </h3>
-          <p className="font-body text-base leading-relaxed text-on-surface-variant max-w-md mb-12">
+          <p className="font-body text-base leading-relaxed text-on-surface-variant max-w-md">
             Whether it is a new composition, a research project, or a
             pedagogical request, precision begins with a conversation.
           </p>
-          <div className="space-y-6">
-            <div className="flex items-center gap-4">
-              <span className="material-symbols-outlined text-primary">
-                mail
-              </span>
-              <span className="font-body text-sm">office@salimdada.com</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="material-symbols-outlined text-primary">
-                location_on
-              </span>
-              <span className="font-body text-sm">
-                Paris | Algiers | International
-              </span>
-            </div>
-          </div>
         </div>
 
         {/* Right Column — Form / Feedback */}
