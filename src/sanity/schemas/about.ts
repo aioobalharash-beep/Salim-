@@ -11,6 +11,16 @@ export default defineType({
       title: "Profile Image",
       type: "image",
       options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          description:
+            "Short description of the image for accessibility and SEO.",
+          validation: (Rule) => Rule.required(),
+        }),
+      ],
     }),
     defineField({
       name: "imageCaption",
@@ -144,6 +154,11 @@ export default defineType({
       ],
       description:
         "Timeline entries displayed on the About page. Add as many as needed — they alternate left and right.",
+    }),
+    defineField({
+      name: "seo",
+      title: "SEO Settings",
+      type: "seoSettings",
     }),
   ],
   preview: {

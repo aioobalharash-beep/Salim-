@@ -71,6 +71,13 @@ export interface CatalogueWork {
   performers: string | null;
   watchLink: string | null;
   audioUrl: string | null;
+  slug?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    keywords?: string[] | null;
+    ogImage?: unknown;
+  } | null;
 }
 
 function formatPremiereDate(iso: string | null) {

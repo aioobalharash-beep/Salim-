@@ -60,6 +60,16 @@ export default defineType({
       type: "image",
       options: { hotspot: true },
       description: "Sharp rectangular cover. Square or portrait both work.",
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          description:
+            "Short description of the image for accessibility and SEO.",
+          validation: (Rule) => Rule.required(),
+        }),
+      ],
     }),
     defineField({
       name: "audioFile",

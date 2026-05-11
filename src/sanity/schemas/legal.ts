@@ -54,6 +54,11 @@ export default defineType({
         },
       ],
     }),
+    defineField({
+      name: "seo",
+      title: "SEO Settings",
+      type: "seoSettings",
+    }),
   ],
   preview: {
     select: { title: "title" },

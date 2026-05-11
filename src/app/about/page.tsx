@@ -2,16 +2,32 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { PortableText, type PortableTextBlock } from "next-sanity";
 import { client } from "@/sanity/client";
-import { aboutQuery } from "@/sanity/queries";
+import { aboutQuery, catalogueListQuery } from "@/sanity/queries";
 import { urlFor, type SanityImageSource } from "@/sanity/image";
-
-export const metadata: Metadata = {
-  title: "About Salim — Salim Dada",
-  description:
-    "The narrative of Salim Dada: composer, conductor, musicologist, and UNESCO cultural envoy bridging silence and sound across the Mediterranean.",
-};
+import { buildMetadata, type SeoSettings } from "@/sanity/seo";
+import type { CatalogueWork } from "@/components/CatalogueFilter";
 
 export const revalidate = 60;
+
+const FALLBACK_TITLE = "About Salim";
+const FALLBACK_DESCRIPTION =
+  "The narrative of Salim Dada: composer, conductor, musicologist, and UNESCO cultural envoy bridging silence and sound across the Mediterranean.";
+
+export async function generateMetadata(): Promise<Metadata> {
+  let about: AboutData | null = null;
+  try {
+    about = await client.fetch(aboutQuery);
+  } catch {
+    // Sanity unavailable — use fallbacks
+  }
+  return buildMetadata({
+    seo: about?.seo,
+    fallbackTitle: FALLBACK_TITLE,
+    fallbackDescription: FALLBACK_DESCRIPTION,
+    fallbackImage: about?.profileImage,
+    url: "/about",
+  });
+}
 
 interface ChronologyItem {
   year: string;
@@ -20,7 +36,7 @@ interface ChronologyItem {
 }
 
 interface AboutData {
-  profileImage?: SanityImageSource;
+  profileImage?: SanityImageSource & { alt?: string };
   imageCaption?: string;
   heroTitle?: string;
   heroSubtitle?: string;
@@ -31,6 +47,7 @@ interface AboutData {
   pullQuote?: string;
   timelineTitle?: string;
   chronology?: ChronologyItem[];
+  seo?: SeoSettings | null;
 }
 
 // Seed data used when Sanity has no About document yet
@@ -106,12 +123,66 @@ const richTextComponents = {
 
 export default async function AboutPage() {
   let about: AboutData | null = null;
+  let catalogueWorks: CatalogueWork[] = [];
 
   try {
     about = await client.fetch(aboutQuery);
   } catch {
     // Sanity unavailable — use seed data
   }
+  try {
+    catalogueWorks =
+      (await client.fetch<CatalogueWork[]>(catalogueListQuery)) ?? [];
+  } catch {
+    // ignore — JSON-LD will only include Person
+  }
+
+  const profileImageUrl = about?.profileImage
+    ? urlFor(about.profileImage).width(1200).url()
+    : undefined;
+
+  const personJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Salim Dada",
+    url: "/about",
+    image: profileImageUrl,
+    jobTitle: "Composer, Conductor, Musicologist",
+    description:
+      about?.seo?.metaDescription || FALLBACK_DESCRIPTION,
+    sameAs: undefined,
+    nationality: "Algerian",
+    knowsAbout: [
+      "Composition",
+      "Orchestration",
+      "Conducting",
+      "Musicology",
+      "Mediterranean Music",
+      "Intangible Cultural Heritage",
+    ],
+  };
+
+  const compositionsJsonLd = catalogueWorks.map((work) => ({
+    "@context": "https://schema.org",
+    "@type": "MusicComposition",
+    name: work.title,
+    alternateName: work.subtitle || undefined,
+    composer: { "@type": "Person", name: "Salim Dada", url: "/about" },
+    dateCreated: work.year || undefined,
+    musicCompositionForm: work.genre || undefined,
+    description: work.seo?.metaDescription || work.description || undefined,
+    firstPerformance: work.premiereDate
+      ? {
+          "@type": "Event",
+          startDate: work.premiereDate,
+          location: work.premierePlace || undefined,
+          performer: work.performers || undefined,
+        }
+      : undefined,
+    url: work.watchLink || undefined,
+  }));
+
+  const jsonLd = [personJsonLd, ...compositionsJsonLd];
 
   const pullQuote = about?.pullQuote || seed.pullQuote;
   const heroTitle = about?.heroTitle || "Between Silence & Sound.";
@@ -129,6 +200,11 @@ export default async function AboutPage() {
 
   return (
     <div className="pt-32 pb-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* ── Hero: Centered Statement ── */}
       <section className="max-w-screen-2xl mx-auto px-6 md:px-12 mb-32">
         <div className="max-w-5xl mx-auto text-center py-16 md:py-24">
@@ -156,7 +232,7 @@ export default async function AboutPage() {
                       ? urlFor(about!.profileImage!).width(1200).url()
                       : seed.portraitUrl
                   }
-                  alt="Portrait of Salim Dada"
+                  alt={about?.profileImage?.alt || "Portrait of Salim Dada"}
                   width={1200}
                   height={1500}
                   sizes="(max-width: 768px) 100vw, 40vw"
