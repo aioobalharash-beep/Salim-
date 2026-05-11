@@ -49,7 +49,11 @@ export const heroSettingsQuery = groq`
       subtitle,
       title,
       image,
-      link
+      link{
+        type,
+        internal,
+        external
+      }
     }
   }
 `;
