@@ -74,46 +74,47 @@ function ReviewCard({ review }: { review: ReviewItem }) {
 
   return (
     <article className="group relative">
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.p
-          key={showing}
-          lang={lang}
-          dir={dir}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.35, ease: "easeOut" }}
-          className={`${fontClass} text-base md:text-lg leading-[1.7] text-on-surface/85 max-w-3xl mx-auto text-center`}
-        >
-          {text}
-        </motion.p>
-      </AnimatePresence>
+      {/* Layout-animated wrapper keeps card height stable while the two texts cross-fade */}
+      <motion.div
+        layout
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="max-w-3xl mx-auto"
+      >
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.p
+            key={showing}
+            lang={lang}
+            dir={dir}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className={`${fontClass} text-base md:text-lg leading-[1.7] text-on-surface/85 text-center`}
+          >
+            {text}
+          </motion.p>
+        </AnimatePresence>
+      </motion.div>
 
-      <div className="mt-8 max-w-3xl mx-auto flex items-baseline justify-between gap-6">
-        {/* Toggle — hidden entirely when no translation exists */}
+      <motion.div
+        layout
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="mt-8 max-w-3xl mx-auto flex items-baseline justify-between gap-6"
+      >
+        {/* Single-word toggle, hidden entirely when no translation exists */}
         <div className="min-w-[5rem]">
           {hasTranslation && (
-            <div
-              role="group"
-              aria-label="Review language"
-              className="inline-flex items-baseline gap-3 font-label text-[10px] uppercase tracking-[0.2em]"
+            <button
+              type="button"
+              onClick={() => setIsTranslated((v) => !v)}
+              aria-pressed={isTranslated}
+              aria-label={
+                isTranslated ? "Show original" : "Show translation"
+              }
+              className="font-body text-xs lowercase tracking-wide text-on-surface/55 hover:text-on-surface transition-colors duration-300 focus:outline-none focus-visible:text-on-surface"
             >
-              <ToggleLabel
-                active={!isTranslated}
-                onClick={() => setIsTranslated(false)}
-                label="Original"
-                layoutId={`reviews-toggle-${review._id}`}
-              />
-              <span aria-hidden className="text-on-surface/20">
-                /
-              </span>
-              <ToggleLabel
-                active={isTranslated}
-                onClick={() => setIsTranslated(true)}
-                label="Translation"
-                layoutId={`reviews-toggle-${review._id}`}
-              />
-            </div>
+              {isTranslated ? "original" : "translate"}
+            </button>
           )}
         </div>
 
@@ -127,43 +128,8 @@ function ReviewCard({ review }: { review: ReviewItem }) {
           )}
           <span className="sr-only">{meta}</span>
         </p>
-      </div>
+      </motion.div>
     </article>
-  );
-}
-
-function ToggleLabel({
-  active,
-  onClick,
-  label,
-  layoutId,
-}: {
-  active: boolean;
-  onClick: () => void;
-  label: string;
-  layoutId: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={`relative pb-1 transition-colors duration-300 focus:outline-none focus-visible:text-on-surface ${
-        active
-          ? "text-on-surface"
-          : "text-on-surface/40 hover:text-on-surface/70"
-      }`}
-    >
-      {label}
-      {/* Bronze underline marks the active label; slides between Original ↔ Translation */}
-      {active && (
-        <motion.span
-          layoutId={layoutId}
-          className="absolute left-0 right-0 -bottom-px h-px bg-primary"
-          transition={{ type: "spring", stiffness: 380, damping: 32 }}
-        />
-      )}
-    </button>
   );
 }
 
