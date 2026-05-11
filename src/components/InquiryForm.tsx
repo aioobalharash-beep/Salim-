@@ -40,17 +40,6 @@ export default function InquiryForm() {
           <div className="space-y-6">
             <div className="flex items-center gap-4">
               <span className="material-symbols-outlined text-primary">
-                mail
-              </span>
-              <a
-                href="mailto:salimdadanet@gmail.com"
-                className="font-body text-sm hover:text-primary transition-colors duration-300"
-              >
-                salimdadanet@gmail.com
-              </a>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="material-symbols-outlined text-primary">
                 location_on
               </span>
               <span className="font-body text-sm">
