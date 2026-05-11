@@ -1,28 +1,94 @@
 import type { Metadata } from "next";
 import { client } from "@/sanity/client";
 import { catalogueListQuery } from "@/sanity/queries";
+import { buildMetadata } from "@/sanity/seo";
 import CatalogueFilter, {
   type CatalogueWork,
 } from "@/components/CatalogueFilter";
 
-export const metadata: Metadata = {
-  title: "Catalogue — Salim Dada",
-  description:
-    "The complete catalogue of compositions by Salim Dada — chamber, symphonic, vocal, and contemporary works, with premiere histories and listening links.",
-};
-
 export const revalidate = 60;
 
-export default async function CataloguePage() {
-  let works: CatalogueWork[] = [];
+const FALLBACK_TITLE = "Catalogue";
+const FALLBACK_DESCRIPTION =
+  "The complete catalogue of compositions by Salim Dada — chamber, symphonic, vocal, and contemporary works, with premiere histories and listening links.";
+
+async function getWorks(): Promise<CatalogueWork[]> {
   try {
-    works = (await client.fetch<CatalogueWork[]>(catalogueListQuery)) ?? [];
+    return (await client.fetch<CatalogueWork[]>(catalogueListQuery)) ?? [];
   } catch {
-    // Sanity unavailable — render empty catalogue
+    return [];
   }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const works = await getWorks();
+  const aggregatedKeywords = Array.from(
+    new Set(
+      works
+        .flatMap((w) => [w.genre, w.instrumentation].filter(Boolean) as string[])
+    )
+  ).slice(0, 12);
+
+  return buildMetadata({
+    seo: aggregatedKeywords.length
+      ? { keywords: aggregatedKeywords }
+      : undefined,
+    fallbackTitle: FALLBACK_TITLE,
+    fallbackDescription: FALLBACK_DESCRIPTION,
+    url: "/catalogue",
+  });
+}
+
+function buildMusicCompositionJsonLd(works: CatalogueWork[]) {
+  return works.map((work) => ({
+    "@context": "https://schema.org",
+    "@type": "MusicComposition",
+    "@id": work.slug ? `/catalogue#${work.slug}` : undefined,
+    name: work.title,
+    alternateName: work.subtitle || undefined,
+    composer: {
+      "@type": "Person",
+      name: "Salim Dada",
+      url: "/about",
+    },
+    dateCreated: work.year || undefined,
+    musicCompositionForm: work.genre || undefined,
+    musicalKey: undefined,
+    inLanguage: undefined,
+    description: work.seo?.metaDescription || work.description || undefined,
+    keywords:
+      work.seo?.keywords?.join(", ") ||
+      [work.genre, work.instrumentation].filter(Boolean).join(", ") ||
+      undefined,
+    firstPerformance: work.premiereDate
+      ? {
+          "@type": "Event",
+          startDate: work.premiereDate,
+          location: work.premierePlace || undefined,
+          performer: work.performers || undefined,
+        }
+      : undefined,
+    recordedAs: work.audioUrl
+      ? {
+          "@type": "MusicRecording",
+          contentUrl: work.audioUrl,
+        }
+      : undefined,
+    url: work.watchLink || undefined,
+  }));
+}
+
+export default async function CataloguePage() {
+  const works = await getWorks();
+  const jsonLd = buildMusicCompositionJsonLd(works);
 
   return (
     <div className="min-h-screen bg-background pt-44 pb-40">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* ── Header ── */}
       <section className="max-w-5xl mx-auto px-6 md:px-8 mb-20">
         <p className="font-label text-[10px] uppercase tracking-[0.5em] text-primary/50 mb-8">

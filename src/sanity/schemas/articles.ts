@@ -66,6 +66,7 @@ export default defineType({
           type: "string",
           description:
             "Short description of the image for accessibility and SEO.",
+          validation: (Rule) => Rule.required(),
         }),
       ],
     }),
@@ -99,8 +100,23 @@ export default defineType({
         {
           type: "image",
           options: { hotspot: true },
+          fields: [
+            {
+              name: "alt",
+              title: "Alt text",
+              type: "string",
+              description:
+                "Short description of the image for accessibility and SEO.",
+              validation: (Rule) => Rule.required(),
+            },
+          ],
         },
       ],
+    }),
+    defineField({
+      name: "seo",
+      title: "SEO Settings",
+      type: "seoSettings",
     }),
   ],
   preview: {

@@ -39,6 +39,7 @@ export default defineType({
     { name: "technical", title: "Technical" },
     { name: "premiere", title: "World Premiere" },
     { name: "media", title: "Media" },
+    { name: "seo", title: "SEO" },
   ],
   fields: [
     /* ── Basic Info ────────────────────────────────────────────── */
@@ -163,6 +164,25 @@ export default defineType({
       type: "file",
       group: "media",
       options: { accept: "audio/*" },
+    }),
+
+    /* ── SEO ────────────────────────────────────────────────────── */
+    defineField({
+      name: "seo",
+      title: "SEO Settings",
+      type: "seoSettings",
+      group: "seo",
+    }),
+
+    /* ── Catalogue Slug (used for canonical URLs) ─────────────── */
+    defineField({
+      name: "slug",
+      title: "Slug",
+      type: "slug",
+      group: "seo",
+      options: { source: "title", maxLength: 96 },
+      description:
+        "URL-friendly identifier used as a stable anchor on the Catalogue page.",
     }),
   ],
   preview: {

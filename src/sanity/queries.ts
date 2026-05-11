@@ -1,5 +1,16 @@
 import { groq } from "next-sanity";
 
+const seoProjection = groq`
+  metaTitle,
+  metaDescription,
+  keywords,
+  ogImage{
+    ...,
+    "alt": coalesce(alt, asset->altText, ""),
+    asset
+  }
+`;
+
 export const articlesListQuery = groq`
   *[_type == "articles"] | order(publishedAt desc) {
     title,
@@ -25,7 +36,10 @@ export const articlesBySlugQuery = groq`
       "dimensions": asset->metadata.dimensions,
       asset
     },
-    body
+    body,
+    seo{
+      ${seoProjection}
+    }
   }
 `;
 
@@ -42,7 +56,11 @@ export const heroSettingsQuery = groq`
 
 export const aboutQuery = groq`
   *[_type == "about"][0] {
-    profileImage,
+    profileImage{
+      ...,
+      "alt": coalesce(alt, asset->altText, ""),
+      asset
+    },
     imageCaption,
     heroTitle,
     heroSubtitle,
@@ -56,6 +74,9 @@ export const aboutQuery = groq`
       year,
       title,
       description
+    },
+    seo{
+      ${seoProjection}
     }
   }
 `;
@@ -154,14 +175,21 @@ export const catalogueListQuery = groq`
     premierePlace,
     performers,
     watchLink,
-    "audioUrl": audioFile.asset->url
+    "audioUrl": audioFile.asset->url,
+    "slug": slug.current,
+    seo{
+      ${seoProjection}
+    }
   }
 `;
 
 export const legalQuery = groq`
   *[_type == "legal"][0] {
     title,
-    content
+    content,
+    seo{
+      ${seoProjection}
+    }
   }
 `;
 

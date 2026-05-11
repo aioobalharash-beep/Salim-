@@ -45,6 +45,16 @@ export default defineType({
       title: "Thumbnail / Photo",
       type: "image",
       options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          description:
+            "Short description of the image for accessibility and SEO.",
+          validation: (Rule) => Rule.required(),
+        }),
+      ],
     }),
     defineField({
       name: "description",

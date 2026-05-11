@@ -6,6 +6,7 @@ import { PortableText, type PortableTextBlock } from "next-sanity";
 import { client } from "@/sanity/client";
 import { urlFor, type SanityImageSource } from "@/sanity/image";
 import { articlesBySlugQuery } from "@/sanity/queries";
+import { buildMetadata, type SeoSettings } from "@/sanity/seo";
 
 export const revalidate = 60;
 
@@ -23,6 +24,7 @@ interface Article {
       })
     | null;
   body: PortableTextBlock[] | null;
+  seo?: SeoSettings | null;
 }
 
 async function getArticle(slug: string): Promise<Article | null> {
@@ -36,10 +38,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const article = await getArticle(params.slug);
   if (!article) return { title: "Not Found" };
-  return {
-    title: `${article.title} — Salim Dada`,
-    description: article.excerpt || undefined,
-  };
+  return buildMetadata({
+    seo: article.seo,
+    fallbackTitle: article.title,
+    fallbackDescription: article.excerpt,
+    fallbackImage: article.featuredImage,
+    url: `/articles/${article.slug}`,
+    type: "article",
+  });
 }
 
 function formatDate(iso: string | null) {
@@ -58,8 +64,32 @@ export default async function ArticlePage({
   const article = await getArticle(params.slug);
   if (!article) notFound();
 
+  const featuredImageUrl = article.featuredImage
+    ? urlFor(article.featuredImage).width(1200).url()
+    : undefined;
+
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: article.seo?.metaDescription || article.excerpt || undefined,
+    image: featuredImageUrl ? [featuredImageUrl] : undefined,
+    datePublished: article.publishedAt || undefined,
+    author: {
+      "@type": "Person",
+      name: "Salim Dada",
+      url: "/about",
+    },
+    articleSection: article.category || undefined,
+    keywords: article.seo?.keywords?.join(", ") || undefined,
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <article className="pt-44 pb-40">
         {/* ── Back Link ── */}
         <div className="max-w-[700px] mx-auto px-6 md:px-8 mb-20">
