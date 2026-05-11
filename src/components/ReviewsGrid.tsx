@@ -60,9 +60,9 @@ function dirForScript(script: Script): "rtl" | "ltr" {
 }
 
 function ReviewCard({ review }: { review: ReviewItem }) {
-  const [translated, setTranslated] = useState(false);
+  const [isTranslated, setIsTranslated] = useState(false);
   const hasTranslation = Boolean(review.translation?.trim());
-  const showing = translated && hasTranslation ? "translation" : "original";
+  const showing = isTranslated && hasTranslation ? "translation" : "original";
   const text = showing === "translation" ? review.translation! : review.content;
   const meta = [review.sourceText, review.place, review.year]
     .filter(Boolean)
@@ -90,25 +90,30 @@ function ReviewCard({ review }: { review: ReviewItem }) {
       </AnimatePresence>
 
       <div className="mt-8 max-w-3xl mx-auto flex items-baseline justify-between gap-6">
+        {/* Toggle — hidden entirely when no translation exists */}
         <div className="min-w-[5rem]">
           {hasTranslation && (
-            <button
-              type="button"
-              onClick={() => setTranslated((t) => !t)}
-              onMouseEnter={() => setTranslated(true)}
-              onMouseLeave={() => setTranslated(false)}
-              aria-label={
-                showing === "translation" ? "Show original" : "Show translation"
-              }
-              aria-pressed={showing === "translation"}
-              className={`font-body text-xs lowercase tracking-wide transition-colors duration-300 focus:outline-none ${
-                showing === "translation"
-                  ? "text-primary"
-                  : "text-on-surface/50 hover:text-on-surface"
-              }`}
+            <div
+              role="group"
+              aria-label="Review language"
+              className="inline-flex items-baseline gap-3 font-label text-[10px] uppercase tracking-[0.2em]"
             >
-              translate
-            </button>
+              <ToggleLabel
+                active={!isTranslated}
+                onClick={() => setIsTranslated(false)}
+                label="Original"
+                layoutId={`reviews-toggle-${review._id}`}
+              />
+              <span aria-hidden className="text-on-surface/20">
+                /
+              </span>
+              <ToggleLabel
+                active={isTranslated}
+                onClick={() => setIsTranslated(true)}
+                label="Translation"
+                layoutId={`reviews-toggle-${review._id}`}
+              />
+            </div>
           )}
         </div>
 
@@ -124,6 +129,41 @@ function ReviewCard({ review }: { review: ReviewItem }) {
         </p>
       </div>
     </article>
+  );
+}
+
+function ToggleLabel({
+  active,
+  onClick,
+  label,
+  layoutId,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  layoutId: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`relative pb-1 transition-colors duration-300 focus:outline-none focus-visible:text-on-surface ${
+        active
+          ? "text-on-surface"
+          : "text-on-surface/40 hover:text-on-surface/70"
+      }`}
+    >
+      {label}
+      {/* Bronze underline marks the active label; slides between Original ↔ Translation */}
+      {active && (
+        <motion.span
+          layoutId={layoutId}
+          className="absolute left-0 right-0 -bottom-px h-px bg-primary"
+          transition={{ type: "spring", stiffness: 380, damping: 32 }}
+        />
+      )}
+    </button>
   );
 }
 
