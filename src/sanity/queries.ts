@@ -25,18 +25,36 @@ export const articlesListQuery = groq`
 export const articlesBySlugQuery = groq`
   *[_type == "articles" && slug.current == $slug][0] {
     title,
+    richTitle,
     "slug": slug.current,
     category,
+    eyebrowTags,
     publishedAt,
+    readingTimeMinutes,
     byline,
+    bylineDetails,
+    deck,
     excerpt,
+    showHeroOrnament,
+    accentColor,
+    showTableOfContents,
     featuredImage{
       ...,
       "alt": coalesce(alt, asset->altText, ""),
+      caption,
+      credit,
       "dimensions": asset->metadata.dimensions,
       asset
     },
-    body,
+    body[]{
+      ...,
+      _type == "bodyImage" => {
+        ...,
+        "alt": coalesce(alt, asset->altText, ""),
+        "dimensions": asset->metadata.dimensions,
+        asset
+      }
+    },
     seo{
       ${seoProjection}
     }
