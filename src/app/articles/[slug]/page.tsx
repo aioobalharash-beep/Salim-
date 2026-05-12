@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PortableText, type PortableTextBlock } from "next-sanity";
+import type { PortableTextComponents } from "@portabletext/react";
 import { client } from "@/sanity/client";
 import { urlFor, type SanityImageSource } from "@/sanity/image";
 import { articlesBySlugQuery } from "@/sanity/queries";
@@ -10,19 +11,40 @@ import { buildMetadata, type SeoSettings } from "@/sanity/seo";
 
 export const revalidate = 60;
 
+/* ────────────────────────────────────────────────────────────────────────
+ * Types — mirror the Sanity schema in src/sanity/schemas/articles.ts
+ * ──────────────────────────────────────────────────────────────────────── */
+
+interface BylineDetails {
+  authorName?: string | null;
+  authorRole?: string | null;
+  publicationCredit?: string | null;
+}
+
+type SanityImageWithMeta = SanityImageSource & {
+  alt?: string;
+  caption?: string;
+  credit?: string;
+  size?: "column" | "wide" | "full";
+  dimensions?: { width: number; height: number; aspectRatio: number };
+};
+
 interface Article {
   title: string;
+  richTitle?: PortableTextBlock[] | null;
   slug: string;
   category: string | null;
+  eyebrowTags?: string[] | null;
   publishedAt: string | null;
+  readingTimeMinutes?: number | null;
   byline: string | null;
+  bylineDetails?: BylineDetails | null;
+  deck?: PortableTextBlock[] | null;
   excerpt: string | null;
-  featuredImage:
-    | (SanityImageSource & {
-        alt?: string;
-        dimensions?: { width: number; height: number; aspectRatio: number };
-      })
-    | null;
+  showHeroOrnament?: boolean | null;
+  accentColor?: string | null;
+  showTableOfContents?: boolean | null;
+  featuredImage: SanityImageWithMeta | null;
   body: PortableTextBlock[] | null;
   seo?: SeoSettings | null;
 }
@@ -52,9 +74,282 @@ function formatDate(iso: string | null) {
   if (!iso) return "";
   return new Date(iso).toLocaleDateString("en-US", {
     month: "long",
+    day: "numeric",
     year: "numeric",
   });
 }
+
+/* Slugify section headings for anchor ids. */
+function slugify(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
+
+/* Extract plain text from a Portable Text block (for anchors / TOC). */
+function blockToPlainText(block: PortableTextBlock): string {
+  if (!block || !Array.isArray((block as any).children)) return "";
+  return (block as any).children
+    .map((c: any) => (typeof c?.text === "string" ? c.text : ""))
+    .join("");
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+ * Inline mark / annotation components — shared across PT renderers.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+const sharedMarks: PortableTextComponents["marks"] = {
+  strong: ({ children }) => <strong>{children}</strong>,
+  em: ({ children }) => <em>{children}</em>,
+  underline: ({ children }) => (
+    <span style={{ textDecoration: "underline" }}>{children}</span>
+  ),
+  smallCaps: ({ children }) => <span className="small-caps">{children}</span>,
+  color: ({ value, children }) => (
+    <span style={{ color: value?.value || undefined }}>{children}</span>
+  ),
+  lang: ({ value, children }) => (
+    <span lang={value?.code || undefined}>{children}</span>
+  ),
+  link: ({ value, children }) => {
+    const target = value?.openInNewTab ? "_blank" : undefined;
+    const rel =
+      value?.rel ??
+      (value?.openInNewTab ? "noopener noreferrer" : undefined);
+    return (
+      <a href={value?.href || "#"} target={target} rel={rel}>
+        {children}
+      </a>
+    );
+  },
+  footnoteRef: ({ value, children }) => (
+    <sup className="fn-marker">
+      <a href={`#fn-${value?.number}`} id={`fnref-${value?.number}`}>
+        {children}
+        {value?.number}
+      </a>
+    </sup>
+  ),
+};
+
+/* Minimal PT components for short rich-text fields (deck, title, etc.) */
+const inlineRichComponents: PortableTextComponents = {
+  marks: sharedMarks,
+  block: {
+    normal: ({ children }) => <>{children}</>,
+  },
+};
+
+/* ────────────────────────────────────────────────────────────────────────
+ * Custom block renderers used inside the article body.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+function ComposerVoice({ value }: { value: any }) {
+  return (
+    <aside className="composer-voice">
+      <PortableText value={value.body} components={inlineRichComponents} />
+      {value.attribution && (
+        <span className="attribution">{value.attribution}</span>
+      )}
+    </aside>
+  );
+}
+
+function Timeline({ value }: { value: any }) {
+  const items: Array<{ date: string; text: PortableTextBlock[] }> =
+    value.items || [];
+  return (
+    <div className="timeline">
+      {value.title && <div className="timeline-title">{value.title}</div>}
+      {items.map((item, i) => (
+        <div className="timeline-item" key={i}>
+          <div className="timeline-date">{item.date}</div>
+          <div className="timeline-text">
+            <PortableText value={item.text} components={inlineRichComponents} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Factbox({ value }: { value: any }) {
+  return (
+    <aside className="factbox">
+      {value.label && <div className="factbox-label">{value.label}</div>}
+      {value.title && <div className="factbox-title">{value.title}</div>}
+      {value.intro && <p>{value.intro}</p>}
+      {Array.isArray(value.items) &&
+        value.items.map((item: any, i: number) => (
+          <p key={i}>
+            {item.term && <strong>{item.term}</strong>}
+            {item.term && item.description ? " — " : null}
+            {item.description}
+          </p>
+        ))}
+    </aside>
+  );
+}
+
+function TwoColumn({ value }: { value: any }) {
+  return (
+    <div className="twocol">
+      <div className="twocol-col">
+        {value.leftLabel && <h3>{value.leftLabel}</h3>}
+        <PortableText
+          value={value.leftBody}
+          components={inlineRichComponents}
+        />
+      </div>
+      <div className="twocol-col">
+        {value.rightLabel && <h3>{value.rightLabel}</h3>}
+        <PortableText
+          value={value.rightBody}
+          components={inlineRichComponents}
+        />
+      </div>
+    </div>
+  );
+}
+
+function PullQuote({ value }: { value: any }) {
+  return (
+    <blockquote className="pullquote">
+      <p>{value.quote}</p>
+      {value.attribution && <footer>{value.attribution}</footer>}
+    </blockquote>
+  );
+}
+
+function AuthorNote({ value }: { value: any }) {
+  return (
+    <div className="author-note">
+      <PortableText value={value.body} components={inlineRichComponents} />
+    </div>
+  );
+}
+
+function Divider({ value }: { value: any }) {
+  const style = value?.style || "fleuron";
+  if (style === "thin") return <hr className="ed-divider ed-divider--thin" />;
+  if (style === "gradient")
+    return <hr className="ed-divider ed-divider--gradient" />;
+  return (
+    <div className={`ed-divider ed-divider--${style}`} aria-hidden>
+      {style === "dots" ? "• • •" : "❧"}
+    </div>
+  );
+}
+
+function BodyImage({ value }: { value: SanityImageWithMeta }) {
+  if (!value) return null;
+  const dims = value.dimensions;
+  const renderedWidth = 1600;
+  const renderedHeight = dims
+    ? Math.round(renderedWidth / dims.aspectRatio)
+    : Math.round((renderedWidth * 2) / 3);
+  const size = value.size || "column";
+  return (
+    <figure className={`ed-figure ${size}`}>
+      <Image
+        src={urlFor(value)
+          .width(renderedWidth)
+          .quality(88)
+          .auto("format")
+          .url()}
+        alt={value.alt || ""}
+        width={renderedWidth}
+        height={renderedHeight}
+        sizes={
+          size === "full"
+            ? "100vw"
+            : size === "wide"
+              ? "(max-width: 900px) 100vw, 900px"
+              : "(max-width: 820px) 100vw, 720px"
+        }
+        className=""
+      />
+      {(value.caption || value.credit) && (
+        <figcaption>
+          {value.caption}
+          {value.credit && <span className="ed-credit">{value.credit}</span>}
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
+function Footnotes({ value }: { value: any }) {
+  const items: Array<{ number: number; text: PortableTextBlock[] }> =
+    value.items || [];
+  return (
+    <section className="ed-footnotes">
+      <h4>Footnotes</h4>
+      <ol>
+        {items.map((fn, i) => (
+          <li key={i} id={`fn-${fn.number}`}>
+            <span className="fn-num">{fn.number}.</span>
+            <PortableText value={fn.text} components={inlineRichComponents} />{" "}
+            <a href={`#fnref-${fn.number}`} aria-label="Back to text">
+              ↩
+            </a>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+ * Body PortableText components.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+function buildBodyComponents(): PortableTextComponents {
+  return {
+    marks: sharedMarks,
+    block: {
+      normal: ({ children }) => <p>{children}</p>,
+      lead: ({ children }) => <p className="lead">{children}</p>,
+      caption: ({ children }) => <p className="caption">{children}</p>,
+      h2: ({ children, value }) => {
+        const id = slugify(blockToPlainText(value));
+        return <h2 id={id}>{children}</h2>;
+      },
+      h2Italic: ({ children, value }) => {
+        const id = slugify(blockToPlainText(value));
+        return (
+          <h2 id={id} className="h2-italic">
+            {children}
+          </h2>
+        );
+      },
+      h3: ({ children }) => <h3>{children}</h3>,
+      h3Eyebrow: ({ children }) => <h3 className="h3-eyebrow">{children}</h3>,
+      blockquote: ({ children }) => (
+        <blockquote className="pullquote">
+          <p>{children}</p>
+        </blockquote>
+      ),
+    },
+    types: {
+      bodyImage: BodyImage as any,
+      composerVoice: ComposerVoice as any,
+      timeline: Timeline as any,
+      factbox: Factbox as any,
+      twoColumn: TwoColumn as any,
+      pullQuote: PullQuote as any,
+      authorNote: AuthorNote as any,
+      divider: Divider as any,
+      footnotes: Footnotes as any,
+    },
+  };
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+ * Page
+ * ──────────────────────────────────────────────────────────────────────── */
 
 export default async function ArticlePage({
   params,
@@ -77,170 +372,244 @@ export default async function ArticlePage({
     datePublished: article.publishedAt || undefined,
     author: {
       "@type": "Person",
-      name: "Salim Dada",
+      name: article.bylineDetails?.authorName || "Salim Dada",
       url: "/about",
     },
     articleSection: article.category || undefined,
     keywords: article.seo?.keywords?.join(", ") || undefined,
   };
 
+  // Build TOC from H2 / H2-italic blocks if enabled.
+  const tocEntries =
+    article.showTableOfContents && Array.isArray(article.body)
+      ? article.body
+          .filter(
+            (b: any) =>
+              b?._type === "block" &&
+              (b.style === "h2" || b.style === "h2Italic"),
+          )
+          .map((b: any) => {
+            const text = blockToPlainText(b);
+            return { id: slugify(text), text };
+          })
+          .filter((e) => e.id && e.text)
+      : [];
+
+  const eyebrowParts = [
+    ...(article.eyebrowTags && article.eyebrowTags.length
+      ? article.eyebrowTags
+      : article.category
+        ? [article.category]
+        : []),
+  ];
+
+  const styleVars = article.accentColor
+    ? ({ ["--ed-accent" as any]: article.accentColor } as React.CSSProperties)
+    : undefined;
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="editorial min-h-screen" style={styleVars}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
-      <article className="pt-44 pb-40">
+      <div className="editorial-top-ornament" />
+
+      <article className="pt-28 pb-24">
         {/* ── Back Link ── */}
-        <div className="max-w-[700px] mx-auto px-6 md:px-8 mb-20">
+        <div className="editorial-hero" style={{ paddingTop: 0, paddingBottom: 0 }}>
           <Link
             href="/articles"
-            className="inline-flex items-center gap-2.5 group"
+            className="editorial-sans"
+            style={{
+              textDecoration: "none",
+              fontSize: "0.7rem",
+              fontWeight: 300,
+              textTransform: "uppercase",
+              letterSpacing: "0.22em",
+              color: "var(--ed-warm-grey)",
+            }}
           >
-            <span className="text-primary/30 group-hover:text-primary/60 group-hover:-translate-x-0.5 transition-all duration-300 text-xs">
-              ←
-            </span>
-            <span className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/30 group-hover:text-primary/60 transition-colors duration-300">
-              Articles
-            </span>
+            ← Articles
           </Link>
         </div>
 
-        {/* ── Header ── */}
-        <header className="max-w-[700px] mx-auto px-6 md:px-8 mb-16">
-          <div className="flex items-center gap-3 mb-10">
-            <span className="font-label text-[10px] uppercase tracking-[0.2em] text-foreground/30">
-              {formatDate(article.publishedAt)}
+        {/* ── Hero ── */}
+        <section className="editorial-hero">
+          {article.showHeroOrnament !== false && (
+            <span className="editorial-fleuron" aria-hidden>
+              ❧
             </span>
-            {article.category && (
-              <>
-                <span className="w-[3px] h-[3px] rounded-full bg-foreground/10" />
-                <span className="font-label text-[10px] uppercase tracking-[0.2em] text-primary/40">
-                  {article.category}
-                </span>
-              </>
-            )}
-          </div>
+          )}
 
-          <h1 className="font-headline text-4xl md:text-[3.2rem] md:leading-[1.15] text-foreground mb-6">
-            {article.title}
+          {eyebrowParts.length > 0 && (
+            <div className="editorial-eyebrow">
+              {eyebrowParts.join("  ·  ")}
+            </div>
+          )}
+
+          <h1 className="editorial-title">
+            {article.richTitle && article.richTitle.length > 0 ? (
+              <PortableText
+                value={article.richTitle}
+                components={inlineRichComponents}
+              />
+            ) : (
+              article.title
+            )}
           </h1>
 
-          {article.byline && (
-            <p className="font-label text-[12px] md:text-[13px] tracking-[0.08em] text-primary/80 mb-10">
-              {article.byline}
-            </p>
-          )}
-
-          {article.excerpt && (
-            <p className="font-headline italic text-xl md:text-[1.35rem] leading-relaxed text-foreground/40 mt-2">
-              {article.excerpt}
-            </p>
-          )}
-
-          <div className="w-12 h-[1px] bg-foreground/10 mt-16" />
-        </header>
-
-        {/* ── Featured Image ── constrained to the text column, manual crop honored by Sanity */}
-        {article.featuredImage && (() => {
-          const dims = article.featuredImage.dimensions;
-          const renderedWidth = 1400; // 700px column @ 2x
-          const renderedHeight = dims
-            ? Math.round(renderedWidth / dims.aspectRatio)
-            : Math.round((renderedWidth * 2) / 3);
-          return (
-            <figure className="max-w-[700px] mx-auto px-6 md:px-8 mb-20">
-              <Image
-                src={urlFor(article.featuredImage)
-                  .width(renderedWidth)
-                  .quality(90)
-                  .auto("format")
-                  .url()}
-                alt={article.featuredImage.alt || article.title}
-                width={renderedWidth}
-                height={renderedHeight}
-                sizes="(max-width: 700px) 100vw, 700px"
-                priority
-                className="w-full h-auto object-contain bg-foreground/[0.04]"
+          {article.deck && article.deck.length > 0 ? (
+            <div className="editorial-deck">
+              <PortableText
+                value={article.deck}
+                components={inlineRichComponents}
               />
-              {article.featuredImage.alt && (
-                <figcaption className="font-label text-[10px] uppercase tracking-[0.22em] text-foreground/35 text-center mt-4">
-                  {article.featuredImage.alt}
-                </figcaption>
-              )}
-            </figure>
-          );
-        })()}
+            </div>
+          ) : article.excerpt ? (
+            <p className="editorial-deck">{article.excerpt}</p>
+          ) : null}
 
-        {/* ── Body (Portable Text) ── */}
-        <section className="max-w-[700px] mx-auto px-6 md:px-8 prose-salim">
-          {article.body ? (
-            <PortableText
-              value={article.body}
-              components={{
-                block: {
-                  h2: ({ children }) => (
-                    <h2 className="font-headline text-[1.75rem] md:text-[2rem] leading-snug mt-20 mb-8 text-foreground">
-                      {children}
-                    </h2>
-                  ),
-                  h3: ({ children }) => (
-                    <h3 className="font-headline text-xl md:text-2xl leading-snug mt-16 mb-6 text-foreground">
-                      {children}
-                    </h3>
-                  ),
-                  blockquote: ({ children }) => (
-                    <blockquote className="my-14 mx-0 md:-mx-4 pl-8 md:pl-10 border-l-[2px] border-primary/20 py-1">
-                      <p className="font-headline italic text-xl md:text-[1.4rem] leading-relaxed text-primary/80">
-                        {children}
-                      </p>
-                    </blockquote>
-                  ),
-                  normal: ({ children }) => (
-                    <p className="font-body text-[1.05rem] md:text-lg leading-[2] text-foreground/55 mb-7">
-                      {children}
-                    </p>
-                  ),
-                },
-                marks: {
-                  strong: ({ children }) => (
-                    <strong className="font-medium text-foreground">
-                      {children}
-                    </strong>
-                  ),
-                  em: ({ children }) => (
-                    <em className="text-foreground/70">{children}</em>
-                  ),
-                },
-              }}
-            />
-          ) : (
-            <p className="font-body text-sm text-foreground/30">
-              No content yet.
+          {(article.bylineDetails?.authorName ||
+            article.bylineDetails?.authorRole ||
+            article.bylineDetails?.publicationCredit ||
+            article.byline ||
+            article.publishedAt) && (
+            <p className="editorial-byline">
+              {article.bylineDetails?.authorName ? (
+                <strong>{article.bylineDetails.authorName}</strong>
+              ) : null}
+              {article.bylineDetails?.authorRole && (
+                <>
+                  {" "}
+                  &nbsp;·&nbsp; {article.bylineDetails.authorRole}
+                </>
+              )}
+              {article.publishedAt && (
+                <>
+                  {" "}
+                  &nbsp;·&nbsp; {formatDate(article.publishedAt)}
+                </>
+              )}
+              {article.readingTimeMinutes ? (
+                <>
+                  {" "}
+                  &nbsp;·&nbsp; {article.readingTimeMinutes} min read
+                </>
+              ) : null}
+              {article.bylineDetails?.publicationCredit && (
+                <>
+                  <br />
+                  {article.bylineDetails.publicationCredit}
+                </>
+              )}
+              {!article.bylineDetails?.authorName && article.byline ? (
+                <span>{article.byline}</span>
+              ) : null}
             </p>
           )}
         </section>
 
-        {/* ── Article Footer ── */}
-        <footer className="max-w-[700px] mx-auto px-6 md:px-8 mt-28 pt-14 border-t border-foreground/[0.04]">
-          <div className="flex items-center justify-between">
-            <Link
-              href="/articles"
-              className="inline-flex items-center gap-3 group"
+        {/* ── Featured Image ── */}
+        {article.featuredImage &&
+          (() => {
+            const dims = article.featuredImage.dimensions;
+            const renderedWidth = 1600;
+            const renderedHeight = dims
+              ? Math.round(renderedWidth / dims.aspectRatio)
+              : Math.round((renderedWidth * 2) / 3);
+            return (
+              <figure className="ed-figure" style={{ maxWidth: 820, margin: "0 auto", padding: "0 2.5rem" }}>
+                <Image
+                  src={urlFor(article.featuredImage)
+                    .width(renderedWidth)
+                    .quality(90)
+                    .auto("format")
+                    .url()}
+                  alt={article.featuredImage.alt || article.title}
+                  width={renderedWidth}
+                  height={renderedHeight}
+                  sizes="(max-width: 820px) 100vw, 820px"
+                  priority
+                />
+                {(article.featuredImage.caption ||
+                  article.featuredImage.credit) && (
+                  <figcaption>
+                    {article.featuredImage.caption}
+                    {article.featuredImage.credit && (
+                      <span className="ed-credit">
+                        {article.featuredImage.credit}
+                      </span>
+                    )}
+                  </figcaption>
+                )}
+              </figure>
+            );
+          })()}
+
+        {/* ── Optional TOC ── */}
+        {tocEntries.length > 0 && (
+          <nav className="ed-toc" aria-label="Table of contents">
+            <div className="ed-toc-title">Contents</div>
+            <ol>
+              {tocEntries.map((entry) => (
+                <li key={entry.id}>
+                  <a href={`#${entry.id}`}>{entry.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
+
+        {/* ── Body ── */}
+        <section className="editorial-body">
+          {article.body ? (
+            <PortableText
+              value={article.body}
+              components={buildBodyComponents()}
+            />
+          ) : (
+            <p style={{ color: "var(--ed-warm-grey)" }}>No content yet.</p>
+          )}
+        </section>
+
+        {/* ── Footer / back link ── */}
+        <footer
+          className="editorial-hero"
+          style={{
+            paddingTop: "2rem",
+            paddingBottom: "2rem",
+            borderTop: "1px solid var(--ed-rule)",
+          }}
+        >
+          <Link
+            href="/articles"
+            className="editorial-sans"
+            style={{
+              textDecoration: "none",
+              fontSize: "0.7rem",
+              fontWeight: 300,
+              textTransform: "uppercase",
+              letterSpacing: "0.22em",
+              color: "var(--ed-warm-grey)",
+            }}
+          >
+            ← All Articles
+          </Link>
+          {article.category && (
+            <span
+              className="editorial-sans"
+              style={{
+                float: "right",
+                fontSize: "0.7rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.2em",
+                color: "var(--ed-warm-grey)",
+              }}
             >
-              <span className="text-primary/30 group-hover:text-primary/60 group-hover:-translate-x-0.5 transition-all duration-300 text-xs">
-                ←
-              </span>
-              <span className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/40 group-hover:text-primary/70 transition-colors duration-300">
-                All Perspectives
-              </span>
-            </Link>
-            {article.category && (
-              <span className="font-label text-[10px] uppercase tracking-[0.2em] text-foreground/15">
-                {article.category}
-              </span>
-            )}
-          </div>
+              {article.category}
+            </span>
+          )}
         </footer>
       </article>
     </div>
