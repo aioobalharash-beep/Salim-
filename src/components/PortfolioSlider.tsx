@@ -89,7 +89,7 @@ export default function PortfolioSlider({
   }
 
   return (
-    <section className="min-h-screen flex flex-col justify-center py-20 px-6 md:px-12 max-w-screen-2xl mx-auto">
+    <section className="min-h-screen flex flex-col justify-center py-20 px-6 md:px-8 lg:px-12 max-w-[1600px] mx-auto">
       {/* Header with tabs */}
       <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 md:mb-16">
         <div>
@@ -135,9 +135,9 @@ export default function PortfolioSlider({
                 <Wrapper
                   key={item._id}
                   {...wrapperProps}
-                  className="grid grid-cols-[auto,1fr] gap-6 md:gap-8 group cursor-pointer items-start"
+                  className="grid grid-cols-[auto,1fr] gap-6 md:gap-10 group cursor-pointer items-center"
                 >
-                  <div className="relative w-[220px] sm:w-[260px] md:w-[300px] lg:w-[340px] aspect-[2/3] overflow-hidden bg-surface-container-low shrink-0">
+                  <div className="relative w-[220px] sm:w-[260px] md:w-[300px] lg:w-[340px] aspect-[2/3] overflow-hidden bg-surface-container-low shrink-0 border border-outline-variant/20 shadow-[0_2px_18px_rgba(0,0,0,0.04)]">
                     <Image
                       src={getImageSrc(item, i)}
                       alt={item.title}
@@ -146,12 +146,15 @@ export default function PortfolioSlider({
                       className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
                     />
                   </div>
-                  <div className="pt-1">
-                    <h4 className="font-serif-brand text-base md:text-lg text-on-surface leading-snug group-hover:text-primary transition-colors duration-300">
+                  <div>
+                    <span className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/60 mb-3 block">
+                      {item.type === "work" ? "Work" : "Event"}
+                    </span>
+                    <h4 className="font-serif-brand text-xl md:text-2xl text-on-surface leading-snug group-hover:text-primary transition-colors duration-300">
                       {item.title}
                     </h4>
                     {item.description && (
-                      <p className="font-body text-sm leading-relaxed text-on-surface-variant/70 mt-3">
+                      <p className="font-body text-sm md:text-[15px] leading-relaxed text-on-surface-variant/70 mt-4">
                         {item.description}
                       </p>
                     )}
