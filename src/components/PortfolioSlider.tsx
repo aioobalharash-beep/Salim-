@@ -8,6 +8,7 @@ import { urlFor } from "@/sanity/image";
 interface PortfolioItem {
   _id: string;
   title: string;
+  eyebrow?: string;
   description?: string;
   type: "work" | "event";
   image?: { asset: { _ref: string } };
@@ -147,9 +148,11 @@ export default function PortfolioSlider({
                     />
                   </div>
                   <div>
-                    <span className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/60 mb-3 block">
-                      {item.type === "work" ? "Work" : "Event"}
-                    </span>
+                    {item.eyebrow && (
+                      <span className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/60 mb-3 block">
+                        {item.eyebrow}
+                      </span>
+                    )}
                     <h4 className="font-serif-brand text-xl md:text-2xl text-on-surface leading-snug group-hover:text-primary transition-colors duration-300">
                       {item.title}
                     </h4>
