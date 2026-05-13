@@ -8,6 +8,7 @@ import { urlFor } from "@/sanity/image";
 interface PortfolioItem {
   _id: string;
   title: string;
+  description?: string;
   type: "work" | "event";
   image?: { asset: { _ref: string } };
   link?: string;
@@ -18,24 +19,32 @@ const seedItems: PortfolioItem[] = [
   {
     _id: "seed-1",
     title: "The Mediterranean Symphony Cycle",
+    description:
+      "A symphonic exploration of Mediterranean modal traditions, premiered across three continents.",
     type: "work",
     link: "/media",
   },
   {
     _id: "seed-2",
     title: "Echoes of Algiers",
+    description:
+      "An archival recording project capturing the unwritten melodies of traditional Algerian music.",
     type: "work",
     link: "/media/discography",
   },
   {
     _id: "seed-3",
     title: "UNESCO Heritage Gala 2024",
+    description:
+      "Ceremonial performance celebrating the safeguarding of intangible cultural heritage.",
     type: "event",
     link: "/about",
   },
   {
     _id: "seed-4",
     title: "Paris Conservatoire Masterclass",
+    description:
+      "An intensive masterclass on orchestration and cross-cultural composition.",
     type: "event",
     link: "/training",
   },
@@ -75,7 +84,7 @@ export default function PortfolioSlider({
       const seedIdx = seedItems.indexOf(item);
       return seedImages[seedIdx >= 0 ? seedIdx : index] || seedImages[0];
     }
-    if (item.image) return urlFor(item.image).width(900).height(600).url();
+    if (item.image) return urlFor(item.image).width(900).height(1350).url();
     return seedImages[index % seedImages.length];
   }
 
@@ -115,7 +124,7 @@ export default function PortfolioSlider({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14"
           >
             {visible.map((item, i) => {
               const Wrapper = item.link ? "a" : "div";
@@ -126,20 +135,27 @@ export default function PortfolioSlider({
                 <Wrapper
                   key={item._id}
                   {...wrapperProps}
-                  className="block group cursor-pointer"
+                  className="grid grid-cols-[auto,1fr] gap-6 md:gap-8 group cursor-pointer items-start"
                 >
-                  <div className="aspect-[3/2] w-full overflow-hidden relative bg-surface-container-low">
+                  <div className="relative w-[180px] sm:w-[200px] md:w-[220px] aspect-[2/3] overflow-hidden bg-surface-container-low shrink-0">
                     <Image
                       src={getImageSrc(item, i)}
                       alt={item.title}
                       fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover grayscale brightness-90 transition-all duration-700 group-hover:brightness-100 group-hover:scale-[1.02]"
+                      sizes="(max-width: 768px) 50vw, 220px"
+                      className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
                     />
                   </div>
-                  <h4 className="font-serif-brand text-xl mt-5 text-on-surface group-hover:text-primary transition-colors duration-300">
-                    {item.title}
-                  </h4>
+                  <div className="pt-1">
+                    <h4 className="font-serif-brand text-xl md:text-2xl text-on-surface leading-snug group-hover:text-primary transition-colors duration-300">
+                      {item.title}
+                    </h4>
+                    {item.description && (
+                      <p className="font-body text-sm md:text-[15px] leading-relaxed text-on-surface-variant/70 mt-3">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
                 </Wrapper>
               );
             })}

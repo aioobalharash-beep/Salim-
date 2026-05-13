@@ -9,7 +9,7 @@ import type { CatalogueWork } from "@/components/CatalogueFilter";
 
 export const revalidate = 60;
 
-const FALLBACK_TITLE = "About Salim";
+const FALLBACK_TITLE = "About Dada";
 const FALLBACK_DESCRIPTION =
   "The narrative of Salim Dada: composer, conductor, musicologist, and UNESCO cultural envoy bridging silence and sound across the Mediterranean.";
 
