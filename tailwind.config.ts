@@ -109,6 +109,7 @@ const config: Config = {
         label: ["Inter", "sans-serif"],
         "serif-brand": ['"Playfair Display"', "serif"],
         "arabic-serif": [
+          '"B Davat"',
           '"Arabic Typesetting"',
           '"Noto Naskh Arabic"',
           '"Traditional Arabic"',
