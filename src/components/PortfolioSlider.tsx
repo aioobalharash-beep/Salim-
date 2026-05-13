@@ -89,9 +89,9 @@ export default function PortfolioSlider({
   }
 
   return (
-    <section className="py-32 px-6 md:px-12 max-w-screen-2xl mx-auto">
+    <section className="min-h-screen flex flex-col justify-center py-20 px-6 md:px-12 max-w-screen-2xl mx-auto">
       {/* Header with tabs */}
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-16">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 md:mb-16">
         <div>
           <h3 className="font-headline text-3xl font-light mb-4">
             Work &amp; Events
@@ -137,21 +137,21 @@ export default function PortfolioSlider({
                   {...wrapperProps}
                   className="grid grid-cols-[auto,1fr] gap-6 md:gap-8 group cursor-pointer items-start"
                 >
-                  <div className="relative w-[180px] sm:w-[200px] md:w-[220px] aspect-[2/3] overflow-hidden bg-surface-container-low shrink-0">
+                  <div className="relative w-[220px] sm:w-[260px] md:w-[300px] lg:w-[340px] aspect-[2/3] overflow-hidden bg-surface-container-low shrink-0">
                     <Image
                       src={getImageSrc(item, i)}
                       alt={item.title}
                       fill
-                      sizes="(max-width: 768px) 50vw, 220px"
+                      sizes="(max-width: 768px) 60vw, 340px"
                       className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
                     />
                   </div>
                   <div className="pt-1">
-                    <h4 className="font-serif-brand text-xl md:text-2xl text-on-surface leading-snug group-hover:text-primary transition-colors duration-300">
+                    <h4 className="font-serif-brand text-base md:text-lg text-on-surface leading-snug group-hover:text-primary transition-colors duration-300">
                       {item.title}
                     </h4>
                     {item.description && (
-                      <p className="font-body text-sm md:text-[15px] leading-relaxed text-on-surface-variant/70 mt-3">
+                      <p className="font-body text-sm leading-relaxed text-on-surface-variant/70 mt-3">
                         {item.description}
                       </p>
                     )}
