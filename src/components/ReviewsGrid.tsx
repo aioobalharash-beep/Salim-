@@ -50,6 +50,11 @@ function fontClassForScript(script: Script): string {
   }
 }
 
+function textSizeForScript(script: Script): string {
+  if (script === "arabic") return "text-xl md:text-2xl";
+  return "text-base md:text-lg";
+}
+
 function langForScript(script: Script): string | undefined {
   if (script === "arabic") return "ar";
   return undefined;
@@ -69,6 +74,7 @@ function ReviewCard({ review }: { review: ReviewItem }) {
     .join(", ");
   const script = detectScript(text);
   const fontClass = fontClassForScript(script);
+  const textSize = textSizeForScript(script);
   const lang = langForScript(script);
   const dir = dirForScript(script);
 
@@ -89,7 +95,7 @@ function ReviewCard({ review }: { review: ReviewItem }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className={`${fontClass} text-base md:text-lg leading-[1.7] text-on-surface/85 text-center`}
+            className={`${fontClass} ${textSize} leading-[1.7] text-on-surface/85 text-center`}
           >
             {text}
           </motion.p>
