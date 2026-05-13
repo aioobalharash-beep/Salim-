@@ -19,7 +19,7 @@ const links = [
   // { href: "/shop", label: "Shop" },
   { href: "/media", label: "Media", children: mediaSubLinks },
   { href: "/articles", label: "Articles" },
-  { href: "/about", label: "About Salim" },
+  { href: "/about", label: "About Dada" },
 ];
 
 export default function Navbar() {

@@ -8,6 +8,7 @@ import { urlFor } from "@/sanity/image";
 interface PortfolioItem {
   _id: string;
   title: string;
+  description?: string;
   type: "work" | "event";
   image?: { asset: { _ref: string } };
   link?: string;
@@ -18,24 +19,32 @@ const seedItems: PortfolioItem[] = [
   {
     _id: "seed-1",
     title: "The Mediterranean Symphony Cycle",
+    description:
+      "A symphonic exploration of Mediterranean modal traditions, premiered across three continents.",
     type: "work",
     link: "/media",
   },
   {
     _id: "seed-2",
     title: "Echoes of Algiers",
+    description:
+      "An archival recording project capturing the unwritten melodies of traditional Algerian music.",
     type: "work",
     link: "/media/discography",
   },
   {
     _id: "seed-3",
     title: "UNESCO Heritage Gala 2024",
+    description:
+      "Ceremonial performance celebrating the safeguarding of intangible cultural heritage.",
     type: "event",
     link: "/about",
   },
   {
     _id: "seed-4",
     title: "Paris Conservatoire Masterclass",
+    description:
+      "An intensive masterclass on orchestration and cross-cultural composition.",
     type: "event",
     link: "/training",
   },
@@ -75,14 +84,14 @@ export default function PortfolioSlider({
       const seedIdx = seedItems.indexOf(item);
       return seedImages[seedIdx >= 0 ? seedIdx : index] || seedImages[0];
     }
-    if (item.image) return urlFor(item.image).width(900).height(600).url();
+    if (item.image) return urlFor(item.image).width(900).height(1350).url();
     return seedImages[index % seedImages.length];
   }
 
   return (
-    <section className="py-32 px-6 md:px-12 max-w-screen-2xl mx-auto">
+    <section className="min-h-screen flex flex-col justify-center py-20 px-6 md:px-8 lg:px-12 max-w-[1600px] mx-auto">
       {/* Header with tabs */}
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-16">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 md:mb-16">
         <div>
           <h3 className="font-headline text-3xl font-light mb-4">
             Work &amp; Events
@@ -115,7 +124,7 @@ export default function PortfolioSlider({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14"
           >
             {visible.map((item, i) => {
               const Wrapper = item.link ? "a" : "div";
@@ -126,20 +135,30 @@ export default function PortfolioSlider({
                 <Wrapper
                   key={item._id}
                   {...wrapperProps}
-                  className="block group cursor-pointer"
+                  className="grid grid-cols-[auto,1fr] gap-6 md:gap-10 group cursor-pointer items-center"
                 >
-                  <div className="aspect-[3/2] w-full overflow-hidden relative bg-surface-container-low">
+                  <div className="relative w-[220px] sm:w-[260px] md:w-[300px] lg:w-[340px] aspect-[2/3] overflow-hidden bg-surface-container-low shrink-0 border border-outline-variant/20 shadow-[0_2px_18px_rgba(0,0,0,0.04)]">
                     <Image
                       src={getImageSrc(item, i)}
                       alt={item.title}
                       fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover grayscale brightness-90 transition-all duration-700 group-hover:brightness-100 group-hover:scale-[1.02]"
+                      sizes="(max-width: 768px) 60vw, 340px"
+                      className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
                     />
                   </div>
-                  <h4 className="font-serif-brand text-xl mt-5 text-on-surface group-hover:text-primary transition-colors duration-300">
-                    {item.title}
-                  </h4>
+                  <div>
+                    <span className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/60 mb-3 block">
+                      {item.type === "work" ? "Work" : "Event"}
+                    </span>
+                    <h4 className="font-serif-brand text-xl md:text-2xl text-on-surface leading-snug group-hover:text-primary transition-colors duration-300">
+                      {item.title}
+                    </h4>
+                    {item.description && (
+                      <p className="font-body text-sm md:text-[15px] leading-relaxed text-on-surface-variant/70 mt-4">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
                 </Wrapper>
               );
             })}

@@ -107,6 +107,7 @@ export const portfolioQuery = groq`
   *[_type == "portfolio"] | order(order asc) {
     _id,
     title,
+    description,
     type,
     image,
     link
