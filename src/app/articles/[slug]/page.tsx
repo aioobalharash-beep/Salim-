@@ -21,24 +21,22 @@ interface BylineDetails {
   publicationCredit?: string | null;
 }
 
+/* Captions and credits can be either a plain string (legacy) or a
+ * Portable Text array (current). The renderer accepts both. */
+type RichOrString = string | PortableTextBlock[];
+
 type SanityImageWithMeta = SanityImageSource & {
   alt?: string;
-  caption?: string;
-  credit?: string;
-  captionItalic?: boolean;
-  creditUppercase?: boolean;
-  creditItalic?: boolean;
+  caption?: RichOrString;
+  credit?: RichOrString;
   size?: "column" | "wide" | "full";
   dimensions?: { width: number; height: number; aspectRatio: number };
 };
 
 interface YouTubeBlock {
   url: string;
-  caption?: string;
-  credit?: string;
-  captionItalic?: boolean;
-  creditUppercase?: boolean;
-  creditItalic?: boolean;
+  caption?: RichOrString;
+  credit?: RichOrString;
   size?: "column" | "wide" | "full";
   embedMode?: "thumbnail" | "iframe";
 }
@@ -59,34 +57,33 @@ function getYouTubeId(url: string): string | null {
   return null;
 }
 
+function renderRichOrString(value: RichOrString | undefined) {
+  if (!value) return null;
+  if (typeof value === "string") return value;
+  if (!Array.isArray(value) || value.length === 0) return null;
+  return <PortableText value={value} components={inlineRichComponents} />;
+}
+
 function FigureCaption({
   caption,
-  captionItalic,
   credit,
-  creditUppercase,
-  creditItalic,
 }: {
-  caption?: string;
-  captionItalic?: boolean;
-  credit?: string;
-  creditUppercase?: boolean;
-  creditItalic?: boolean;
+  caption?: RichOrString;
+  credit?: RichOrString;
 }) {
-  if (!caption && !credit) return null;
-  const capCls = ["ed-caption", captionItalic !== false ? "italic" : ""]
-    .filter(Boolean)
-    .join(" ");
-  const credCls = [
-    "ed-credit",
-    creditUppercase !== false ? "uppercase" : "",
-    creditItalic ? "italic" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const hasCaption =
+    typeof caption === "string"
+      ? caption.length > 0
+      : Array.isArray(caption) && caption.length > 0;
+  const hasCredit =
+    typeof credit === "string"
+      ? credit.length > 0
+      : Array.isArray(credit) && credit.length > 0;
+  if (!hasCaption && !hasCredit) return null;
   return (
     <figcaption>
-      {caption && <span className={capCls}>{caption}</span>}
-      {credit && <span className={credCls}>{credit}</span>}
+      {hasCaption && <span className="ed-caption">{renderRichOrString(caption)}</span>}
+      {hasCredit && <span className="ed-credit">{renderRichOrString(credit)}</span>}
     </figcaption>
   );
 }
@@ -332,15 +329,24 @@ function BodyImage({ value }: { value: SanityImageWithMeta }) {
               : "(max-width: 820px) 100vw, 720px"
         }
       />
-      <FigureCaption
-        caption={value.caption}
-        captionItalic={value.captionItalic}
-        credit={value.credit}
-        creditUppercase={value.creditUppercase}
-        creditItalic={value.creditItalic}
-      />
+      <FigureCaption caption={value.caption} credit={value.credit} />
     </figure>
   );
+}
+
+/* Quick plain-text extraction from a rich-or-string value (used for
+ * alt / title / aria-label attributes where markup isn't allowed). */
+function richToPlainText(value: RichOrString | undefined): string | undefined {
+  if (!value) return undefined;
+  if (typeof value === "string") return value;
+  return value
+    .map((b: any) =>
+      Array.isArray(b?.children)
+        ? b.children.map((c: any) => c?.text ?? "").join("")
+        : "",
+    )
+    .join(" ")
+    .trim() || undefined;
 }
 
 function YouTubeEmbed({ value }: { value: YouTubeBlock }) {
@@ -348,12 +354,13 @@ function YouTubeEmbed({ value }: { value: YouTubeBlock }) {
   if (!id) return null;
   const size = value.size || "column";
   const mode = value.embedMode || "thumbnail";
+  const captionText = richToPlainText(value.caption);
   return (
     <figure className={`ed-figure ${size}`}>
       {mode === "iframe" ? (
         <iframe
           src={`https://www.youtube-nocookie.com/embed/${id}`}
-          title={value.caption || "YouTube video"}
+          title={captionText || "YouTube video"}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
           loading="lazy"
@@ -364,24 +371,18 @@ function YouTubeEmbed({ value }: { value: YouTubeBlock }) {
           href={`https://www.youtube.com/watch?v=${id}`}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={value.caption || "Watch on YouTube"}
+          aria-label={captionText || "Watch on YouTube"}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={`https://i.ytimg.com/vi/${id}/maxresdefault.jpg`}
-            alt={value.caption || "YouTube thumbnail"}
+            alt={captionText || "YouTube thumbnail"}
             loading="lazy"
           />
           <span className="ed-yt-play" aria-hidden />
         </a>
       )}
-      <FigureCaption
-        caption={value.caption}
-        captionItalic={value.captionItalic}
-        credit={value.credit}
-        creditUppercase={value.creditUppercase}
-        creditItalic={value.creditItalic}
-      />
+      <FigureCaption caption={value.caption} credit={value.credit} />
     </figure>
   );
 }
@@ -418,6 +419,12 @@ function buildBodyComponents(): PortableTextComponents {
       normal: ({ children }) => <p>{children}</p>,
       lead: ({ children }) => <p className="lead">{children}</p>,
       caption: ({ children }) => <p className="caption">{children}</p>,
+      alignCenter: ({ children }) => (
+        <p style={{ textAlign: "center" }}>{children}</p>
+      ),
+      alignRight: ({ children }) => (
+        <p style={{ textAlign: "right" }}>{children}</p>
+      ),
       h2: ({ children, value }) => {
         const id = slugify(blockToPlainText(value));
         return <h2 id={id}>{children}</h2>;
@@ -638,17 +645,10 @@ export default async function ArticlePage({
                   sizes="(max-width: 820px) 100vw, 820px"
                   priority
                 />
-                {(article.featuredImage.caption ||
-                  article.featuredImage.credit) && (
-                  <figcaption>
-                    {article.featuredImage.caption}
-                    {article.featuredImage.credit && (
-                      <span className="ed-credit">
-                        {article.featuredImage.credit}
-                      </span>
-                    )}
-                  </figcaption>
-                )}
+                <FigureCaption
+                  caption={article.featuredImage.caption}
+                  credit={article.featuredImage.credit}
+                />
               </figure>
             );
           })()}
