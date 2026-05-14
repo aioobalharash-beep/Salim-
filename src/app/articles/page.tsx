@@ -8,7 +8,7 @@ export const revalidate = 60;
 
 const FALLBACK_TITLE = "Articles";
 const FALLBACK_DESCRIPTION =
-  "Long-form reflections on musicology, cultural preservation, pedagogy, and Mediterranean musical traditions.";
+  "Writing at the crossroads of artistic practice, scholarly research and cultural expertise — on composition, musicology, guitar, arts, orchestra conducting, AI & music, and the diversity of cultural expressions.";
 
 interface ArticleListItem {
   title: string;
