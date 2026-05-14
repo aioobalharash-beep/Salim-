@@ -126,6 +126,8 @@ const inlineMarks = {
 const blockStyles = [
   { title: "Normal", value: "normal" },
   { title: "Lead (first paragraph)", value: "lead" },
+  { title: "Centered", value: "alignCenter" },
+  { title: "Right-aligned", value: "alignRight" },
   { title: "H2", value: "h2" },
   { title: "H2 — Italic Rust (section head)", value: "h2Italic" },
   { title: "H3", value: "h3" },
@@ -138,6 +140,27 @@ const blockLists = [
   { title: "Bullet", value: "bullet" },
   { title: "Numbered", value: "number" },
 ];
+
+/* Short rich-text type for figure captions and credits. Supports inline
+ * italic and bold marks so the editor can format individual words rather
+ * than apply one style to the whole field. */
+const captionRichType = {
+  type: "array" as const,
+  of: [
+    {
+      type: "block" as const,
+      styles: [{ title: "Normal", value: "normal" }],
+      lists: [],
+      marks: {
+        decorators: [
+          { title: "Bold", value: "strong" },
+          { title: "Italic", value: "em" },
+        ],
+        annotations: [],
+      },
+    },
+  ],
+};
 
 export default defineType({
   name: "articles",
@@ -338,14 +361,16 @@ export default defineType({
         defineField({
           name: "caption",
           title: "Caption",
-          type: "string",
-          description: "Italic caption shown beneath the image.",
+          description:
+            "Type the caption exactly as you want it (any case). Use the Italic / Bold buttons to format individual words.",
+          ...captionRichType,
         }),
         defineField({
           name: "credit",
           title: "Credit",
-          type: "string",
-          description: "Photographer / source. Rendered in small uppercase.",
+          description:
+            "Photographer / source. Type the text exactly as you want it (any case). Italic / Bold are available for individual words.",
+          ...captionRichType,
         }),
       ],
     }),
@@ -419,36 +444,16 @@ export default defineType({
             defineField({
               name: "caption",
               title: "Caption",
-              type: "string",
-              description: "Caption shown below the image.",
-            }),
-            defineField({
-              name: "captionItalic",
-              title: "Italic caption",
-              type: "boolean",
-              initialValue: true,
-              description: "If on, the caption is rendered in italic.",
+              description:
+                "Type the caption exactly as you want it (any case). Use the Italic / Bold buttons to format individual words.",
+              ...captionRichType,
             }),
             defineField({
               name: "credit",
               title: "Credit",
-              type: "string",
-              description: "Photographer / source.",
-            }),
-            defineField({
-              name: "creditUppercase",
-              title: "Uppercase credit",
-              type: "boolean",
-              initialValue: true,
               description:
-                "If on, the credit is rendered in small uppercase with tracking.",
-            }),
-            defineField({
-              name: "creditItalic",
-              title: "Italic credit",
-              type: "boolean",
-              initialValue: false,
-              description: "If on, the credit is rendered in italic.",
+                "Photographer / source. Type the text exactly as you want it (any case). Italic / Bold are available for individual words.",
+              ...captionRichType,
             }),
             defineField({
               name: "size",
@@ -485,31 +490,16 @@ export default defineType({
             defineField({
               name: "caption",
               title: "Caption",
-              type: "string",
-              description: "Optional caption shown below the video.",
-            }),
-            defineField({
-              name: "captionItalic",
-              title: "Italic caption",
-              type: "boolean",
-              initialValue: true,
+              description:
+                "Optional. Type the caption exactly as you want it (any case). Italic / Bold available on individual words.",
+              ...captionRichType,
             }),
             defineField({
               name: "credit",
               title: "Credit",
-              type: "string",
-            }),
-            defineField({
-              name: "creditUppercase",
-              title: "Uppercase credit",
-              type: "boolean",
-              initialValue: true,
-            }),
-            defineField({
-              name: "creditItalic",
-              title: "Italic credit",
-              type: "boolean",
-              initialValue: false,
+              description:
+                "Optional. Italic / Bold available on individual words.",
+              ...captionRichType,
             }),
             defineField({
               name: "size",
@@ -542,10 +532,10 @@ export default defineType({
             }),
           ],
           preview: {
-            select: { title: "caption", subtitle: "url" },
-            prepare: ({ title, subtitle }) => ({
-              title: title || "YouTube Video",
-              subtitle,
+            select: { url: "url" },
+            prepare: ({ url }) => ({
+              title: "YouTube Video",
+              subtitle: url,
             }),
           },
         }),
@@ -579,17 +569,33 @@ export default defineType({
             defineField({
               name: "attribution",
               title: "Attribution",
-              type: "string",
               description:
-                "Small uppercase line beneath the quote (e.g. '— Henri Tomasi, manuscript preface').",
+                "Small line beneath the quote (e.g. '— Henri Tomasi, manuscript preface'). Type the text exactly as you want it — use the Italic / Bold buttons to format individual words.",
+              ...captionRichType,
             }),
           ],
           preview: {
             select: { attribution: "attribution" },
-            prepare: ({ attribution }) => ({
-              title: "Composer / Subject Voice",
-              subtitle: attribution || "Dark pull-out quote",
-            }),
+            prepare: (selection: Record<string, any>) => {
+              const attribution = selection.attribution;
+              const subtitle =
+                typeof attribution === "string"
+                  ? attribution
+                  : Array.isArray(attribution)
+                    ? attribution
+                        .map((b: any) =>
+                          Array.isArray(b?.children)
+                            ? b.children.map((c: any) => c?.text ?? "").join("")
+                            : "",
+                        )
+                        .join(" ")
+                        .trim()
+                    : "";
+              return {
+                title: "Composer / Subject Voice",
+                subtitle: subtitle || "Dark pull-out quote",
+              };
+            },
           },
         }),
 

@@ -292,14 +292,17 @@ textarea:focus {
 .editorial .composer-voice p:last-of-type { margin-bottom: 0; }
 .editorial .composer-voice .attribution {
   font-family: "Outfit", system-ui, sans-serif;
-  font-size: 0.7rem;
+  font-size: 0.82rem;
   font-weight: 300;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.04em;
   color: var(--ed-gold);
   margin-top: 1rem;
   display: block;
   font-style: normal;
+}
+.editorial .composer-voice .attribution p {
+  margin: 0;
+  display: inline;
 }
 
 /* — Two-column / bilingual poem — */
@@ -496,22 +499,20 @@ textarea:focus {
   text-align: center;
   margin-top: 0.6rem;
 }
-.editorial figure.ed-figure .ed-caption.italic { font-style: italic; }
+.editorial figure.ed-figure .ed-caption p,
+.editorial figure.ed-figure .ed-credit p {
+  margin: 0;
+  display: inline;
+}
 .editorial figure.ed-figure .ed-credit {
   font-family: "Outfit", system-ui, sans-serif;
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
   color: var(--ed-warm-grey);
   display: block;
   margin-top: 0.3rem;
 }
-.editorial figure.ed-figure .ed-credit.uppercase {
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-size: 0.62rem;
-}
-.editorial figure.ed-figure .ed-credit.italic { font-style: italic; }
 
 /* — YouTube embed — */
 .editorial .ed-youtube {
