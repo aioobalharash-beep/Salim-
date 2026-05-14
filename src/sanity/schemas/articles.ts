@@ -420,13 +420,35 @@ export default defineType({
               name: "caption",
               title: "Caption",
               type: "string",
-              description: "Italic caption below the image.",
+              description: "Caption shown below the image.",
+            }),
+            defineField({
+              name: "captionItalic",
+              title: "Italic caption",
+              type: "boolean",
+              initialValue: true,
+              description: "If on, the caption is rendered in italic.",
             }),
             defineField({
               name: "credit",
               title: "Credit",
               type: "string",
-              description: "Photographer / source (small uppercase).",
+              description: "Photographer / source.",
+            }),
+            defineField({
+              name: "creditUppercase",
+              title: "Uppercase credit",
+              type: "boolean",
+              initialValue: true,
+              description:
+                "If on, the credit is rendered in small uppercase with tracking.",
+            }),
+            defineField({
+              name: "creditItalic",
+              title: "Italic credit",
+              type: "boolean",
+              initialValue: false,
+              description: "If on, the credit is rendered in italic.",
             }),
             defineField({
               name: "size",
@@ -443,6 +465,89 @@ export default defineType({
               },
             }),
           ],
+        }),
+
+        /* ── YouTube embed (thumbnail) ── */
+        defineArrayMember({
+          type: "object",
+          name: "youtube",
+          title: "YouTube Video",
+          fields: [
+            defineField({
+              name: "url",
+              title: "YouTube URL",
+              type: "url",
+              description:
+                "Any YouTube link (watch URL, youtu.be short link, /embed/, or /shorts/).",
+              validation: (Rule) =>
+                Rule.required().uri({ scheme: ["http", "https"] }),
+            }),
+            defineField({
+              name: "caption",
+              title: "Caption",
+              type: "string",
+              description: "Optional caption shown below the video.",
+            }),
+            defineField({
+              name: "captionItalic",
+              title: "Italic caption",
+              type: "boolean",
+              initialValue: true,
+            }),
+            defineField({
+              name: "credit",
+              title: "Credit",
+              type: "string",
+            }),
+            defineField({
+              name: "creditUppercase",
+              title: "Uppercase credit",
+              type: "boolean",
+              initialValue: true,
+            }),
+            defineField({
+              name: "creditItalic",
+              title: "Italic credit",
+              type: "boolean",
+              initialValue: false,
+            }),
+            defineField({
+              name: "size",
+              title: "Display size",
+              type: "string",
+              initialValue: "column",
+              options: {
+                list: [
+                  { title: "Column width", value: "column" },
+                  { title: "Wide (slight bleed)", value: "wide" },
+                  { title: "Full bleed", value: "full" },
+                ],
+                layout: "radio",
+              },
+            }),
+            defineField({
+              name: "embedMode",
+              title: "Embed mode",
+              type: "string",
+              initialValue: "thumbnail",
+              description:
+                "Thumbnail = lightweight poster image that opens the video on click. Iframe = inline player.",
+              options: {
+                list: [
+                  { title: "Thumbnail (recommended)", value: "thumbnail" },
+                  { title: "Inline iframe player", value: "iframe" },
+                ],
+                layout: "radio",
+              },
+            }),
+          ],
+          preview: {
+            select: { title: "caption", subtitle: "url" },
+            prepare: ({ title, subtitle }) => ({
+              title: title || "YouTube Video",
+              subtitle,
+            }),
+          },
         }),
 
         /* ── Composer / Subject voice (dark pull-out) ── */

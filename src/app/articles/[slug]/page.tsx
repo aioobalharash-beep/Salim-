@@ -25,9 +25,71 @@ type SanityImageWithMeta = SanityImageSource & {
   alt?: string;
   caption?: string;
   credit?: string;
+  captionItalic?: boolean;
+  creditUppercase?: boolean;
+  creditItalic?: boolean;
   size?: "column" | "wide" | "full";
   dimensions?: { width: number; height: number; aspectRatio: number };
 };
+
+interface YouTubeBlock {
+  url: string;
+  caption?: string;
+  credit?: string;
+  captionItalic?: boolean;
+  creditUppercase?: boolean;
+  creditItalic?: boolean;
+  size?: "column" | "wide" | "full";
+  embedMode?: "thumbnail" | "iframe";
+}
+
+function getYouTubeId(url: string): string | null {
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    if (u.hostname === "youtu.be") return u.pathname.slice(1) || null;
+    if (u.hostname.endsWith("youtube.com")) {
+      if (u.pathname === "/watch") return u.searchParams.get("v");
+      const m = u.pathname.match(/^\/(embed|shorts|v)\/([^/?#]+)/);
+      if (m) return m[2];
+    }
+  } catch {
+    /* fall through */
+  }
+  return null;
+}
+
+function FigureCaption({
+  caption,
+  captionItalic,
+  credit,
+  creditUppercase,
+  creditItalic,
+}: {
+  caption?: string;
+  captionItalic?: boolean;
+  credit?: string;
+  creditUppercase?: boolean;
+  creditItalic?: boolean;
+}) {
+  if (!caption && !credit) return null;
+  const capCls = ["ed-caption", captionItalic !== false ? "italic" : ""]
+    .filter(Boolean)
+    .join(" ");
+  const credCls = [
+    "ed-credit",
+    creditUppercase !== false ? "uppercase" : "",
+    creditItalic ? "italic" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return (
+    <figcaption>
+      {caption && <span className={capCls}>{caption}</span>}
+      {credit && <span className={credCls}>{credit}</span>}
+    </figcaption>
+  );
+}
 
 interface Article {
   title: string;
@@ -269,14 +331,57 @@ function BodyImage({ value }: { value: SanityImageWithMeta }) {
               ? "(max-width: 900px) 100vw, 900px"
               : "(max-width: 820px) 100vw, 720px"
         }
-        className=""
       />
-      {(value.caption || value.credit) && (
-        <figcaption>
-          {value.caption}
-          {value.credit && <span className="ed-credit">{value.credit}</span>}
-        </figcaption>
+      <FigureCaption
+        caption={value.caption}
+        captionItalic={value.captionItalic}
+        credit={value.credit}
+        creditUppercase={value.creditUppercase}
+        creditItalic={value.creditItalic}
+      />
+    </figure>
+  );
+}
+
+function YouTubeEmbed({ value }: { value: YouTubeBlock }) {
+  const id = getYouTubeId(value?.url || "");
+  if (!id) return null;
+  const size = value.size || "column";
+  const mode = value.embedMode || "thumbnail";
+  return (
+    <figure className={`ed-figure ${size}`}>
+      {mode === "iframe" ? (
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${id}`}
+          title={value.caption || "YouTube video"}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          loading="lazy"
+        />
+      ) : (
+        <a
+          className="ed-youtube"
+          href={`https://www.youtube.com/watch?v=${id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={value.caption || "Watch on YouTube"}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`https://i.ytimg.com/vi/${id}/maxresdefault.jpg`}
+            alt={value.caption || "YouTube thumbnail"}
+            loading="lazy"
+          />
+          <span className="ed-yt-play" aria-hidden />
+        </a>
       )}
+      <FigureCaption
+        caption={value.caption}
+        captionItalic={value.captionItalic}
+        credit={value.credit}
+        creditUppercase={value.creditUppercase}
+        creditItalic={value.creditItalic}
+      />
     </figure>
   );
 }
@@ -335,6 +440,7 @@ function buildBodyComponents(): PortableTextComponents {
     },
     types: {
       bodyImage: BodyImage as any,
+      youtube: YouTubeEmbed as any,
       composerVoice: ComposerVoice as any,
       timeline: Timeline as any,
       factbox: Factbox as any,
