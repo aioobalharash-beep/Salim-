@@ -66,32 +66,28 @@ export default async function VideoPage() {
       />
 
       <section className="px-6 md:px-12 max-w-screen-2xl mx-auto pb-32">
-        <ul className="divide-y divide-primary/15">
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-20">
           {videos.map((v) => {
             const embed = toEmbedUrl(v.videoLink);
             return (
-              <li key={v._id} className="py-16 md:py-20 first:pt-0 last:pb-0">
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-12 items-start">
-                  <div className="md:col-span-3">
-                    <div className="relative w-full aspect-video bg-on-surface/5 overflow-hidden">
-                      {embed ? (
-                        <iframe
-                          src={embed}
-                          title="Video"
-                          loading="lazy"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                          allowFullScreen
-                          className="absolute inset-0 w-full h-full"
-                        />
-                      ) : null}
-                    </div>
-                  </div>
-                  <div className="md:col-span-2">
-                    <p className="font-body text-base leading-relaxed text-on-surface-variant whitespace-pre-line">
-                      {v.description}
-                    </p>
-                  </div>
+              <li key={v._id} className="flex flex-col">
+                <div className="relative w-full aspect-video bg-on-surface/5 overflow-hidden">
+                  {embed ? (
+                    <iframe
+                      src={embed}
+                      title="Video"
+                      loading="lazy"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      className="absolute inset-0 w-full h-full"
+                    />
+                  ) : null}
                 </div>
+                {v.description && (
+                  <p className="mt-6 font-body text-base leading-relaxed text-on-surface-variant whitespace-pre-line text-center">
+                    {v.description}
+                  </p>
+                )}
               </li>
             );
           })}
