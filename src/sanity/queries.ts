@@ -104,10 +104,12 @@ export const aboutQuery = groq`
 `;
 
 export const portfolioQuery = groq`
-  *[_type == "portfolio"] | order(order asc) {
+  *[_type == "portfolio"] | order(pageGroup asc, order asc) {
     _id,
     title,
     type,
+    orientation,
+    pageGroup,
     image,
     link
   }
