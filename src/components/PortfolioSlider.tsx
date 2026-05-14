@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { urlFor } from "@/sanity/image";
+
+type Orientation = "vertical" | "horizontal";
 
 interface PortfolioItem {
   _id: string;
@@ -11,69 +13,195 @@ interface PortfolioItem {
   eyebrow?: string;
   description?: string;
   type: "work" | "event";
+  orientation?: Orientation;
+  pageGroup?: number;
   image?: { asset: { _ref: string } };
   link?: string;
 }
 
-// Seed data
+/* ── Seed data: demonstrates the two valid page layouts. ─────────────── */
 const seedItems: PortfolioItem[] = [
+  // Work — page 1: three verticals
   {
-    _id: "seed-1",
-    title: "The Mediterranean Symphony Cycle",
+    _id: "seed-w1a",
+    title: "Suite Algérienne — Solo Guitar",
+    eyebrow: "Publication",
+    description:
+      "Newly published score for solo classical guitar, exploring Algerian modal traditions.",
+    type: "work",
+    orientation: "vertical",
+    pageGroup: 1,
+    link: "/catalogue",
+  },
+  {
+    _id: "seed-w1b",
+    title: "Conversations — 12 Duets",
+    eyebrow: "Publication",
+    description:
+      "Twelve duets for two violinists, written as a contemporary dialogue across registers.",
+    type: "work",
+    orientation: "vertical",
+    pageGroup: 1,
+    link: "/catalogue",
+  },
+  {
+    _id: "seed-w1c",
+    title: "Mediterranean Cycle",
+    eyebrow: "Symphony",
     description:
       "A symphonic exploration of Mediterranean modal traditions, premiered across three continents.",
     type: "work",
+    orientation: "vertical",
+    pageGroup: 1,
     link: "/media",
   },
+  // Work — page 2: one vertical + one horizontal
   {
-    _id: "seed-2",
+    _id: "seed-w2a",
     title: "Echoes of Algiers",
+    eyebrow: "Recording",
     description:
       "An archival recording project capturing the unwritten melodies of traditional Algerian music.",
     type: "work",
+    orientation: "vertical",
+    pageGroup: 2,
     link: "/media/discography",
   },
   {
-    _id: "seed-3",
+    _id: "seed-w2b",
+    title: "Sinfonietta per archi — Live",
+    eyebrow: "Premiere",
+    description:
+      "Live footage of the first Algerian symphony for strings, recorded in Antwerp ahead of its world premiere.",
+    type: "work",
+    orientation: "horizontal",
+    pageGroup: 2,
+    link: "/media/video",
+  },
+
+  // Events — page 1: 1V + 1H
+  {
+    _id: "seed-e1a",
     title: "UNESCO Heritage Gala 2024",
+    eyebrow: "Ceremony",
     description:
       "Ceremonial performance celebrating the safeguarding of intangible cultural heritage.",
     type: "event",
+    orientation: "vertical",
+    pageGroup: 1,
     link: "/about",
   },
   {
-    _id: "seed-4",
+    _id: "seed-e1b",
     title: "Paris Conservatoire Masterclass",
+    eyebrow: "Masterclass",
     description:
       "An intensive masterclass on orchestration and cross-cultural composition.",
     type: "event",
+    orientation: "horizontal",
+    pageGroup: 1,
     link: "/training",
   },
 ];
 
-const seedImages = [
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuB6r-Mctd1H1GECr_-W16XF8uRUjpmIeGtwRNv9zYhQIpSXjaA5GwKHNpFiSTpGvT7JZ85RJmxu5LJmwRgd0hrTzZ2AaemNWtEngXPXcbvIC8Kfz5Pai8YpXUQLmVDmuJlprTVDQQlcDZBHaswsMGm6L8crK8e0Y_LruCzHV4FX4T0-Kajy6RioqNxNyHk-YVerCOf_sObHQQvPETVoqLMyiCg1zHgD1U4XHVrKNItrC6koFlqKnj8_gM9qumec098Vdv8N3D8BADI",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuCm8N-B8paqMsf-Qq--j02S8rM6pwRW5iYqhHbHQ3hj2godwwe3TKmYIsI7ej8NDw2AjUkqulg6_K2Q1hT1gSowt7saduB_gri2VVFY2gxrzqFoNt8s-dBXbPGE_N4z-KP3YAj6Fry0EDBpuzfDswB5IOIUFV9UORspEBbQ2RygTCs6h09hJn2y6IMwdj7PtZHsrjB-Qzkf5sH21qoeJbvm-WyKQ0inrbQeiEBuZAaVPlzzgWlS3oK86Y0f1SsEt64H_U4O2HbaH7Q",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuDKQncCtMO1LDFajAnhmh05zwIo_IQRwymL9y2EG3ceqtszirfBoTL70nYvS4bLIgIv_iONQu42Df7ta_GKfzf6T7l_lBBDOXEBsFXs5GMB6oSPVe7O433s8_gpm-LXrqwPK4FZW6yEK0rDPZ_EvlOZfSof6F5ozP2PJz20Qqv0tDNn_5VDCOJBBu3q5h6snC2z7Qcirlb61C7k1undiDIlwmVNMBDTN8ZkzBbGob-_MapKkypGt2t025qAPtNDusV1A4rZV9AJR3Y",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuCA2HzKVHVrZU6DMo9jGpg-hq9CrPTt2yR8306t0OXm2yM4T0dfOEedW2PPtbVEbZQLWxTWzziuGZ3jEzJsdT2NKBpfojGCzWJAyQ0s1b0_qdaB8wZxUUuxnVKNKP0MBKG5llqth2Ix3LWgkhT678AcgeGwhV_jikD4zMUmk3N1bQJZ_3How9am7KuP0OOKyOF4zNMNWUILr0xgwyBnra0d0arAmkFr0dRNos-rDU28KERJlBmB7rW-T4yl5Z38Gznb-0U53hioNps",
-];
+const seedImages: Record<Orientation, string[]> = {
+  vertical: [
+    "https://lh3.googleusercontent.com/aida-public/AB6AXuB6r-Mctd1H1GECr_-W16XF8uRUjpmIeGtwRNv9zYhQIpSXjaA5GwKHNpFiSTpGvT7JZ85RJmxu5LJmwRgd0hrTzZ2AaemNWtEngXPXcbvIC8Kfz5Pai8YpXUQLmVDmuJlprTVDQQlcDZBHaswsMGm6L8crK8e0Y_LruCzHV4FX4T0-Kajy6RioqNxNyHk-YVerCOf_sObHQQvPETVoqLMyiCg1zHgD1U4XHVrKNItrC6koFlqKnj8_gM9qumec098Vdv8N3D8BADI",
+    "https://lh3.googleusercontent.com/aida-public/AB6AXuCm8N-B8paqMsf-Qq--j02S8rM6pwRW5iYqhHbHQ3hj2godwwe3TKmYIsI7ej8NDw2AjUkqulg6_K2Q1hT1gSowt7saduB_gri2VVFY2gxrzqFoNt8s-dBXbPGE_N4z-KP3YAj6Fry0EDBpuzfDswB5IOIUFV9UORspEBbQ2RygTCs6h09hJn2y6IMwdj7PtZHsrjB-Qzkf5sH21qoeJbvm-WyKQ0inrbQeiEBuZAaVPlzzgWlS3oK86Y0f1SsEt64H_U4O2HbaH7Q",
+  ],
+  horizontal: [
+    "https://lh3.googleusercontent.com/aida-public/AB6AXuDKQncCtMO1LDFajAnhmh05zwIo_IQRwymL9y2EG3ceqtszirfBoTL70nYvS4bLIgIv_iONQu42Df7ta_GKfzf6T7l_lBBDOXEBsFXs5GMB6oSPVe7O433s8_gpm-LXrqwPK4FZW6yEK0rDPZ_EvlOZfSof6F5ozP2PJz20Qqv0tDNn_5VDCOJBBu3q5h6snC2z7Qcirlb61C7k1undiDIlwmVNMBDTN8ZkzBbGob-_MapKkypGt2t025qAPtNDusV1A4rZV9AJR3Y",
+    "https://lh3.googleusercontent.com/aida-public/AB6AXuCA2HzKVHVrZU6DMo9jGpg-hq9CrPTt2yR8306t0OXm2yM4T0dfOEedW2PPtbVEbZQLWxTWzziuGZ3jEzJsdT2NKBpfojGCzWJAyQ0s1b0_qdaB8wZxUUuxnVKNKP0MBKG5llqth2Ix3LWgkhT678AcgeGwhV_jikD4zMUmk3N1bQJZ_3How9am7KuP0OOKyOF4zNMNWUILr0xgwyBnra0d0arAmkFr0dRNos-rDU28KERJlBmB7rW-T4yl5Z38Gznb-0U53hioNps",
+  ],
+};
+
+/* ── Layout decision: classify a group's composition. ────────────────── */
+type Layout = "threeVertical" | "verticalPlusHorizontal" | "fallback";
+
+function classifyGroup(items: PortfolioItem[]): Layout {
+  if (
+    items.length === 3 &&
+    items.every((i) => (i.orientation ?? "vertical") === "vertical")
+  ) {
+    return "threeVertical";
+  }
+  if (items.length === 2) {
+    const orientations = items.map((i) => i.orientation ?? "vertical").sort();
+    if (orientations[0] === "horizontal" && orientations[1] === "vertical") {
+      return "verticalPlusHorizontal";
+    }
+  }
+  return "fallback";
+}
+
+/* Group items by pageGroup. If pageGroup is missing, fall back to
+ * auto-chunking based on orientation: greedily emit 3-vertical pages
+ * when possible, otherwise pair a vertical with a horizontal. */
+function buildPages(items: PortfolioItem[]): PortfolioItem[][] {
+  const haveGroups = items.some((i) => typeof i.pageGroup === "number");
+
+  if (haveGroups) {
+    const buckets = new Map<number, PortfolioItem[]>();
+    for (const item of items) {
+      const key = item.pageGroup ?? 9999;
+      if (!buckets.has(key)) buckets.set(key, []);
+      buckets.get(key)!.push(item);
+    }
+    return Array.from(buckets.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([, list]) => list);
+  }
+
+  // Auto-chunk fallback for legacy entries.
+  const pages: PortfolioItem[][] = [];
+  const queue = [...items];
+  while (queue.length > 0) {
+    const next3 = queue.slice(0, 3);
+    if (
+      next3.length === 3 &&
+      next3.every((i) => (i.orientation ?? "vertical") === "vertical")
+    ) {
+      pages.push(queue.splice(0, 3));
+      continue;
+    }
+    const v = queue.findIndex(
+      (i) => (i.orientation ?? "vertical") === "vertical",
+    );
+    const h = queue.findIndex((i) => i.orientation === "horizontal");
+    if (v !== -1 && h !== -1) {
+      const a = queue[v];
+      const b = queue[h];
+      queue.splice(Math.max(v, h), 1);
+      queue.splice(Math.min(v, h), 1);
+      pages.push([a, b]);
+      continue;
+    }
+    pages.push(queue.splice(0, Math.min(2, queue.length)));
+  }
+  return pages;
+}
 
 export default function PortfolioSlider({
   items,
 }: {
   items: PortfolioItem[];
 }) {
-  const all = items.length > 0 ? items : seedItems;
   const useSeed = items.length === 0;
+  const all = useSeed ? seedItems : items;
 
   const [activeTab, setActiveTab] = useState<"work" | "event">("work");
-  const filtered = all.filter((i) => i.type === activeTab);
   const [page, setPage] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const maxPage = Math.max(0, Math.ceil(filtered.length / 2) - 1);
+  const pages = useMemo(
+    () => buildPages(all.filter((i) => i.type === activeTab)),
+    [all, activeTab],
+  );
+
+  const maxPage = Math.max(0, pages.length - 1);
   const visiblePage = Math.min(page, maxPage);
-  const visible = filtered.slice(visiblePage * 2, visiblePage * 2 + 2);
+  const visible = pages[visiblePage] ?? [];
+  const layout = classifyGroup(visible);
 
   const handleTabChange = (tab: "work" | "event") => {
     setActiveTab(tab);
@@ -81,12 +209,36 @@ export default function PortfolioSlider({
   };
 
   function getImageSrc(item: PortfolioItem, index: number) {
-    if (useSeed) {
-      const seedIdx = seedItems.indexOf(item);
-      return seedImages[seedIdx >= 0 ? seedIdx : index] || seedImages[0];
+    const orientation: Orientation = item.orientation ?? "vertical";
+    if (useSeed || !item.image) {
+      const pool = seedImages[orientation];
+      return pool[index % pool.length];
     }
-    if (item.image) return urlFor(item.image).width(900).height(1350).url();
-    return seedImages[index % seedImages.length];
+    if (orientation === "vertical") {
+      return urlFor(item.image).width(600).height(800).url();
+    }
+    return urlFor(item.image).width(900).height(600).url();
+  }
+
+  // Grid + aspect-ratio classes per layout.
+  const gridClass =
+    layout === "threeVertical"
+      ? "grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14"
+      : layout === "verticalPlusHorizontal"
+        ? "grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-start"
+        : visible.length >= 3
+          ? "grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14"
+          : "grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-start";
+
+  function aspectClass(item: PortfolioItem) {
+    return (item.orientation ?? "vertical") === "horizontal"
+      ? "aspect-[3/2]"
+      : "aspect-[3/4]";
+  }
+
+  function sizesAttr() {
+    if (layout === "threeVertical") return "(max-width: 768px) 100vw, 33vw";
+    return "(max-width: 768px) 100vw, 50vw";
   }
 
   return (
@@ -125,29 +277,39 @@ export default function PortfolioSlider({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14"
+            className={gridClass}
           >
             {visible.map((item, i) => {
               const Wrapper = item.link ? "a" : "div";
               const wrapperProps = item.link
-                ? { href: item.link, target: item.link.startsWith("http") ? "_blank" as const : undefined, rel: item.link.startsWith("http") ? "noopener noreferrer" : undefined }
+                ? {
+                    href: item.link,
+                    target: item.link.startsWith("http")
+                      ? ("_blank" as const)
+                      : undefined,
+                    rel: item.link.startsWith("http")
+                      ? "noopener noreferrer"
+                      : undefined,
+                  }
                 : {};
               return (
                 <Wrapper
                   key={item._id}
                   {...wrapperProps}
-                  className="grid grid-cols-[auto,1fr] gap-6 md:gap-10 group cursor-pointer items-center"
+                  className="block group cursor-pointer text-center"
                 >
-                  <div className="relative w-[220px] sm:w-[260px] md:w-[300px] lg:w-[340px] aspect-[2/3] overflow-hidden bg-surface-container-low shrink-0 border border-outline-variant/20 shadow-[0_2px_18px_rgba(0,0,0,0.04)]">
+                  <div
+                    className={`${aspectClass(item)} w-full overflow-hidden relative bg-surface-container-low border border-outline-variant/20 shadow-[0_2px_18px_rgba(0,0,0,0.04)]`}
+                  >
                     <Image
                       src={getImageSrc(item, i)}
                       alt={item.title}
                       fill
-                      sizes="(max-width: 768px) 60vw, 340px"
+                      sizes={sizesAttr()}
                       className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
                     />
                   </div>
-                  <div>
+                  <div className="mt-6">
                     {item.eyebrow && (
                       <span className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/60 mb-3 block">
                         {item.eyebrow}
@@ -157,7 +319,7 @@ export default function PortfolioSlider({
                       {item.title}
                     </h4>
                     {item.description && (
-                      <p className="font-body text-sm md:text-[15px] leading-relaxed text-on-surface-variant/70 mt-4">
+                      <p className="font-body text-sm md:text-[15px] leading-relaxed text-on-surface-variant/70 mt-4 max-w-prose mx-auto">
                         {item.description}
                       </p>
                     )}
@@ -168,8 +330,8 @@ export default function PortfolioSlider({
           </motion.div>
         </AnimatePresence>
 
-        {/* Hidden arrows — appear on hover */}
-        {filtered.length > 2 && (
+        {/* Hidden arrows — appear on hover when there's more than one page */}
+        {pages.length > 1 && (
           <>
             <motion.button
               initial={{ opacity: 0 }}
@@ -177,6 +339,7 @@ export default function PortfolioSlider({
               className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300 w-12 h-12 flex items-center justify-center bg-surface/90 shadow-card border border-outline-variant/10"
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={visiblePage === 0}
+              aria-label="Previous page"
             >
               <span className="text-on-surface text-sm">←</span>
             </motion.button>
@@ -186,10 +349,29 @@ export default function PortfolioSlider({
               className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300 w-12 h-12 flex items-center justify-center bg-surface/90 shadow-card border border-outline-variant/10"
               onClick={() => setPage((p) => Math.min(maxPage, p + 1))}
               disabled={visiblePage >= maxPage}
+              aria-label="Next page"
             >
               <span className="text-on-surface text-sm">→</span>
             </motion.button>
           </>
+        )}
+
+        {/* Page dots */}
+        {pages.length > 1 && (
+          <div className="flex justify-center gap-2 mt-10">
+            {pages.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setPage(i)}
+                aria-label={`Go to page ${i + 1}`}
+                className={`h-[3px] transition-all duration-300 ${
+                  i === visiblePage
+                    ? "w-8 bg-on-surface"
+                    : "w-4 bg-on-surface/20 hover:bg-on-surface/40"
+                }`}
+              />
+            ))}
+          </div>
         )}
       </div>
     </section>
