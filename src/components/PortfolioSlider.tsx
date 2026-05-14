@@ -220,15 +220,13 @@ export default function PortfolioSlider({
     return urlFor(item.image).width(900).height(600).url();
   }
 
-  // Grid + aspect-ratio classes per layout.
-  const gridClass =
-    layout === "threeVertical"
-      ? "grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14"
-      : layout === "verticalPlusHorizontal"
-        ? "grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-start"
-        : visible.length >= 3
-          ? "grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14"
-          : "grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-start";
+  // Always use a 3-column grid so card width stays consistent across pages.
+  // - All-vertical pages: each card spans 1 column (and any missing 3rd slot
+  //   is just left empty, which is fine).
+  // - 1V + 1H pages: the vertical spans 1 column at aspect 3:4, and the
+  //   horizontal spans 2 columns at aspect 3:2 — the two card heights then
+  //   match exactly (W·4/3 = 2W·2/3), keeping the row visually balanced.
+  const gridClass = "grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14 items-start";
 
   function aspectClass(item: PortfolioItem) {
     return (item.orientation ?? "vertical") === "horizontal"
@@ -236,9 +234,23 @@ export default function PortfolioSlider({
       : "aspect-[3/4]";
   }
 
-  function sizesAttr() {
-    if (layout === "threeVertical") return "(max-width: 768px) 100vw, 33vw";
-    return "(max-width: 768px) 100vw, 50vw";
+  function colSpanClass(item: PortfolioItem) {
+    if (layout === "verticalPlusHorizontal") {
+      return (item.orientation ?? "vertical") === "horizontal"
+        ? "md:col-span-2"
+        : "md:col-span-1";
+    }
+    return "md:col-span-1";
+  }
+
+  function sizesAttr(item: PortfolioItem) {
+    if (
+      layout === "verticalPlusHorizontal" &&
+      (item.orientation ?? "vertical") === "horizontal"
+    ) {
+      return "(max-width: 768px) 100vw, 66vw";
+    }
+    return "(max-width: 768px) 100vw, 33vw";
   }
 
   return (
@@ -296,7 +308,7 @@ export default function PortfolioSlider({
                 <Wrapper
                   key={item._id}
                   {...wrapperProps}
-                  className="block group cursor-pointer text-center"
+                  className={`block group cursor-pointer text-center ${colSpanClass(item)}`}
                 >
                   <div
                     className={`${aspectClass(item)} w-full overflow-hidden relative bg-surface-container-low border border-outline-variant/20 shadow-[0_2px_18px_rgba(0,0,0,0.04)]`}
@@ -305,7 +317,7 @@ export default function PortfolioSlider({
                       src={getImageSrc(item, i)}
                       alt={item.title}
                       fill
-                      sizes={sizesAttr()}
+                      sizes={sizesAttr(item)}
                       className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
                     />
                   </div>
