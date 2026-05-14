@@ -44,6 +44,23 @@ html {
 
 /* ── Google Fonts are loaded via <link> in layout.tsx ── */
 
+/* ── B Davat — self-hosted Arabic display font used for Arabic reviews.
+   Drop the font files into /public/fonts/. Supports either modern
+   (woff2/woff) or legacy (ttf/otf) packages — the browser uses the
+   first one it finds and skips the rest. */
+@font-face {
+  font-family: "B Davat";
+  src:
+    url("/fonts/BDavat.woff2") format("woff2"),
+    url("/fonts/BDavat.woff") format("woff"),
+    url("/fonts/BDavat.ttf") format("truetype"),
+    url("/fonts/BDavat.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF;
+}
+
 .material-symbols-outlined {
   font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24;
 }

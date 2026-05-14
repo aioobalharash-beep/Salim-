@@ -13,6 +13,20 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: "eyebrow",
+      title: "Eyebrow Label",
+      type: "string",
+      description:
+        "Small label shown above the title (e.g. \"Publication\", \"Premiere\"). Leave empty to hide.",
+    }),
+    defineField({
+      name: "description",
+      title: "Description",
+      type: "text",
+      rows: 3,
+      description: "Short description shown next to the image.",
+    }),
+    defineField({
       name: "type",
       title: "Type",
       type: "string",

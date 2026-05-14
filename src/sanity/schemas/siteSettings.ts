@@ -82,7 +82,7 @@ export default defineType({
                       { title: "Media — Gallery", value: "/media/gallery" },
                       { title: "Catalogue", value: "/catalogue" },
                       { title: "Articles", value: "/articles" },
-                      { title: "About Salim", value: "/about" },
+                      { title: "About Dada", value: "/about" },
                     ],
                     layout: "dropdown",
                   },

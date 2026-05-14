@@ -10,6 +10,8 @@ type Orientation = "vertical" | "horizontal";
 interface PortfolioItem {
   _id: string;
   title: string;
+  eyebrow?: string;
+  description?: string;
   type: "work" | "event";
   orientation?: Orientation;
   pageGroup?: number;
@@ -20,16 +22,86 @@ interface PortfolioItem {
 /* ── Seed data: demonstrates the two valid page layouts. ─────────────── */
 const seedItems: PortfolioItem[] = [
   // Work — page 1: three verticals
-  { _id: "seed-w1a", title: "Suite Algérienne — Solo Guitar", type: "work", orientation: "vertical", pageGroup: 1, link: "/catalogue" },
-  { _id: "seed-w1b", title: "Conversations — 12 Duets", type: "work", orientation: "vertical", pageGroup: 1, link: "/catalogue" },
-  { _id: "seed-w1c", title: "Mediterranean Cycle", type: "work", orientation: "vertical", pageGroup: 1, link: "/catalogue" },
+  {
+    _id: "seed-w1a",
+    title: "Suite Algérienne — Solo Guitar",
+    eyebrow: "Publication",
+    description:
+      "Newly published score for solo classical guitar, exploring Algerian modal traditions.",
+    type: "work",
+    orientation: "vertical",
+    pageGroup: 1,
+    link: "/catalogue",
+  },
+  {
+    _id: "seed-w1b",
+    title: "Conversations — 12 Duets",
+    eyebrow: "Publication",
+    description:
+      "Twelve duets for two violinists, written as a contemporary dialogue across registers.",
+    type: "work",
+    orientation: "vertical",
+    pageGroup: 1,
+    link: "/catalogue",
+  },
+  {
+    _id: "seed-w1c",
+    title: "Mediterranean Cycle",
+    eyebrow: "Symphony",
+    description:
+      "A symphonic exploration of Mediterranean modal traditions, premiered across three continents.",
+    type: "work",
+    orientation: "vertical",
+    pageGroup: 1,
+    link: "/media",
+  },
   // Work — page 2: one vertical + one horizontal
-  { _id: "seed-w2a", title: "Echoes of Algiers", type: "work", orientation: "vertical", pageGroup: 2, link: "/media/discography" },
-  { _id: "seed-w2b", title: "Sinfonietta per archi — Live", type: "work", orientation: "horizontal", pageGroup: 2, link: "/media/video" },
+  {
+    _id: "seed-w2a",
+    title: "Echoes of Algiers",
+    eyebrow: "Recording",
+    description:
+      "An archival recording project capturing the unwritten melodies of traditional Algerian music.",
+    type: "work",
+    orientation: "vertical",
+    pageGroup: 2,
+    link: "/media/discography",
+  },
+  {
+    _id: "seed-w2b",
+    title: "Sinfonietta per archi — Live",
+    eyebrow: "Premiere",
+    description:
+      "Live footage of the first Algerian symphony for strings, recorded in Antwerp ahead of its world premiere.",
+    type: "work",
+    orientation: "horizontal",
+    pageGroup: 2,
+    link: "/media/video",
+  },
 
   // Events — page 1: 1V + 1H
-  { _id: "seed-e1a", title: "UNESCO Heritage Gala 2024", type: "event", orientation: "vertical", pageGroup: 1, link: "/about" },
-  { _id: "seed-e1b", title: "Paris Conservatoire Masterclass", type: "event", orientation: "horizontal", pageGroup: 1, link: "/training" },
+  {
+    _id: "seed-e1a",
+    title: "UNESCO Heritage Gala 2024",
+    eyebrow: "Ceremony",
+    description:
+      "Ceremonial performance celebrating the safeguarding of intangible cultural heritage.",
+    type: "event",
+    orientation: "vertical",
+    pageGroup: 1,
+    link: "/about",
+  },
+  {
+    _id: "seed-e1b",
+    title: "Paris Conservatoire Masterclass",
+    eyebrow: "Masterclass",
+    description:
+      "An intensive masterclass on orchestration and cross-cultural composition.",
+    type: "event",
+    orientation: "horizontal",
+    pageGroup: 1,
+    link: "/training",
+  },
 ];
 
 const seedImages: Record<Orientation, string[]> = {
@@ -47,7 +119,10 @@ const seedImages: Record<Orientation, string[]> = {
 type Layout = "threeVertical" | "verticalPlusHorizontal" | "fallback";
 
 function classifyGroup(items: PortfolioItem[]): Layout {
-  if (items.length === 3 && items.every((i) => (i.orientation ?? "vertical") === "vertical")) {
+  if (
+    items.length === 3 &&
+    items.every((i) => (i.orientation ?? "vertical") === "vertical")
+  ) {
     return "threeVertical";
   }
   if (items.length === 2) {
@@ -89,7 +164,9 @@ function buildPages(items: PortfolioItem[]): PortfolioItem[][] {
       pages.push(queue.splice(0, 3));
       continue;
     }
-    const v = queue.findIndex((i) => (i.orientation ?? "vertical") === "vertical");
+    const v = queue.findIndex(
+      (i) => (i.orientation ?? "vertical") === "vertical",
+    );
     const h = queue.findIndex((i) => i.orientation === "horizontal");
     if (v !== -1 && h !== -1) {
       const a = queue[v];
@@ -146,12 +223,12 @@ export default function PortfolioSlider({
   // Grid + aspect-ratio classes per layout.
   const gridClass =
     layout === "threeVertical"
-      ? "grid grid-cols-1 md:grid-cols-3 gap-8"
+      ? "grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14"
       : layout === "verticalPlusHorizontal"
-        ? "grid grid-cols-1 md:grid-cols-2 gap-8 items-start"
+        ? "grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-start"
         : visible.length >= 3
-          ? "grid grid-cols-1 md:grid-cols-3 gap-8"
-          : "grid grid-cols-1 md:grid-cols-2 gap-8 items-start";
+          ? "grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14"
+          : "grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-start";
 
   function aspectClass(item: PortfolioItem) {
     return (item.orientation ?? "vertical") === "horizontal"
@@ -165,9 +242,9 @@ export default function PortfolioSlider({
   }
 
   return (
-    <section className="py-32 px-6 md:px-12 max-w-screen-2xl mx-auto">
+    <section className="min-h-screen flex flex-col justify-center py-20 px-6 md:px-8 lg:px-12 max-w-[1600px] mx-auto">
       {/* Header with tabs */}
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-16">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 md:mb-16">
         <div>
           <h3 className="font-headline text-3xl font-light mb-4">
             Work &amp; Events
@@ -207,8 +284,12 @@ export default function PortfolioSlider({
               const wrapperProps = item.link
                 ? {
                     href: item.link,
-                    target: item.link.startsWith("http") ? ("_blank" as const) : undefined,
-                    rel: item.link.startsWith("http") ? "noopener noreferrer" : undefined,
+                    target: item.link.startsWith("http")
+                      ? ("_blank" as const)
+                      : undefined,
+                    rel: item.link.startsWith("http")
+                      ? "noopener noreferrer"
+                      : undefined,
                   }
                 : {};
               return (
@@ -217,18 +298,32 @@ export default function PortfolioSlider({
                   {...wrapperProps}
                   className="block group cursor-pointer text-center"
                 >
-                  <div className={`${aspectClass(item)} w-full overflow-hidden relative bg-surface-container-low`}>
+                  <div
+                    className={`${aspectClass(item)} w-full overflow-hidden relative bg-surface-container-low border border-outline-variant/20 shadow-[0_2px_18px_rgba(0,0,0,0.04)]`}
+                  >
                     <Image
                       src={getImageSrc(item, i)}
                       alt={item.title}
                       fill
                       sizes={sizesAttr()}
-                      className="object-cover grayscale brightness-90 transition-all duration-700 group-hover:brightness-100 group-hover:scale-[1.02]"
+                      className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
                     />
                   </div>
-                  <h4 className="font-serif-brand text-xl mt-5 text-on-surface group-hover:text-primary transition-colors duration-300">
-                    {item.title}
-                  </h4>
+                  <div className="mt-6">
+                    {item.eyebrow && (
+                      <span className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/60 mb-3 block">
+                        {item.eyebrow}
+                      </span>
+                    )}
+                    <h4 className="font-serif-brand text-xl md:text-2xl text-on-surface leading-snug group-hover:text-primary transition-colors duration-300">
+                      {item.title}
+                    </h4>
+                    {item.description && (
+                      <p className="font-body text-sm md:text-[15px] leading-relaxed text-on-surface-variant/70 mt-4 max-w-prose mx-auto">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
                 </Wrapper>
               );
             })}
@@ -270,7 +365,9 @@ export default function PortfolioSlider({
                 onClick={() => setPage(i)}
                 aria-label={`Go to page ${i + 1}`}
                 className={`h-[3px] transition-all duration-300 ${
-                  i === visiblePage ? "w-8 bg-on-surface" : "w-4 bg-on-surface/20 hover:bg-on-surface/40"
+                  i === visiblePage
+                    ? "w-8 bg-on-surface"
+                    : "w-4 bg-on-surface/20 hover:bg-on-surface/40"
                 }`}
               />
             ))}
