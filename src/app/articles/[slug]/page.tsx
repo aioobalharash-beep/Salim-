@@ -206,11 +206,17 @@ const inlineRichComponents: PortableTextComponents = {
  * ──────────────────────────────────────────────────────────────────────── */
 
 function ComposerVoice({ value }: { value: any }) {
+  const hasAttribution =
+    typeof value.attribution === "string"
+      ? value.attribution.length > 0
+      : Array.isArray(value.attribution) && value.attribution.length > 0;
   return (
     <aside className="composer-voice">
       <PortableText value={value.body} components={inlineRichComponents} />
-      {value.attribution && (
-        <span className="attribution">{value.attribution}</span>
+      {hasAttribution && (
+        <span className="attribution">
+          {renderRichOrString(value.attribution)}
+        </span>
       )}
     </aside>
   );

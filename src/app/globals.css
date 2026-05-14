@@ -292,14 +292,17 @@ textarea:focus {
 .editorial .composer-voice p:last-of-type { margin-bottom: 0; }
 .editorial .composer-voice .attribution {
   font-family: "Outfit", system-ui, sans-serif;
-  font-size: 0.7rem;
+  font-size: 0.82rem;
   font-weight: 300;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.04em;
   color: var(--ed-gold);
   margin-top: 1rem;
   display: block;
   font-style: normal;
+}
+.editorial .composer-voice .attribution p {
+  margin: 0;
+  display: inline;
 }
 
 /* — Two-column / bilingual poem — */

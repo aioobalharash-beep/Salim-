@@ -569,17 +569,33 @@ export default defineType({
             defineField({
               name: "attribution",
               title: "Attribution",
-              type: "string",
               description:
-                "Small uppercase line beneath the quote (e.g. '— Henri Tomasi, manuscript preface').",
+                "Small line beneath the quote (e.g. '— Henri Tomasi, manuscript preface'). Type the text exactly as you want it — use the Italic / Bold buttons to format individual words.",
+              ...captionRichType,
             }),
           ],
           preview: {
             select: { attribution: "attribution" },
-            prepare: ({ attribution }) => ({
-              title: "Composer / Subject Voice",
-              subtitle: attribution || "Dark pull-out quote",
-            }),
+            prepare: (selection: Record<string, any>) => {
+              const attribution = selection.attribution;
+              const subtitle =
+                typeof attribution === "string"
+                  ? attribution
+                  : Array.isArray(attribution)
+                    ? attribution
+                        .map((b: any) =>
+                          Array.isArray(b?.children)
+                            ? b.children.map((c: any) => c?.text ?? "").join("")
+                            : "",
+                        )
+                        .join(" ")
+                        .trim()
+                    : "";
+              return {
+                title: "Composer / Subject Voice",
+                subtitle: subtitle || "Dark pull-out quote",
+              };
+            },
           },
         }),
 
