@@ -57,8 +57,8 @@ export default async function ArticlesPage() {
           Articles
         </h1>
         <p className="font-body text-base leading-relaxed text-foreground/50 max-w-xl">
-          Long-form reflections on musicology, cultural preservation, pedagogy,
-          and the invisible threads connecting Mediterranean musical traditions.
+          Writing at the crossroads of artistic practice, scholarly research and cultural expertise  
+          on composition, musicology, guitar, arts, orchestra conducting, AI & music, and the diversity of cultural expressions.
         </p>
       </section>
 
