@@ -258,7 +258,7 @@ export default function PortfolioSlider({
       {/* Header with tabs */}
       <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 md:mb-16">
         <div>
-          <h3 className="font-headline text-3xl font-light mb-4">
+          <h3 className="font-headline text-2xl sm:text-3xl md:text-4xl font-light mb-4">
             Work &amp; Events
           </h3>
           <div className="w-16 h-[1px] bg-primary/30" />

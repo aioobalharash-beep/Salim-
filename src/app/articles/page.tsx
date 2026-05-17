@@ -53,7 +53,7 @@ export default async function ArticlesPage() {
         <p className="font-label text-[10px] uppercase tracking-[0.5em] text-primary/50 mb-8">
           Perspectives
         </p>
-        <h1 className="font-headline text-5xl md:text-7xl font-light text-foreground leading-[1.1] mb-8">
+        <h1 className="font-headline text-4xl sm:text-5xl md:text-7xl font-light text-foreground leading-[1.1] mb-8">
           Articles
         </h1>
         <p className="font-body text-base leading-relaxed text-foreground/50 max-w-xl">

@@ -44,7 +44,7 @@ export default function TestimonialSection({
           <p className="font-label text-[10px] uppercase tracking-[0.4em] text-primary/60 mb-4">
             Testimonials
           </p>
-          <h3 className="font-headline text-4xl font-light">
+          <h3 className="font-headline text-2xl sm:text-3xl md:text-4xl font-light">
             Words of Trust
           </h3>
         </div>

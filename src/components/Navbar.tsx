@@ -182,7 +182,7 @@ export default function Navbar() {
                   <div key={link.href}>
                     <button
                       onClick={() => setMobileMediaOpen((o) => !o)}
-                      className={`w-full flex items-center justify-between py-3 font-label tracking-[0.15em] text-[11px] uppercase transition-colors duration-300 ${
+                      className={`w-full flex items-center justify-between min-h-[44px] py-3 font-label tracking-[0.15em] text-[11px] uppercase transition-colors duration-300 ${
                         isActive
                           ? "text-on-surface"
                           : "text-on-surface/40"
@@ -225,7 +225,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`py-3 font-label tracking-[0.15em] text-[11px] uppercase transition-colors duration-300 ${
+                  className={`flex items-center min-h-[44px] py-3 font-label tracking-[0.15em] text-[11px] uppercase transition-colors duration-300 ${
                     isActive
                       ? "text-on-surface"
                       : "text-on-surface/40"
@@ -236,10 +236,10 @@ export default function Navbar() {
               );
             })}
 
-            {/* Mobile CTA */}
+            {/* Mobile CTA — prominent, 48px tap target */}
             <a
               href="/#enquiry-section"
-              className="mt-4 text-center font-label tracking-[0.15em] text-[11px] uppercase px-6 py-3 border border-on-surface/20 text-on-surface hover:bg-on-surface hover:text-surface transition-all duration-300"
+              className="mt-6 min-h-[48px] flex items-center justify-center font-label tracking-[0.2em] text-[12px] uppercase px-6 py-4 bg-on-surface text-surface hover:opacity-90 transition-opacity duration-300"
             >
               Inquiry
             </a>

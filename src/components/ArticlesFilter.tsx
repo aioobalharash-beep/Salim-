@@ -123,7 +123,7 @@ export default function ArticlesFilter({ articles }: { articles: Article[] }) {
             <h2 className="mb-7">
               <Link
                 href={`/articles/${article.slug}`}
-                className="font-headline text-3xl md:text-[2.6rem] md:leading-[1.2] text-foreground group-hover:text-primary transition-colors duration-500"
+                className="font-headline text-2xl sm:text-3xl md:text-[2.6rem] md:leading-[1.2] text-foreground group-hover:text-primary transition-colors duration-500"
               >
                 {article.title}
               </Link>

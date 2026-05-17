@@ -37,10 +37,10 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="w-full py-16 px-6 md:px-12 bg-surface-container-low border-t border-outline-variant/15">
-      <div className="flex flex-col gap-10 w-full max-w-screen-2xl mx-auto">
+    <footer className="w-full py-12 md:py-16 px-6 md:px-12 bg-surface-container-low border-t border-outline-variant/15">
+      <div className="flex flex-col gap-8 md:gap-10 w-full max-w-screen-2xl mx-auto">
         {/* Top row: Brand + Social */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
           <Link
             href="/"
             className="font-serif-brand text-2xl font-light tracking-widest text-on-surface uppercase"
@@ -49,7 +49,7 @@ export default function Footer() {
           </Link>
 
           {/* Social Icons */}
-          <div className="flex gap-5 items-center">
+          <div className="flex gap-6 items-center">
             {socialLinks.map((s) => (
               <a
                 key={s.label}
@@ -57,7 +57,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label}
-                className="text-primary/40 hover:text-primary transition-colors duration-300"
+                className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] text-primary/40 hover:text-primary transition-colors duration-300"
               >
                 {s.icon}
               </a>
@@ -65,22 +65,25 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom row: Copyright + Links */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pt-6 border-t border-outline-variant/10">
-          <p className="font-body text-[10px] uppercase tracking-[0.1em] text-primary/40">
-            &copy; {new Date().getFullYear()} Salim Dada. All rights reserved. Powered by{" "}
-            <a
-              href="https://www.mahara.tech"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary/60 hover:text-primary transition-colors duration-300"
-            >
-              mahara tech
-            </a>
-            .
+        {/* Bottom row: Copyright + Links — stack on mobile, side-by-side from md+ */}
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-5 pt-6 border-t border-outline-variant/10">
+          <p className="font-body text-[10px] uppercase tracking-[0.1em] text-primary/40 leading-relaxed">
+            &copy; {new Date().getFullYear()} Salim Dada. All rights reserved.{" "}
+            <span className="block sm:inline">
+              Powered by{" "}
+              <a
+                href="https://www.mahara.tech"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary/60 hover:text-primary transition-colors duration-300"
+              >
+                mahara tech
+              </a>
+              .
+            </span>
           </p>
 
-          <div className="flex gap-8 items-center">
+          <div className="flex flex-wrap gap-x-6 gap-y-2 items-center">
             {footerLinks.map(({ href, label }) => (
               <Link
                 key={label}
