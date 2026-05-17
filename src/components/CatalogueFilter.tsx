@@ -6,11 +6,13 @@ import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 /* ── Option lists kept in lock-step with the Sanity schema ───────── */
 const INSTRUMENTATIONS = [
   "Symphony Orchestra",
-  "Wind & Military Orchestra",
+  "Wind or Military Orchestra",
   "Chamber Orchestra",
   "Strings",
   "Winds",
-  "Voice",
+  "Voice & Orchestra",
+  "Voice & Accompaniment",
+  "Voice A Capella",
   "Takht Arabi",
   "Hybrid Ensemble",
   "Guitar",
@@ -24,10 +26,13 @@ const GENRES = [
   "Chamber Music",
   "Vocal Forms",
   "Soundtrack",
-  "Solo Music",
-  "Traditional & Mixed Ensemble",
+  "Ballet",
+  "Solo",
+  "Anthem",
+  "Traditional Forms",
   "Contemporary Song",
-  "Arrangement & Orchestration",
+  "Jazz",
+  "Fusion",
   "Didactic Music",
   "Other",
 ] as const;
@@ -61,11 +66,13 @@ export interface CatalogueWork {
   description: string | null;
   year: string | null;
   instrumentation: string | null;
+  instrumentationDetail: string | null;
   genre: string | null;
   durationMinutes: number | null;
   durationDisplay: string | null;
   movements: number | null;
   published: boolean | null;
+  publicationUrl: string | null;
   premiereDate: string | null;
   premierePlace: string | null;
   performers: string | null;
@@ -285,7 +292,14 @@ function EntryCard({
           <MetaRow label="Genre" value={work.genre} />
         )}
         {work.instrumentation && (
-          <MetaRow label="Instrumentation" value={work.instrumentation} />
+          <MetaRow
+            label="Instrumentation"
+            value={
+              work.instrumentationDetail
+                ? `${work.instrumentation} ${work.instrumentationDetail}`
+                : work.instrumentation
+            }
+          />
         )}
         {(work.durationDisplay ||
           typeof work.durationMinutes === "number") && (
@@ -327,9 +341,22 @@ function EntryCard({
               work.published ? "bg-tertiary" : "bg-foreground/25"
             }`}
           />
-          <span className="text-foreground/55">
-            {work.published ? "Published" : "Unpublished"}
-          </span>
+          {work.published ? (
+            work.publicationUrl ? (
+              <a
+                href={work.publicationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-foreground/55 hover:text-foreground transition-colors underline-offset-4 hover:underline"
+              >
+                Published
+              </a>
+            ) : (
+              <span className="text-foreground/55">Published</span>
+            )
+          ) : (
+            <span className="text-foreground/55">Unpublished</span>
+          )}
         </span>
 
         {work.watchLink && (

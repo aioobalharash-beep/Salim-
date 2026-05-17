@@ -2,11 +2,13 @@ import { defineType, defineField } from "sanity";
 
 export const INSTRUMENTATION_OPTIONS: { title: string; value: string }[] = [
   { title: "Symphony Orchestra", value: "Symphony Orchestra" },
-  { title: "Wind & Military Orchestra", value: "Wind & Military Orchestra" },
+  { title: "Wind or Military Orchestra", value: "Wind or Military Orchestra" },
   { title: "Chamber Orchestra", value: "Chamber Orchestra" },
   { title: "Strings", value: "Strings" },
   { title: "Winds", value: "Winds" },
-  { title: "Voice", value: "Voice" },
+  { title: "Voice & Orchestra", value: "Voice & Orchestra" },
+  { title: "Voice & Accompaniment", value: "Voice & Accompaniment" },
+  { title: "Voice A Capella", value: "Voice A Capella" },
   { title: "Takht Arabi", value: "Takht Arabi" },
   { title: "Hybrid Ensemble", value: "Hybrid Ensemble" },
   { title: "Guitar", value: "Guitar" },
@@ -20,10 +22,13 @@ export const GENRE_OPTIONS: { title: string; value: string }[] = [
   { title: "Chamber Music", value: "Chamber Music" },
   { title: "Vocal Forms", value: "Vocal Forms" },
   { title: "Soundtrack", value: "Soundtrack" },
-  { title: "Solo Music", value: "Solo Music" },
-  { title: "Traditional & Mixed Ensemble", value: "Traditional & Mixed Ensemble" },
+  { title: "Ballet", value: "Ballet" },
+  { title: "Solo", value: "Solo" },
+  { title: "Anthem", value: "Anthem" },
+  { title: "Traditional Forms", value: "Traditional Forms" },
   { title: "Contemporary Song", value: "Contemporary Song" },
-  { title: "Arrangement & Orchestration", value: "Arrangement & Orchestration" },
+  { title: "Jazz", value: "Jazz" },
+  { title: "Fusion", value: "Fusion" },
   { title: "Didactic Music", value: "Didactic Music" },
   { title: "Other", value: "Other" },
 ];
@@ -84,6 +89,14 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: "instrumentationDetail",
+      title: "Instrumentation Detail",
+      type: "string",
+      group: "categorization",
+      description:
+        "Optional free-text appended after the instrumentation (e.g. 'with solo violin', 'and electronics text override').",
+    }),
+    defineField({
       name: "genre",
       title: "Genre",
       type: "string",
@@ -121,11 +134,22 @@ export default defineType({
     }),
     defineField({
       name: "published",
-      title: "Published",
+      title: "Is Published?",
       type: "boolean",
       group: "technical",
       initialValue: false,
-      description: "Toggle visibility on the public catalogue page.",
+      description:
+        "Has this piece of music been physically published or distributed?",
+    }),
+    defineField({
+      name: "publicationUrl",
+      title: "Publication URL",
+      type: "url",
+      group: "technical",
+      description: "Link to external publisher or media.",
+      hidden: ({ parent }) => !parent?.published,
+      validation: (Rule) =>
+        Rule.uri({ scheme: ["http", "https"], allowRelative: false }),
     }),
 
     /* ── World Premiere ────────────────────────────────────────── */
