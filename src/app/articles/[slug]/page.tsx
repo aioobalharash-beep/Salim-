@@ -418,9 +418,36 @@ function Footnotes({ value }: { value: any }) {
  * Body PortableText components.
  * ──────────────────────────────────────────────────────────────────────── */
 
+/* Body marks force every embedded anchor to open in a new tab with
+ * safe rel attributes, regardless of the Sanity-side openInNewTab flag. */
+const bodyMarks: PortableTextComponents["marks"] = {
+  ...sharedMarks,
+  link: ({ value, children }) => (
+    <a
+      href={value?.href || "#"}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {children}
+    </a>
+  ),
+};
+
 function buildBodyComponents(): PortableTextComponents {
   return {
-    marks: sharedMarks,
+    marks: bodyMarks,
+    list: {
+      bullet: ({ children }) => (
+        <ul className="list-disc pl-5 my-4 space-y-1">{children}</ul>
+      ),
+      number: ({ children }) => (
+        <ol className="list-decimal pl-5 my-4 space-y-1">{children}</ol>
+      ),
+    },
+    listItem: {
+      bullet: ({ children }) => <li>{children}</li>,
+      number: ({ children }) => <li>{children}</li>,
+    },
     block: {
       normal: ({ children }) => <p>{children}</p>,
       lead: ({ children }) => <p className="lead">{children}</p>,

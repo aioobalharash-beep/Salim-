@@ -23,14 +23,6 @@ const categories = [
   "Other",
 ];
 
-function formatDate(iso: string | null) {
-  if (!iso) return "";
-  return new Date(iso).toLocaleDateString("en-US", {
-    month: "long",
-    year: "numeric",
-  });
-}
-
 export default function ArticlesFilter({ articles }: { articles: Article[] }) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
@@ -95,55 +87,19 @@ export default function ArticlesFilter({ articles }: { articles: Article[] }) {
         )}
 
         {filtered.map((article, i) => (
-          <article
+          <Link
             key={article.slug}
-            className={`group ${i > 0 ? "pt-20" : "pt-12"} pb-20 ${
+            href={`/articles/${article.slug}`}
+            className={`group block ${i > 0 ? "pt-10" : "pt-6"} pb-10 ${
               i < filtered.length - 1
                 ? "border-b border-foreground/[0.04]"
                 : ""
             }`}
           >
-            <div className="flex items-center gap-3 mb-7">
-              <span className="font-label text-[10px] uppercase tracking-[0.2em] text-foreground/30">
-                {formatDate(article.publishedAt)}
-              </span>
-              {article.category && (
-                <>
-                  <span className="w-[3px] h-[3px] rounded-full bg-foreground/10" />
-                  <span className="font-label text-[10px] uppercase tracking-[0.2em] text-primary/50">
-                    {article.category}
-                  </span>
-                </>
-              )}
-            </div>
-
-            <h2 className="mb-6">
-              <Link
-                href={`/articles/${article.slug}`}
-                className="font-headline text-3xl md:text-[2.6rem] md:leading-[1.2] text-foreground group-hover:text-primary transition-colors duration-500"
-              >
-                {article.title}
-              </Link>
+            <h2 className="font-headline text-3xl md:text-[2.6rem] md:leading-[1.2] text-foreground group-hover:text-primary transition-colors duration-500">
+              {article.title}
             </h2>
-
-            {article.excerpt && (
-              <p className="font-body text-[15px] leading-[1.85] text-foreground/45 max-w-2xl mb-10">
-                {article.excerpt}
-              </p>
-            )}
-
-            <Link
-              href={`/articles/${article.slug}`}
-              className="inline-flex items-center gap-4 group/link"
-            >
-              <span className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/60 group-hover/link:text-primary transition-colors duration-300">
-                Read Article
-              </span>
-              <span className="text-primary/30 group-hover/link:text-primary/60 group-hover/link:translate-x-1 transition-all duration-300 text-xs">
-                →
-              </span>
-            </Link>
-          </article>
+          </Link>
         ))}
       </section>
     </>
