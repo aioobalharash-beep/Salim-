@@ -79,19 +79,22 @@ function PanelInner({
       <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/70 via-[#1A1A1A]/15 to-transparent" />
       {/* Whisper-soft bronze tint to harmonise with the Ivory canvas */}
       <div className="absolute inset-0 bg-[#8C7851]/10 mix-blend-multiply pointer-events-none" />
+      {/* Mobile-only contrast layer — guards white text against lighter image regions
+          that may appear once the frame reshapes vertically on phones. Off from md+. */}
+      <div className="absolute inset-0 bg-black/20 md:bg-transparent pointer-events-none" />
 
-      {/* Text — pinned to bottom */}
-      <div className="absolute bottom-10 left-10 md:bottom-14 md:left-14">
-        <p className="font-label text-[9px] uppercase tracking-[0.4em] text-background/40 mb-3 transition-colors duration-700 group-hover:text-background/60">
+      {/* Text — vertically + horizontally centered on mobile, bottom-left from md+ */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 md:items-start md:justify-end md:text-left md:px-14 md:pb-14">
+        <p className="font-label text-[9px] uppercase tracking-[0.4em] text-background/60 md:text-background/40 mb-3 transition-colors duration-700 group-hover:text-background/80 md:group-hover:text-background/60">
           {subtitle}
         </p>
-        <h2 className="font-serif-brand text-3xl md:text-4xl text-background font-light tracking-tight transition-transform duration-700 group-hover:translate-x-1">
+        <h2 className="font-serif-brand text-3xl sm:text-4xl md:text-4xl text-background font-light tracking-tight transition-transform duration-700 group-hover:translate-x-1">
           {title}
         </h2>
       </div>
 
-      {/* Hover arrow */}
-      <span className="absolute bottom-10 right-10 md:bottom-14 md:right-14 text-background/0 group-hover:text-background/40 transition-all duration-700 group-hover:translate-x-1 text-sm">
+      {/* Hover arrow — desktop-only (hover affordance not meaningful on touch) */}
+      <span className="hidden md:inline absolute bottom-14 right-14 text-background/0 group-hover:text-background/40 transition-all duration-700 group-hover:translate-x-1 text-sm">
         →
       </span>
     </>
@@ -99,7 +102,7 @@ function PanelInner({
 }
 
 const PANEL_CLASSES =
-  "relative group flex-1 min-h-[25vh] md:min-h-0 overflow-hidden transition-[flex] duration-1000 ease-[cubic-bezier(0.25,0.1,0.25,1)] hover:flex-[2]";
+  "relative group flex-1 min-h-[280px] md:min-h-0 overflow-hidden transition-[flex] duration-1000 ease-[cubic-bezier(0.25,0.1,0.25,1)] md:hover:flex-[2]";
 
 /** Renders a hero panel using <Link> for internal routes or <a target="_blank"> for external. */
 function HeroPanel({
@@ -157,7 +160,7 @@ export default async function Hero() {
   const useSeed = columns.length === 0;
 
   return (
-    <header className="pt-[72px] h-screen flex flex-col md:flex-row w-full overflow-hidden">
+    <header className="pt-[72px] md:h-screen flex flex-col md:flex-row w-full overflow-hidden">
       {useSeed
         ? seedColumns.map((panel) => (
             <HeroPanel
@@ -172,7 +175,7 @@ export default async function Hero() {
                   alt={panel.alt}
                   fill
                   sizes="(max-width: 768px) 100vw, 25vw"
-                  className="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
+                  className="object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-105"
                   priority
                 />
               }
@@ -188,11 +191,17 @@ export default async function Hero() {
               imageNode={
                 col.image ? (
                   <Image
-                    src={urlFor(col.image).width(1200).height(1600).url()}
+                    src={urlFor(col.image)
+                      .width(1200)
+                      .height(1600)
+                      .fit("crop")
+                      .crop("focalpoint")
+                      .auto("format")
+                      .url()}
                     alt={col.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 25vw"
-                    className="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
+                    className="object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-105"
                     priority
                   />
                 ) : null
