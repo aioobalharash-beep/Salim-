@@ -246,6 +246,8 @@ function EntryCard({
   activeSrc: string | null;
   setActiveSrc: (s: string | null) => void;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   const premiereBits = [
     formatPremiereDate(work.premiereDate),
     work.premierePlace,
@@ -279,111 +281,153 @@ function EntryCard({
         </p>
       )}
 
-      {/* Description */}
-      {work.description && (
-        <p className="font-body text-[15px] leading-[1.85] text-foreground/55 max-w-2xl mb-8 whitespace-pre-line">
-          {work.description}
-        </p>
-      )}
+      {/* More / Less Trigger */}
+      <button
+        type="button"
+        onClick={() => setIsOpen((v) => !v)}
+        aria-expanded={isOpen}
+        className="inline-flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.28em] text-foreground/45 hover:text-foreground transition-colors"
+      >
+        <span>{isOpen ? "less" : "more"}</span>
+        <motion.span
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className="inline-flex"
+          aria-hidden="true"
+        >
+          <svg
+            width="10"
+            height="10"
+            viewBox="0 0 10 10"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M2 3.5L5 6.5L8 3.5"
+              stroke="currentColor"
+              strokeWidth="1.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </motion.span>
+      </button>
 
-      {/* Metadata Block */}
-      <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-3 max-w-2xl mb-8">
-        {work.genre && (
-          <MetaRow label="Genre" value={work.genre} />
-        )}
-        {work.instrumentation && (
-          <MetaRow
-            label="Instrumentation"
-            value={
-              work.instrumentationDetail
-                ? `${work.instrumentation} ${work.instrumentationDetail}`
-                : work.instrumentation
-            }
-          />
-        )}
-        {(work.durationDisplay ||
-          typeof work.durationMinutes === "number") && (
-          <MetaRow
-            label="Duration"
-            value={
-              work.durationDisplay ??
-              `${work.durationMinutes} min`
-            }
-          />
-        )}
-        {typeof work.movements === "number" && (
-          <MetaRow label="Movements" value={String(work.movements)} />
-        )}
-        {(premiereBits.length > 0 || work.performers) && (
-          <div className="sm:col-span-2 pt-3 border-t border-foreground/[0.05]">
-            <dt className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/50 mb-2">
-              World Premiere
-            </dt>
-            <dd className="font-body text-[13px] leading-[1.7] text-foreground/65">
-              {premiereBits.length > 0 && (
-                <div>{premiereBits.join(" — ")}</div>
-              )}
-              {work.performers && (
-                <div className="text-foreground/45 whitespace-pre-line">
-                  {work.performers}
-                </div>
-              )}
-            </dd>
-          </div>
-        )}
-      </dl>
+      {/* Collapsible Body */}
+      <motion.div
+        initial={false}
+        animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        style={{ overflow: "hidden" }}
+      >
+        <div className="pt-8">
+          {/* Description */}
+          {work.description && (
+            <p className="font-headline not-italic font-normal text-[15px] leading-[1.85] text-foreground/55 max-w-2xl mb-8 whitespace-pre-line">
+              {work.description}
+            </p>
+          )}
 
-      {/* Footer Action Row */}
-      <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-        <span className="inline-flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.25em]">
-          <span
-            className={`w-1.5 h-1.5 rounded-full ${
-              work.published ? "bg-tertiary" : "bg-foreground/25"
-            }`}
-          />
-          {work.published ? (
-            work.publicationUrl ? (
+          {/* Metadata Block */}
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-3 max-w-2xl mb-8">
+            {work.genre && (
+              <MetaRow label="Genre" value={work.genre} />
+            )}
+            {work.instrumentation && (
+              <MetaRow
+                label="Instrumentation"
+                value={
+                  work.instrumentationDetail
+                    ? `${work.instrumentation} ${work.instrumentationDetail}`
+                    : work.instrumentation
+                }
+              />
+            )}
+            {(work.durationDisplay ||
+              typeof work.durationMinutes === "number") && (
+              <MetaRow
+                label="Duration"
+                value={
+                  work.durationDisplay ??
+                  `${work.durationMinutes} min`
+                }
+              />
+            )}
+            {typeof work.movements === "number" && (
+              <MetaRow label="Movements" value={String(work.movements)} />
+            )}
+            {(premiereBits.length > 0 || work.performers) && (
+              <div className="sm:col-span-2 pt-3 border-t border-foreground/[0.05]">
+                <dt className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/50 mb-2">
+                  World Premiere
+                </dt>
+                <dd className="font-body text-[13px] leading-[1.7] text-foreground/65">
+                  {premiereBits.length > 0 && (
+                    <div>{premiereBits.join(" — ")}</div>
+                  )}
+                  {work.performers && (
+                    <div className="text-foreground/45 whitespace-pre-line">
+                      {work.performers}
+                    </div>
+                  )}
+                </dd>
+              </div>
+            )}
+          </dl>
+
+          {/* Footer Action Row */}
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+            <span className="inline-flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.25em]">
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  work.published ? "bg-tertiary" : "bg-foreground/25"
+                }`}
+              />
+              {work.published ? (
+                work.publicationUrl ? (
+                  <a
+                    href={work.publicationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-foreground/55 hover:text-foreground transition-colors underline-offset-4 hover:underline"
+                  >
+                    Published
+                  </a>
+                ) : (
+                  <span className="text-foreground/55">Published</span>
+                )
+              ) : (
+                <span className="text-foreground/55">Unpublished</span>
+              )}
+            </span>
+
+            {work.watchLink && (
               <a
-                href={work.publicationUrl}
+                href={work.watchLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-foreground/55 hover:text-foreground transition-colors underline-offset-4 hover:underline"
+                className="inline-flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.22em] text-foreground/70 hover:text-foreground transition-colors"
               >
-                Published
+                <span className="w-7 h-7 flex items-center justify-center rounded-full border border-foreground/15">
+                  <span className="material-symbols-outlined text-[14px]">
+                    play_circle
+                  </span>
+                </span>
+                <span>Watch</span>
               </a>
-            ) : (
-              <span className="text-foreground/55">Published</span>
-            )
-          ) : (
-            <span className="text-foreground/55">Unpublished</span>
-          )}
-        </span>
+            )}
 
-        {work.watchLink && (
-          <a
-            href={work.watchLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.22em] text-foreground/70 hover:text-foreground transition-colors"
-          >
-            <span className="w-7 h-7 flex items-center justify-center rounded-full border border-foreground/15">
-              <span className="material-symbols-outlined text-[14px]">
-                play_circle
-              </span>
-            </span>
-            <span>Watch</span>
-          </a>
-        )}
-
-        {work.audioUrl && (
-          <PlayButton
-            src={work.audioUrl}
-            audioRef={audioRef}
-            setActiveSrc={setActiveSrc}
-            activeSrc={activeSrc}
-          />
-        )}
-      </div>
+            {work.audioUrl && (
+              <PlayButton
+                src={work.audioUrl}
+                audioRef={audioRef}
+                setActiveSrc={setActiveSrc}
+                activeSrc={activeSrc}
+              />
+            )}
+          </div>
+        </div>
+      </motion.div>
     </motion.article>
   );
 }
