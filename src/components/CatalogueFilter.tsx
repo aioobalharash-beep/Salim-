@@ -77,6 +77,7 @@ export interface CatalogueWork {
   premierePlace: string | null;
   performers: string | null;
   watchLink: string | null;
+  audioFileUrl: string | null;
   audioUrl: string | null;
   slug?: string | null;
   seo?: {
@@ -135,7 +136,7 @@ function PlayButton({
           {isActive ? "pause" : "play_arrow"}
         </span>
       </span>
-      <span>{isActive ? "Pause" : "Play"}</span>
+      <span className="normal-case tracking-normal">{isActive ? "pause" : "play"}</span>
     </button>
   );
 }
@@ -417,14 +418,29 @@ function EntryCard({
               </a>
             )}
 
-            {work.audioUrl && (
+            {work.audioFileUrl ? (
               <PlayButton
-                src={work.audioUrl}
+                src={work.audioFileUrl}
                 audioRef={audioRef}
                 setActiveSrc={setActiveSrc}
                 activeSrc={activeSrc}
               />
-            )}
+            ) : work.audioUrl ? (
+              <a
+                href={work.audioUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Listen on external platform"
+                className="inline-flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.22em] text-foreground/60 hover:text-foreground transition-colors"
+              >
+                <span className="w-7 h-7 flex items-center justify-center rounded-full border border-foreground/15">
+                  <span className="material-symbols-outlined text-[14px]">
+                    play_arrow
+                  </span>
+                </span>
+                <span className="normal-case tracking-normal">listen</span>
+              </a>
+            ) : null}
           </div>
         </div>
       </motion.div>

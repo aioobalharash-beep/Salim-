@@ -189,6 +189,16 @@ export default defineType({
       group: "media",
       options: { accept: "audio/*" },
     }),
+    defineField({
+      name: "audioUrl",
+      title: "Audio URL",
+      type: "url",
+      group: "media",
+      description:
+        "Link to external streaming platform (Spotify, SoundCloud, YouTube, etc.) if a local audio file is not available.",
+      validation: (Rule) =>
+        Rule.uri({ scheme: ["http", "https"], allowRelative: false }),
+    }),
 
     /* ── SEO ────────────────────────────────────────────────────── */
     defineField({
