@@ -7,7 +7,16 @@ import TestimonialForm from "./TestimonialForm";
 interface TestimonialItem {
   _id: string;
   name: string;
+  profession?: string | null;
+  city?: string | null;
+  country?: string | null;
   content: string;
+}
+
+function formatByline(t: TestimonialItem): string {
+  const place = [t.city, t.country].filter(Boolean).join(", ");
+  const lead = [t.name, t.profession].filter(Boolean).join(", ");
+  return place ? `${lead} — ${place}` : lead;
 }
 
 export default function TestimonialSection({
@@ -60,8 +69,8 @@ export default function TestimonialSection({
                     {t.content}
                   </p>
                   <div className="mt-8 pt-6 border-t border-outline-variant/10">
-                    <p className="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface/60">
-                      {t.name}
+                    <p className="font-body text-[11px] tracking-normal text-on-surface/70">
+                      {formatByline(t)}
                     </p>
                   </div>
                 </div>
