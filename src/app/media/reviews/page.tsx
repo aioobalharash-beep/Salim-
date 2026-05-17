@@ -28,7 +28,7 @@ export default async function ReviewsPage() {
         description="Selected quotes and coverage — reflections on the work from across publications and stages."
       />
 
-      <section className="px-6 md:px-12 max-w-screen-2xl mx-auto pb-32">
+      <section className="px-8 sm:px-10 md:px-12 max-w-screen-2xl mx-auto pb-32">
         <ReviewsGrid items={items} />
       </section>
     </>

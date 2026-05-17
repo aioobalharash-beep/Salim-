@@ -66,7 +66,12 @@ export const heroSettingsQuery = groq`
     heroColumns[] {
       subtitle,
       title,
-      image,
+      image{
+        ...,
+        hotspot,
+        crop,
+        asset
+      },
       link{
         type,
         internal,

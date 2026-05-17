@@ -129,7 +129,7 @@ function PlayButton({
     <button
       onClick={toggle}
       aria-label={isActive ? "Pause audio" : "Play audio"}
-      className="inline-flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.22em] text-foreground/60 hover:text-foreground transition-colors"
+      className="inline-flex items-center gap-2 min-h-[48px] -my-2 py-2 font-label text-[10px] uppercase tracking-[0.22em] text-foreground/60 hover:text-foreground transition-colors"
     >
       <span className="w-7 h-7 flex items-center justify-center rounded-full border border-foreground/15 group-hover:border-foreground/40 transition-colors">
         <span className="material-symbols-outlined text-[14px]">
@@ -261,11 +261,11 @@ function EntryCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="group py-12 border-b border-foreground/[0.06]"
+      className="group py-10 md:py-12 border-b border-foreground/[0.06]"
     >
       {/* Top Line — Title + Year */}
-      <div className="flex items-baseline justify-between gap-6 mb-4">
-        <h2 className="font-headline text-[1.85rem] md:text-[2.4rem] leading-[1.15] text-foreground">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 mb-4">
+        <h2 className="min-w-0 break-words font-headline text-2xl sm:text-3xl md:text-[2.4rem] leading-[1.15] text-foreground">
           {work.title}
         </h2>
         {work.year && (
@@ -277,17 +277,17 @@ function EntryCard({
 
       {/* Subtitle */}
       {work.subtitle && (
-        <p className="font-headline italic text-base md:text-lg text-foreground/55 mb-5">
+        <p className="font-headline italic text-base md:text-lg text-foreground/55 mb-5 break-words">
           {work.subtitle}
         </p>
       )}
 
-      {/* More / Less Trigger */}
+      {/* More / Less Trigger — 48px touch target via min-h, padding absorbed by negative margin */}
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
         aria-expanded={isOpen}
-        className="inline-flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.28em] text-foreground/45 hover:text-foreground transition-colors"
+        className="inline-flex items-center gap-2 min-h-[48px] -my-2 py-2 -mx-2 px-2 font-label text-[10px] uppercase tracking-[0.28em] text-foreground/45 hover:text-foreground transition-colors"
       >
         <span>{isOpen ? "less" : "more"}</span>
         <motion.span
@@ -329,8 +329,8 @@ function EntryCard({
             </p>
           )}
 
-          {/* Metadata Block */}
-          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-3 max-w-2xl mb-8">
+          {/* Metadata Block — single column on mobile, two on sm+ */}
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-5 sm:gap-y-3 max-w-2xl mb-8">
             {work.genre && (
               <MetaRow label="Genre" value={work.genre} />
             )}
@@ -407,7 +407,7 @@ function EntryCard({
                 href={work.watchLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.22em] text-foreground/70 hover:text-foreground transition-colors"
+                className="inline-flex items-center gap-2 min-h-[48px] -my-2 py-2 font-label text-[10px] uppercase tracking-[0.22em] text-foreground/70 hover:text-foreground transition-colors"
               >
                 <span className="w-7 h-7 flex items-center justify-center rounded-full border border-foreground/15">
                   <span className="material-symbols-outlined text-[14px]">
@@ -431,7 +431,7 @@ function EntryCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Listen on external platform"
-                className="inline-flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.22em] text-foreground/60 hover:text-foreground transition-colors"
+                className="inline-flex items-center gap-2 min-h-[48px] -my-2 py-2 font-label text-[10px] uppercase tracking-[0.22em] text-foreground/60 hover:text-foreground transition-colors"
               >
                 <span className="w-7 h-7 flex items-center justify-center rounded-full border border-foreground/15">
                   <span className="material-symbols-outlined text-[14px]">
