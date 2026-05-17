@@ -52,7 +52,9 @@ function toEmbedUrl(url: string): string | null {
 export default async function VideoPage() {
   let videos: VideoItem[] = [];
   try {
-    videos = (await client.fetch<VideoItem[]>(videoListQuery)) ?? [];
+    const fetched =
+      (await client.fetch<(VideoItem | null)[] | null>(videoListQuery)) ?? [];
+    videos = fetched.filter((v): v is VideoItem => !!v && !!v._id);
   } catch {
     videos = [];
   }

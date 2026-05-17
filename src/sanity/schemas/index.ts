@@ -10,6 +10,7 @@ import audio from "./audio";
 import gallery from "./gallery";
 import reviews from "./reviews";
 import video from "./video";
+import videosPage from "./videosPage";
 import catalogue from "./catalogue";
 import legal from "./legal";
 import seoSettings from "./seoSettings";
@@ -27,6 +28,7 @@ export const schemaTypes = [
   gallery,
   reviews,
   video,
+  videosPage,
   catalogue,
   legal,
   seoSettings,
