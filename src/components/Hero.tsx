@@ -10,25 +10,11 @@ interface HeroLink {
   external?: string;
 }
 
-interface HeroImage {
-  asset?: { _ref?: string; _type?: string };
-  hotspot?: { x: number; y: number; height?: number; width?: number };
-  crop?: { top: number; bottom: number; left: number; right: number };
-}
-
 interface HeroColumn {
   subtitle: string;
   title: string;
-  image?: (SanityImageSource & HeroImage) | null;
+  image?: SanityImageSource | null;
   link?: HeroLink;
-}
-
-function hotspotObjectPosition(image?: HeroImage | null): string {
-  const h = image?.hotspot;
-  if (!h || typeof h.x !== "number" || typeof h.y !== "number") return "center";
-  const x = Math.max(0, Math.min(1, h.x)) * 100;
-  const y = Math.max(0, Math.min(1, h.y)) * 100;
-  return `${x}% ${y}%`;
 }
 
 // Seed data used when Sanity has no SiteSettings document yet
@@ -189,7 +175,7 @@ export default async function Hero() {
                   alt={panel.alt}
                   fill
                   sizes="(max-width: 768px) 100vw, 25vw"
-                  className="object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-105"
+                  className="object-cover object-[center_20%] md:object-center transition-transform duration-1000 ease-out group-hover:scale-105"
                   priority
                 />
               }
@@ -215,8 +201,7 @@ export default async function Hero() {
                     alt={col.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 25vw"
-                    style={{ objectPosition: hotspotObjectPosition(col.image) }}
-                    className="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
+                    className="object-cover object-[center_20%] md:object-center transition-transform duration-1000 ease-out group-hover:scale-105"
                     priority
                   />
                 ) : null
