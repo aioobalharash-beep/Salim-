@@ -38,63 +38,60 @@ const socialLinks = [
 export default function Footer() {
   return (
     <footer className="w-full py-12 md:py-16 px-6 md:px-12 bg-surface-container-low border-t border-outline-variant/15">
-      <div className="flex flex-col gap-8 md:gap-10 w-full max-w-screen-2xl mx-auto">
-        {/* Top row: Brand + Social */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-          <Link
-            href="/"
-            className="font-serif-brand text-2xl font-light tracking-widest text-on-surface uppercase"
-          >
-            Salim Dada
-          </Link>
+      <div className="flex flex-col items-center text-center gap-8 md:gap-10 w-full max-w-screen-2xl mx-auto">
+        {/* Brand */}
+        <Link
+          href="/"
+          className="font-serif-brand text-2xl font-light tracking-widest text-on-surface uppercase"
+        >
+          Salim Dada
+        </Link>
 
-          {/* Social Icons */}
-          <div className="flex gap-6 items-center">
-            {socialLinks.map((s) => (
-              <a
-                key={s.label}
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={s.label}
-                className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] text-primary/40 hover:text-primary transition-colors duration-300"
-              >
-                {s.icon}
-              </a>
-            ))}
-          </div>
+        {/* Social Icons */}
+        <div className="flex justify-center space-x-6">
+          {socialLinks.map((s) => (
+            <a
+              key={s.label}
+              href={s.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={s.label}
+              className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] text-primary/40 hover:text-primary transition-colors duration-300"
+            >
+              {s.icon}
+            </a>
+          ))}
         </div>
 
-        {/* Bottom row: Copyright + Links — stack on mobile, side-by-side from md+ */}
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-5 pt-6 border-t border-outline-variant/10">
-          <p className="font-body text-[10px] uppercase tracking-[0.1em] text-primary/40 leading-relaxed">
-            &copy; {new Date().getFullYear()} Salim Dada. All rights reserved.{" "}
-            <span className="block sm:inline">
-              Powered by{" "}
-              <a
-                href="https://www.mahara.tech"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary/60 hover:text-primary transition-colors duration-300"
-              >
-                mahara tech
-              </a>
-              .
-            </span>
-          </p>
-
-          <div className="flex flex-wrap gap-x-6 gap-y-2 items-center">
-            {footerLinks.map(({ href, label }) => (
-              <Link
-                key={label}
-                href={href}
-                className="font-body text-[10px] uppercase tracking-[0.1em] text-primary/40 hover:text-primary transition-colors duration-300"
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
+        {/* Navigation Links */}
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 pt-6 w-full border-t border-outline-variant/10">
+          {footerLinks.map(({ href, label }) => (
+            <Link
+              key={label}
+              href={href}
+              className="font-body text-[10px] uppercase tracking-[0.1em] text-primary/40 hover:text-primary transition-colors duration-300"
+            >
+              {label}
+            </Link>
+          ))}
         </div>
+
+        {/* Copyright */}
+        <p className="font-body text-[10px] uppercase tracking-[0.1em] text-primary/40 leading-relaxed text-center">
+          &copy; {new Date().getFullYear()} Salim Dada. All rights reserved.{" "}
+          <span className="block sm:inline">
+            Powered by{" "}
+            <a
+              href="https://www.mahara.tech"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary/60 hover:text-primary transition-colors duration-300"
+            >
+              mahara tech
+            </a>
+            .
+          </span>
+        </p>
       </div>
     </footer>
   );
