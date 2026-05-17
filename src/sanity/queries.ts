@@ -231,16 +231,9 @@ export const legalQuery = groq`
 `;
 
 export const videoListQuery = groq`
-  coalesce(
-    *[_type == "videosPage"][0].videos[]->{
-      _id,
-      videoLink,
-      description
-    },
-    *[_type == "video"] | order(order asc, _createdAt desc) {
-      _id,
-      videoLink,
-      description
-    }
-  )
+  *[_type == "video"] | order(order asc, _createdAt desc) {
+    _id,
+    videoLink,
+    description
+  }
 `;
