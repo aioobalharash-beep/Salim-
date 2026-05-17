@@ -68,12 +68,13 @@ function buildMusicCompositionJsonLd(works: CatalogueWork[]) {
           performer: work.performers || undefined,
         }
       : undefined,
-    recordedAs: work.audioUrl
-      ? {
-          "@type": "MusicRecording",
-          contentUrl: work.audioUrl,
-        }
-      : undefined,
+    recordedAs:
+      work.audioFileUrl || work.audioUrl
+        ? {
+            "@type": "MusicRecording",
+            contentUrl: work.audioFileUrl || work.audioUrl,
+          }
+        : undefined,
     url: work.watchLink || undefined,
   }));
 }

@@ -203,7 +203,8 @@ export const catalogueListQuery = groq`
     premierePlace,
     performers,
     watchLink,
-    "audioUrl": audioFile.asset->url,
+    "audioFileUrl": audioFile.asset->url,
+    audioUrl,
     "slug": slug.current,
     seo{
       ${seoProjection}
