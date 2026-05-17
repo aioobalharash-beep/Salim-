@@ -185,18 +185,20 @@ export const reviewsListQuery = groq`
 `;
 
 export const catalogueListQuery = groq`
-  *[_type == "catalogue" && published == true] | order(year desc, title asc) {
+  *[_type == "catalogue"] | order(year desc, title asc) {
     _id,
     title,
     subtitle,
     description,
     year,
     instrumentation,
+    instrumentationDetail,
     genre,
     durationMinutes,
     durationDisplay,
     movements,
     published,
+    publicationUrl,
     premiereDate,
     premierePlace,
     performers,
