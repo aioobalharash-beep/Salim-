@@ -131,9 +131,12 @@ export const servicesQuery = groq`
 `;
 
 export const testimonialsQuery = groq`
-  *[_type == "testimonial"] | order(order asc) {
+  *[_type == "testimonial" && approved == true && !(_id in path("drafts.**"))] | order(order asc) {
     _id,
     name,
+    profession,
+    city,
+    country,
     content
   }
 `;
