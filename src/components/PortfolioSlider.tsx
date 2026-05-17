@@ -274,7 +274,7 @@ export default function PortfolioSlider({
                   : "text-on-surface/30 border-transparent hover:text-on-surface/60"
               }`}
             >
-              {tab === "work" ? "Latest Work" : "Upcoming Events"}
+              {tab === "work" ? "Work" : "Events"}
             </button>
           ))}
         </div>
