@@ -7,9 +7,9 @@ const GA_MEASUREMENT_ID =
   process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-XRS82SKPKY";
 
 export const metadata: Metadata = {
-  title: "Salim Dada — Conductor · Composer · Guitarist · Scholar",
+  title: "Salim DADA - Composer . Conductor . Guitarist . Musicologist . Cultural Strategist",
   description:
-    "The official portfolio of Salim Dada: maestro, composer, classical guitarist, and UNESCO cultural envoy bridging Mediterranean musical heritage.",
+    "Composer, conductor, guitarist & UNESCO cultural expert. PhD musicology researcher, Sorbonne. Former Algerian Secretary of State for Cultural Production.",
 };
 
 export default function RootLayout({
