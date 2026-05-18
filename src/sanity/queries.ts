@@ -7,6 +7,7 @@ const seoProjection = groq`
   ogImage{
     ...,
     "alt": coalesce(alt, asset->altText, ""),
+    "dimensions": asset->metadata.dimensions,
     asset
   }
 `;

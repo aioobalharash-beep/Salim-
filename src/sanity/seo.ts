@@ -1,24 +1,36 @@
 import type { Metadata } from "next";
 import { urlFor, type SanityImageSource } from "./image";
 
+interface ImageDimensions {
+  width: number;
+  height: number;
+  aspectRatio: number;
+}
+
+type OgImageSource = SanityImageSource & {
+  alt?: string;
+  dimensions?: ImageDimensions;
+};
+
 export interface SeoSettings {
   metaTitle?: string | null;
   metaDescription?: string | null;
   keywords?: string[] | null;
-  ogImage?: (SanityImageSource & { alt?: string }) | null;
+  ogImage?: OgImageSource | null;
 }
 
 interface BuildMetadataInput {
   seo?: SeoSettings | null;
   fallbackTitle: string;
   fallbackDescription?: string | null;
-  fallbackImage?: SanityImageSource | null;
+  fallbackImage?: (SanityImageSource & { dimensions?: ImageDimensions }) | null;
   titleSuffix?: string;
   url?: string;
   type?: "website" | "article";
 }
 
 const DEFAULT_SUFFIX = "Salim Dada";
+const OG_MAX_EDGE = 1200;
 
 export function buildMetadata({
   seo,
@@ -36,19 +48,46 @@ export function buildMetadata({
   const keywords = seo?.keywords?.length ? seo.keywords : undefined;
 
   const ogImageSource = seo?.ogImage ?? fallbackImage ?? null;
-  // Use focal-point crop so portrait images keep the subject (face) in frame
-  // when squeezed into the 1.91:1 OG aspect ratio used by LinkedIn/Facebook.
-  const ogImageUrl = ogImageSource
-    ? urlFor(ogImageSource)
-        .width(1200)
-        .height(630)
-        .fit("crop")
-        .crop("focalpoint")
+  const dims = (ogImageSource as { dimensions?: ImageDimensions } | null)
+    ?.dimensions;
+
+  // Serve OG images at their natural aspect ratio (capped at 1200 on the long
+  // edge). Forcing a 1.91:1 crop mutilates square covers and portraits, which
+  // is the typical art for these articles. LinkedIn / Facebook will pick the
+  // appropriate card layout based on the declared width/height.
+  let ogImageUrl: string | undefined;
+  let ogImageWidth: number | undefined;
+  let ogImageHeight: number | undefined;
+
+  if (ogImageSource) {
+    const aspectRatio = dims?.aspectRatio ?? 1; // assume square if unknown
+    if (aspectRatio >= 1) {
+      ogImageWidth = OG_MAX_EDGE;
+      ogImageHeight = Math.round(OG_MAX_EDGE / aspectRatio);
+      ogImageUrl = urlFor(ogImageSource)
+        .width(OG_MAX_EDGE)
         .auto("format")
-        .url()
-    : undefined;
+        .url();
+    } else {
+      ogImageHeight = OG_MAX_EDGE;
+      ogImageWidth = Math.round(OG_MAX_EDGE * aspectRatio);
+      ogImageUrl = urlFor(ogImageSource)
+        .height(OG_MAX_EDGE)
+        .auto("format")
+        .url();
+    }
+  }
+
   const ogImageAlt =
     (seo?.ogImage && (seo.ogImage as { alt?: string }).alt) || baseTitle;
+
+  // summary_large_image expects a wide (≥1.5:1) image; for square or portrait
+  // art Twitter's compact "summary" card preserves the natural aspect ratio.
+  const twitterCard: "summary" | "summary_large_image" = ogImageUrl
+    ? (dims?.aspectRatio ?? 1) >= 1.5
+      ? "summary_large_image"
+      : "summary"
+    : "summary";
 
   return {
     title,
@@ -60,11 +99,18 @@ export function buildMetadata({
       type,
       url,
       images: ogImageUrl
-        ? [{ url: ogImageUrl, width: 1200, height: 630, alt: ogImageAlt }]
+        ? [
+            {
+              url: ogImageUrl,
+              width: ogImageWidth,
+              height: ogImageHeight,
+              alt: ogImageAlt,
+            },
+          ]
         : undefined,
     },
     twitter: {
-      card: ogImageUrl ? "summary_large_image" : "summary",
+      card: twitterCard,
       title,
       description,
       images: ogImageUrl ? [ogImageUrl] : undefined,
