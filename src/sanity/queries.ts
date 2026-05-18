@@ -47,6 +47,12 @@ export const articlesBySlugQuery = groq`
       "dimensions": asset->metadata.dimensions,
       asset
     },
+    socialShareImage{
+      ...,
+      "alt": coalesce(alt, asset->altText, ""),
+      "dimensions": asset->metadata.dimensions,
+      asset
+    },
     body[]{
       ...,
       _type == "bodyImage" => {

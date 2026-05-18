@@ -104,6 +104,7 @@ interface Article {
   accentColor?: string | null;
   showTableOfContents?: boolean | null;
   featuredImage: SanityImageWithMeta | null;
+  socialShareImage?: SanityImageWithMeta | null;
   body: PortableTextBlock[] | null;
   seo?: SeoSettings | null;
 }
@@ -119,9 +120,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const article = await getArticle(params.slug);
   if (!article) return { title: "Not Found" };
-  // For articles, the featured image is the social-share image. Strip any
-  // seo.ogImage override so editors can't accidentally point shares at a
-  // different photo than the one readers see at the top of the article.
+  // Prefer the dedicated socialShareImage (landscape banner) when set so
+  // editors can dodge LinkedIn's 1.91:1 crop on square covers. Otherwise
+  // fall back to the article's featured image. Strip any seo.ogImage
+  // override so a stale SEO panel can't beat the editorial intent.
+  const shareImage = article.socialShareImage ?? article.featuredImage;
   const seoWithoutOgImage = article.seo
     ? { ...article.seo, ogImage: null }
     : null;
@@ -129,7 +132,7 @@ export async function generateMetadata({
     seo: seoWithoutOgImage,
     fallbackTitle: article.title,
     fallbackDescription: article.excerpt,
-    fallbackImage: article.featuredImage,
+    fallbackImage: shareImage,
     url: `/articles/${article.slug}`,
     type: "article",
   });

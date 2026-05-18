@@ -376,6 +376,25 @@ export default defineType({
     }),
 
     defineField({
+      name: "socialShareImage",
+      title: "Social Share Image",
+      type: "image",
+      group: "content",
+      options: { hotspot: true },
+      description:
+        "Optional landscape image (recommended 1200×630) used by LinkedIn, Facebook, iMessage when this article is shared. If blank, the Featured Image is used — but square or portrait covers will be cropped by LinkedIn's 1.91:1 frame. Upload a dedicated landscape banner here to avoid that.",
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          description:
+            "Short description of the image for accessibility and SEO.",
+        }),
+      ],
+    }),
+
+    defineField({
       name: "excerpt",
       title: "Excerpt (listing)",
       type: "text",
