@@ -36,8 +36,16 @@ export function buildMetadata({
   const keywords = seo?.keywords?.length ? seo.keywords : undefined;
 
   const ogImageSource = seo?.ogImage ?? fallbackImage ?? null;
+  // Use focal-point crop so portrait images keep the subject (face) in frame
+  // when squeezed into the 1.91:1 OG aspect ratio used by LinkedIn/Facebook.
   const ogImageUrl = ogImageSource
-    ? urlFor(ogImageSource).width(1200).height(630).fit("crop").url()
+    ? urlFor(ogImageSource)
+        .width(1200)
+        .height(630)
+        .fit("crop")
+        .crop("focalpoint")
+        .auto("format")
+        .url()
     : undefined;
   const ogImageAlt =
     (seo?.ogImage && (seo.ogImage as { alt?: string }).alt) || baseTitle;
