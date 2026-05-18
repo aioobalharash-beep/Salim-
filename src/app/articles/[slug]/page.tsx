@@ -119,8 +119,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const article = await getArticle(params.slug);
   if (!article) return { title: "Not Found" };
+  // For articles, the featured image is the social-share image. Strip any
+  // seo.ogImage override so editors can't accidentally point shares at a
+  // different photo than the one readers see at the top of the article.
+  const seoWithoutOgImage = article.seo
+    ? { ...article.seo, ogImage: null }
+    : null;
   return buildMetadata({
-    seo: article.seo,
+    seo: seoWithoutOgImage,
     fallbackTitle: article.title,
     fallbackDescription: article.excerpt,
     fallbackImage: article.featuredImage,
