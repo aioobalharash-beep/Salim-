@@ -12,7 +12,7 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: "Shop — Salim Dada",
   description:
-    "Scores, tabs, and books by Salim Dada — available for purchase.",
+    "Scores, albums, and books by Salim Dada — available for purchase.",
 };
 
 type ShopImage = SanityImageSource & { alt?: string };
@@ -60,7 +60,7 @@ export default async function ShopPage() {
       <PageHeader
         tag="Collection"
         title="Shop"
-        description="Scores, tabs, and books — published works available for purchase ."
+        description="Scores, albums, and books — published works available for purchase ."
       />
 
       <section className="px-4 max-w-7xl mx-auto pb-32">
