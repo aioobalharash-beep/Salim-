@@ -44,7 +44,7 @@ export default function ShopCard({
           aria-label={`Quick view: ${title}`}
           className="text-left w-full flex flex-col group"
         >
-          <div className="relative w-full h-[320px] md:h-[380px] overflow-hidden bg-background">
+          <div className="relative w-full h-[320px] md:h-[380px] overflow-hidden bg-[#fbfaf7]">
             <ShopCarousel slides={slides} title={title} fit="contain" />
           </div>
 

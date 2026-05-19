@@ -99,7 +99,7 @@ export default function ShopModal({
             <div className="overflow-y-auto max-h-[85vh] px-8 py-12">
             {/* 1 — Header imagery, centered carousel */}
             <div className="mx-auto w-full max-w-xl">
-              <div className="relative w-full h-[360px] md:h-[480px] bg-background">
+              <div className="relative w-full h-[360px] md:h-[480px] bg-[#fbfaf7]">
                 <ShopCarousel
                   slides={slides}
                   title={title}
