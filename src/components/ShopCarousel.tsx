@@ -38,7 +38,7 @@ export default function ShopCarousel({
   }, []);
 
   if (slides.length === 0) {
-    return <div className="absolute inset-0 bg-background" />;
+    return <div className="absolute inset-0 bg-[#fbfaf7]" />;
   }
 
   const objectFit = fit === "contain" ? "object-contain" : "object-cover";
