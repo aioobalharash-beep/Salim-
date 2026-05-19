@@ -10,6 +10,7 @@ import video from "./video";
 import catalogue from "./catalogue";
 import legal from "./legal";
 import seoSettings from "./seoSettings";
+import shop from "./shop";
 
 export const schemaTypes = [
   articles,
@@ -24,4 +25,5 @@ export const schemaTypes = [
   catalogue,
   legal,
   seoSettings,
+  shop,
 ];

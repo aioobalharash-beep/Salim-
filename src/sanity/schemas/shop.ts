@@ -7,20 +7,15 @@ export default defineType({
   icon: () => "🛒",
   fields: [
     defineField({
-      name: "productName",
-      title: "Product Name",
+      name: "title",
+      title: "Title",
       type: "string",
+      description: "e.g. 'Suite Algérienne for Guitar Solo'.",
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: "price",
-      title: "Price",
-      type: "number",
-      description: "Price in USD.",
-    }),
-    defineField({
-      name: "image",
-      title: "Product Image",
+      name: "coverImage",
+      title: "Cover Image",
       type: "image",
       options: { hotspot: true },
       fields: [
@@ -30,29 +25,58 @@ export default defineType({
           type: "string",
           description:
             "Short description of the image for accessibility and SEO.",
-          validation: (Rule) => Rule.required(),
         }),
       ],
     }),
     defineField({
-      name: "link",
-      title: "Link",
-      type: "url",
-      description: "Purchase link — internal page or external store.",
+      name: "category",
+      title: "Category",
+      type: "string",
+      options: {
+        list: [
+          { title: "Scores", value: "Scores" },
+          { title: "Tabs", value: "Tabs" },
+          { title: "Books", value: "Books" },
+          { title: "Other", value: "Other" },
+        ],
+        layout: "dropdown",
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "priceText",
+      title: "Price",
+      type: "string",
+      description: "Display price, e.g. '€22.00'.",
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: "description",
       title: "Description",
       type: "text",
-      rows: 3,
+      rows: 4,
+      description: "A brief product summary.",
+    }),
+    defineField({
+      name: "purchaseUrl",
+      title: "Sonitus Edizioni Link",
+      type: "url",
+      description: "The exact page link where this item can be purchased.",
+      validation: (Rule) =>
+        Rule.required().uri({ scheme: ["http", "https"] }),
     }),
   ],
   preview: {
-    select: { title: "productName", subtitle: "price", media: "image" },
-    prepare({ title, subtitle, media }) {
+    select: {
+      title: "title",
+      subtitle: "priceText",
+      category: "category",
+      media: "coverImage",
+    },
+    prepare({ title, subtitle, category, media }) {
       return {
         title,
-        subtitle: subtitle ? `$${subtitle}` : "No price set",
+        subtitle: [category, subtitle].filter(Boolean).join(" · "),
         media,
       };
     },
