@@ -54,14 +54,14 @@ export default function ShopCarousel({
         {slides.map((slide, i) => (
           <div
             key={i}
-            className="relative shrink-0 basis-full h-full snap-center bg-transparent"
+            className="relative shrink-0 basis-full w-full h-full snap-center bg-transparent"
           >
             <Image
               src={slide.url}
               alt={slide.alt || `${title} — image ${i + 1}`}
               fill
               sizes={sizes}
-              className={`${objectFit} bg-transparent`}
+              className={`${objectFit} h-full w-full bg-transparent`}
               priority={i === 0}
             />
           </div>
