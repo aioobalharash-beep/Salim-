@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     "Scores, tabs, and books by Salim Dada — available through Sonitus Edizioni and partner publishers.",
 };
 
-type ShopImage = SanityImageSource & { alt?: string; originalUrl?: string };
+type ShopImage = SanityImageSource & { alt?: string };
 
 type ShopItem = {
   _id: string;
@@ -40,17 +40,14 @@ function buildSlides(item: ShopItem): ShopSlide[] {
   const images = item.images ?? [];
   return images
     .map((img) => {
-      const url =
-        img.originalUrl ||
-        (() => {
-          try {
-            return urlFor(img).width(1200).fit("max").auto("format").url();
-          } catch {
-            return null;
-          }
-        })();
-      if (!url) return null;
-      return { url, alt: img.alt || item.title };
+      try {
+        return {
+          url: urlFor(img).width(1200).fit("max").auto("format").url(),
+          alt: img.alt || item.title,
+        };
+      } catch {
+        return null;
+      }
     })
     .filter((s): s is ShopSlide => s !== null);
 }
