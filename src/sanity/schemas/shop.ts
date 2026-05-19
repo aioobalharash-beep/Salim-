@@ -1,4 +1,4 @@
-import { defineType, defineField } from "sanity";
+import { defineType, defineField, defineArrayMember } from "sanity";
 
 export default defineType({
   name: "shop",
@@ -55,6 +55,78 @@ export default defineType({
       type: "text",
       rows: 4,
       description: "A brief product summary.",
+    }),
+    defineField({
+      name: "additionalInfo",
+      title: "Additional Information",
+      type: "array",
+      description:
+        "Dynamic table rows shown in the product pop-up. Add only the rows that apply to this product (e.g. Pages, Binding, ISMN).",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "infoRow",
+          title: "Info Row",
+          fields: [
+            defineField({
+              name: "label",
+              title: "Label",
+              type: "string",
+              description: "Left column, e.g. 'Pages', 'Binding', 'ISMN'.",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "value",
+              title: "Value",
+              type: "string",
+              description:
+                "Right column (rendered italicised), e.g. '28', 'Staple', '9790520250702'.",
+              validation: (Rule) => Rule.required(),
+            }),
+          ],
+          preview: {
+            select: { title: "label", subtitle: "value" },
+          },
+        }),
+      ],
+    }),
+    defineField({
+      name: "audioTracks",
+      title: "Audio Tracks",
+      type: "array",
+      description:
+        "Optional audio samples for this product. Each track shows in the product pop-up with the site audio player.",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "audioTrack",
+          title: "Audio Track",
+          fields: [
+            defineField({
+              name: "trackTitle",
+              title: "Track Title",
+              type: "string",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "trackDescription",
+              title: "Track Description",
+              type: "string",
+              description: "Brief subtitle shown under the track title.",
+            }),
+            defineField({
+              name: "audioFile",
+              title: "Audio File",
+              type: "file",
+              options: { accept: "audio/*" },
+              validation: (Rule) => Rule.required(),
+            }),
+          ],
+          preview: {
+            select: { title: "trackTitle", subtitle: "trackDescription" },
+          },
+        }),
+      ],
     }),
     defineField({
       name: "purchaseUrl",
