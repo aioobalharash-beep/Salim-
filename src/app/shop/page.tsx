@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     "Scores, albums, and books by Salim Dada — available for purchase.",
 };
 
-type ShopImage = SanityImageSource & { alt?: string };
+type ShopImage = SanityImageSource & { alt?: string; originalUrl?: string };
 
 type ShopItem = {
   _id: string;
@@ -40,14 +40,17 @@ function buildSlides(item: ShopItem): ShopSlide[] {
   const images = item.images ?? [];
   return images
     .map((img) => {
-      try {
-        return {
-          url: urlFor(img).width(1200).height(1600).fit("max").url(),
-          alt: img.alt || item.title,
-        };
-      } catch {
-        return null;
-      }
+      const url =
+        img.originalUrl ||
+        (() => {
+          try {
+            return urlFor(img).width(1200).fit("max").auto("format").url();
+          } catch {
+            return null;
+          }
+        })();
+      if (!url) return null;
+      return { url, alt: img.alt || item.title };
     })
     .filter((s): s is ShopSlide => s !== null);
 }
