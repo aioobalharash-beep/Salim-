@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import PageHeader from "@/components/PageHeader";
+import ShopCarousel, { type ShopSlide } from "@/components/ShopCarousel";
 import { client } from "@/sanity/client";
 import { urlFor, type SanityImageSource } from "@/sanity/image";
 import { shopListQuery } from "@/sanity/queries";
@@ -13,14 +13,15 @@ export const metadata: Metadata = {
     "Scores, tabs, and books by Salim Dada — available through Sonitus Edizioni and partner publishers.",
 };
 
+type ShopImage = SanityImageSource & { alt?: string };
+
 type ShopItem = {
   _id: string;
   title: string;
-  category?: "Scores" | "Tabs" | "Books" | "Other";
-  priceText?: string;
+  priceText: string;
   description?: string;
   purchaseUrl: string;
-  coverImage?: SanityImageSource & { alt?: string };
+  images?: ShopImage[];
 };
 
 async function getShopItems(): Promise<ShopItem[]> {
@@ -31,9 +32,20 @@ async function getShopItems(): Promise<ShopItem[]> {
   }
 }
 
-function ctaLabelFor(category?: ShopItem["category"]) {
-  if (category === "Scores" || category === "Tabs") return "buy score";
-  return "purchase asset";
+function buildSlides(item: ShopItem): ShopSlide[] {
+  const images = item.images ?? [];
+  return images
+    .map((img) => {
+      try {
+        return {
+          url: urlFor(img).width(800).height(1200).fit("crop").url(),
+          alt: img.alt || item.title,
+        };
+      } catch {
+        return null;
+      }
+    })
+    .filter((s): s is ShopSlide => s !== null);
 }
 
 export default async function ShopPage() {
@@ -53,12 +65,9 @@ export default async function ShopPage() {
             New publications are being prepared. Please check back soon.
           </p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center md:justify-items-stretch">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 justify-items-center md:justify-items-stretch">
             {items.map((item) => {
-              const imgUrl = item.coverImage
-                ? urlFor(item.coverImage).width(900).height(675).fit("crop").url()
-                : null;
-              const altText = item.coverImage?.alt || item.title;
+              const slides = buildSlides(item);
               const snippet =
                 item.description && item.description.length > 160
                   ? `${item.description.slice(0, 157).trimEnd()}…`
@@ -67,39 +76,20 @@ export default async function ShopPage() {
               return (
                 <article
                   key={item._id}
-                  className="w-full max-w-sm md:max-w-none bg-surface-container-low rounded shadow-card overflow-hidden flex flex-col group"
+                  className="w-full max-w-sm md:max-w-none flex flex-col"
                 >
-                  <div className="aspect-[4/3] w-full overflow-hidden relative bg-surface-container">
-                    {imgUrl ? (
-                      <Image
-                        src={imgUrl}
-                        alt={altText}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                    ) : null}
+                  <div className="relative w-full aspect-[2/3] overflow-hidden bg-surface-container">
+                    <ShopCarousel slides={slides} title={item.title} />
                   </div>
 
-                  <div className="p-8 flex flex-col flex-1">
-                    <div className="flex items-center justify-between mb-4">
-                      {item.category ? (
-                        <p className="font-label text-[10px] uppercase tracking-widest text-primary">
-                          {item.category}
-                        </p>
-                      ) : (
-                        <span />
-                      )}
-                      {item.priceText ? (
-                        <p className="font-label text-sm text-on-surface">
-                          {item.priceText}
-                        </p>
-                      ) : null}
-                    </div>
-
-                    <h2 className="font-serif-brand text-xl text-on-surface mb-3">
+                  <div className="pt-6 flex flex-col">
+                    <h2 className="font-serif-brand text-xl text-on-surface mb-2 leading-snug">
                       {item.title}
                     </h2>
+
+                    <p className="font-label text-2xl font-semibold text-on-surface mb-4 tracking-tight">
+                      €{item.priceText}
+                    </p>
 
                     {snippet ? (
                       <p className="font-body text-xs leading-relaxed text-on-surface-variant mb-6">
@@ -111,9 +101,9 @@ export default async function ShopPage() {
                       href={item.purchaseUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-auto inline-flex items-center justify-center w-full py-3 border border-on-surface/20 text-on-surface font-label text-[10px] uppercase tracking-widest rounded-sm hover:bg-on-surface hover:text-background transition-colors"
+                      className="mt-auto inline-flex items-center justify-center w-full py-3 border border-on-surface/20 text-on-surface font-label text-[10px] lowercase tracking-widest hover:bg-on-surface hover:text-background transition-colors"
                     >
-                      {ctaLabelFor(item.category)}
+                      purchase asset
                     </a>
                   </div>
                 </article>
