@@ -244,3 +244,19 @@ export const videoListQuery = groq`
     description
   }
 `;
+
+export const shopListQuery = groq`
+  *[_type == "shop"] | order(_createdAt desc) {
+    _id,
+    title,
+    category,
+    priceText,
+    description,
+    purchaseUrl,
+    coverImage{
+      ...,
+      "alt": coalesce(alt, asset->altText, ""),
+      asset
+    }
+  }
+`;
