@@ -14,41 +14,40 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: "coverImage",
-      title: "Cover Image",
-      type: "image",
-      options: { hotspot: true },
-      fields: [
-        defineField({
-          name: "alt",
-          title: "Alt text",
-          type: "string",
-          description:
-            "Short description of the image for accessibility and SEO.",
-        }),
+      name: "images",
+      title: "Images",
+      type: "array",
+      description:
+        "First image is used as the default cover. Add sample score pages, back cover, etc. — they appear in the inline carousel.",
+      of: [
+        {
+          type: "image",
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: "alt",
+              title: "Alt text",
+              type: "string",
+              description:
+                "Short description of the image for accessibility and SEO.",
+            }),
+          ],
+        },
       ],
-    }),
-    defineField({
-      name: "category",
-      title: "Category",
-      type: "string",
-      options: {
-        list: [
-          { title: "Scores", value: "Scores" },
-          { title: "Tabs", value: "Tabs" },
-          { title: "Books", value: "Books" },
-          { title: "Other", value: "Other" },
-        ],
-        layout: "dropdown",
-      },
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().min(1),
     }),
     defineField({
       name: "priceText",
       title: "Price",
       type: "string",
-      description: "Display price, e.g. '€22.00'.",
-      validation: (Rule) => Rule.required(),
+      description:
+        'Must follow format "30.00" or "22.50" (do not include currency letters or symbols here).',
+      validation: (Rule) =>
+        Rule.required()
+          .regex(/^\d+\.\d{2}$/, { name: "priceText" })
+          .error(
+            'Must follow format "30.00" or "22.50" — digits, dot, two decimals, no currency.',
+          ),
     }),
     defineField({
       name: "description",
@@ -70,13 +69,12 @@ export default defineType({
     select: {
       title: "title",
       subtitle: "priceText",
-      category: "category",
-      media: "coverImage",
+      media: "images.0",
     },
-    prepare({ title, subtitle, category, media }) {
+    prepare({ title, subtitle, media }) {
       return {
         title,
-        subtitle: [category, subtitle].filter(Boolean).join(" · "),
+        subtitle: subtitle ? `€${subtitle}` : "No price set",
         media,
       };
     },
