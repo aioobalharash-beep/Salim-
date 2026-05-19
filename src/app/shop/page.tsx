@@ -59,13 +59,13 @@ export default async function ShopPage() {
         description="Scores, tabs, and books — published works available for purchase through Sonitus Edizioni and partner editions."
       />
 
-      <section className="px-6 md:px-12 max-w-screen-2xl mx-auto pb-32">
+      <section className="px-4 max-w-7xl mx-auto pb-32">
         {items.length === 0 ? (
           <p className="font-body text-sm text-on-surface-variant max-w-xl">
             New publications are being prepared. Please check back soon.
           </p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 justify-items-center md:justify-items-stretch">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 justify-items-center sm:justify-items-stretch">
             {items.map((item) => {
               const slides = buildSlides(item);
               const snippet =
@@ -76,23 +76,23 @@ export default async function ShopPage() {
               return (
                 <article
                   key={item._id}
-                  className="w-full max-w-sm md:max-w-none flex flex-col"
+                  className="w-full max-w-xs sm:max-w-none flex flex-col"
                 >
-                  <div className="relative w-full aspect-[2/3] overflow-hidden bg-surface-container">
+                  <div className="relative w-full h-[320px] md:h-[380px] overflow-hidden bg-surface-container">
                     <ShopCarousel slides={slides} title={item.title} />
                   </div>
 
-                  <div className="pt-6 flex flex-col">
-                    <h2 className="font-serif-brand text-xl text-on-surface mb-2 leading-snug">
+                  <div className="pt-4 flex flex-col">
+                    <h2 className="font-serif-brand text-lg text-on-surface mb-1 leading-snug">
                       {item.title}
                     </h2>
 
-                    <p className="font-label text-2xl font-semibold text-on-surface mb-4 tracking-tight">
+                    <p className="font-label text-xl font-semibold text-on-surface mb-2 tracking-tight">
                       €{item.priceText}
                     </p>
 
                     {snippet ? (
-                      <p className="font-body text-xs leading-relaxed text-on-surface-variant mb-6">
+                      <p className="font-body text-xs leading-relaxed text-on-surface-variant mb-4">
                         {snippet}
                       </p>
                     ) : null}
@@ -101,9 +101,9 @@ export default async function ShopPage() {
                       href={item.purchaseUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-auto inline-flex items-center justify-center w-full py-3 border border-on-surface/20 text-on-surface font-label text-[10px] lowercase tracking-widest hover:bg-on-surface hover:text-background transition-colors"
+                      className="mt-auto inline-flex items-center justify-center w-full py-2.5 border border-on-surface/20 text-on-surface font-label text-[10px] lowercase tracking-widest hover:bg-on-surface hover:text-background transition-colors"
                     >
-                      purchase asset
+                      buy now
                     </a>
                   </div>
                 </article>
