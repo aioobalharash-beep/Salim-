@@ -109,19 +109,37 @@ export default function ShopModal({
               </div>
             </div>
 
-            {/* 2 — Title, left-aligned */}
-            <h2 className="mt-10 font-serif-brand text-2xl md:text-3xl text-on-surface leading-tight text-left">
+            {/* 2 — Action bar: price + buy now, centered */}
+            <div className="mt-10 mx-auto max-w-md flex flex-col items-center text-center">
+              <p className="font-label text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/60 mb-2">
+                Price
+              </p>
+              <p className="font-label text-3xl md:text-4xl font-semibold text-on-surface tracking-tight mb-6">
+                €{priceText}
+              </p>
+              <a
+                href={purchaseUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center w-full max-w-xs py-3.5 bg-on-surface text-background font-label text-[11px] lowercase tracking-[0.25em] hover:opacity-90 transition-opacity"
+              >
+                buy now
+              </a>
+            </div>
+
+            {/* 3 — Metadata header: title, left-aligned */}
+            <h2 className="mt-14 font-serif-brand text-2xl md:text-3xl text-on-surface leading-tight text-left w-full">
               {title}
             </h2>
 
-            {/* 3 — Description, centered */}
+            {/* 4 — Description, centered */}
             {description && (
               <p className="mt-6 mx-auto max-w-2xl font-body text-sm md:text-base leading-relaxed text-on-surface-variant text-center whitespace-pre-line">
                 {description}
               </p>
             )}
 
-            {/* 4 — Audio experience */}
+            {/* 5 — Audio experience */}
             {tracks.length > 0 && (
               <div
                 className={`mt-12 ${
@@ -168,22 +186,22 @@ export default function ShopModal({
               </div>
             )}
 
-            {/* 5 — Technical specifications, centered vertical stack */}
+            {/* 6 — Technical specifications: left label / right italic value, divided rows */}
             {infoRows.length > 0 && (
-              <div className="mt-14 mx-auto max-w-xl text-center">
-                <p className="font-label text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/60 mb-6">
+              <div className="mt-14 mx-auto max-w-2xl">
+                <p className="font-label text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/60 mb-4 text-left">
                   Additional Information
                 </p>
-                <dl className="flex flex-col gap-5">
+                <dl className="border-t border-outline-variant/25">
                   {infoRows.map((row, i) => (
                     <div
                       key={`${row.label}-${i}`}
-                      className="flex flex-col items-center"
+                      className="flex items-baseline justify-between gap-6 py-3 border-b border-outline-variant/25"
                     >
                       <dt className="font-label text-[11px] uppercase tracking-[0.25em] text-on-surface-variant">
                         {row.label}
                       </dt>
-                      <dd className="mt-1 font-body text-base italic text-on-surface">
+                      <dd className="font-body text-sm italic text-on-surface text-right">
                         {row.value}
                       </dd>
                     </div>
@@ -191,24 +209,6 @@ export default function ShopModal({
                 </dl>
               </div>
             )}
-
-            {/* 6 — Transaction point, centered at the bottom */}
-            <div className="mt-16 mx-auto max-w-md flex flex-col items-center text-center">
-              <p className="font-label text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/60 mb-2">
-                Price
-              </p>
-              <p className="font-label text-3xl md:text-4xl font-semibold text-on-surface tracking-tight mb-6">
-                €{priceText}
-              </p>
-              <a
-                href={purchaseUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center w-full max-w-xs py-3.5 bg-on-surface text-background font-label text-[11px] lowercase tracking-[0.25em] hover:opacity-90 transition-opacity"
-              >
-                buy now
-              </a>
-            </div>
             </div>
           </motion.div>
         </motion.div>
