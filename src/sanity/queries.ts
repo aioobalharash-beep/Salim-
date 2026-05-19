@@ -256,6 +256,15 @@ export const shopListQuery = groq`
       ...,
       "alt": coalesce(alt, asset->altText, ""),
       asset
+    },
+    additionalInfo[]{
+      label,
+      value
+    },
+    audioTracks[]{
+      trackTitle,
+      trackDescription,
+      "audioUrl": audioFile.asset->url
     }
   }
 `;

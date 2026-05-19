@@ -11,9 +11,16 @@ export type ShopSlide = {
 interface ShopCarouselProps {
   slides: ShopSlide[];
   title: string;
+  fit?: "cover" | "contain";
+  sizes?: string;
 }
 
-export default function ShopCarousel({ slides, title }: ShopCarouselProps) {
+export default function ShopCarousel({
+  slides,
+  title,
+  fit = "contain",
+  sizes = "(max-width: 768px) 100vw, 33vw",
+}: ShopCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
 
@@ -31,8 +38,10 @@ export default function ShopCarousel({ slides, title }: ShopCarouselProps) {
   }, []);
 
   if (slides.length === 0) {
-    return <div className="absolute inset-0 bg-surface-container" />;
+    return <div className="absolute inset-0 bg-background" />;
   }
+
+  const objectFit = fit === "contain" ? "object-contain" : "object-cover";
 
   return (
     <>
@@ -51,8 +60,8 @@ export default function ShopCarousel({ slides, title }: ShopCarouselProps) {
               src={slide.url}
               alt={slide.alt || `${title} — image ${i + 1}`}
               fill
-              sizes="(max-width: 768px) 100vw, 33vw"
-              className="object-cover"
+              sizes={sizes}
+              className={objectFit}
               priority={i === 0}
             />
           </div>

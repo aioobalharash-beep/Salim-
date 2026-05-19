@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import PageHeader from "@/components/PageHeader";
-import ShopCarousel, { type ShopSlide } from "@/components/ShopCarousel";
+import ShopCard from "@/components/ShopCard";
+import type { ShopSlide } from "@/components/ShopCarousel";
+import type { ShopAudioTrack, ShopInfoRow } from "@/components/ShopModal";
 import { client } from "@/sanity/client";
 import { urlFor, type SanityImageSource } from "@/sanity/image";
 import { shopListQuery } from "@/sanity/queries";
@@ -22,6 +24,8 @@ type ShopItem = {
   description?: string;
   purchaseUrl: string;
   images?: ShopImage[];
+  additionalInfo?: ShopInfoRow[];
+  audioTracks?: ShopAudioTrack[];
 };
 
 async function getShopItems(): Promise<ShopItem[]> {
@@ -38,7 +42,7 @@ function buildSlides(item: ShopItem): ShopSlide[] {
     .map((img) => {
       try {
         return {
-          url: urlFor(img).width(800).height(1200).fit("crop").url(),
+          url: urlFor(img).width(1200).height(1600).fit("max").url(),
           alt: img.alt || item.title,
         };
       } catch {
@@ -65,50 +69,20 @@ export default async function ShopPage() {
             New publications are being prepared. Please check back soon.
           </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 justify-items-center sm:justify-items-stretch">
-            {items.map((item) => {
-              const slides = buildSlides(item);
-              const snippet =
-                item.description && item.description.length > 160
-                  ? `${item.description.slice(0, 157).trimEnd()}…`
-                  : item.description;
-
-              return (
-                <article
-                  key={item._id}
-                  className="w-full max-w-xs sm:max-w-none flex flex-col"
-                >
-                  <div className="relative w-full h-[320px] md:h-[380px] overflow-hidden bg-surface-container">
-                    <ShopCarousel slides={slides} title={item.title} />
-                  </div>
-
-                  <div className="pt-4 flex flex-col">
-                    <h2 className="font-serif-brand text-lg text-on-surface mb-1 leading-snug">
-                      {item.title}
-                    </h2>
-
-                    <p className="font-label text-xl font-semibold text-on-surface mb-2 tracking-tight">
-                      €{item.priceText}
-                    </p>
-
-                    {snippet ? (
-                      <p className="font-body text-xs leading-relaxed text-on-surface-variant mb-4">
-                        {snippet}
-                      </p>
-                    ) : null}
-
-                    <a
-                      href={item.purchaseUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-auto inline-flex items-center justify-center w-full py-2.5 border border-on-surface/20 text-on-surface font-label text-[10px] lowercase tracking-widest hover:bg-on-surface hover:text-background transition-colors"
-                    >
-                      buy now
-                    </a>
-                  </div>
-                </article>
-              );
-            })}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 items-stretch justify-items-center sm:justify-items-stretch">
+            {items.map((item) => (
+              <ShopCard
+                key={item._id}
+                productId={item._id}
+                title={item.title}
+                priceText={item.priceText}
+                description={item.description}
+                purchaseUrl={item.purchaseUrl}
+                slides={buildSlides(item)}
+                additionalInfo={item.additionalInfo}
+                audioTracks={item.audioTracks}
+              />
+            ))}
           </div>
         )}
       </section>
