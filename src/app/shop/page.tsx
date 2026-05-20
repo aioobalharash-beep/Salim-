@@ -25,6 +25,7 @@ type ShopItem = {
   title: string;
   category?: ShopCategory;
   year?: number;
+  month?: string;
   priceText: string;
   description?: string;
   purchaseUrl: string;
@@ -70,6 +71,7 @@ export default async function ShopPage() {
     audioTracks: item.audioTracks,
     category: item.category,
     year: item.year,
+    month: item.month,
   }));
 
   return (
