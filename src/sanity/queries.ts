@@ -241,7 +241,8 @@ export const videoListQuery = groq`
   *[_type == "video"] | order(order asc, _createdAt desc) {
     _id,
     videoLink,
-    description
+    description,
+    startTime
   }
 `;
 

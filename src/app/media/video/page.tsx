@@ -15,35 +15,48 @@ interface VideoItem {
   _id: string;
   videoLink: string;
   description: string;
+  startTime?: number;
 }
 
-function toEmbedUrl(url: string): string | null {
+function toEmbedUrl(url: string, startTime?: number): string | null {
   try {
     const u = new URL(url);
     const host = u.hostname.replace(/^www\./, "");
 
+    let embed: string | null = null;
     if (host === "youtu.be") {
       const id = u.pathname.slice(1);
-      return id ? `https://www.youtube.com/embed/${id}` : null;
-    }
-    if (host.endsWith("youtube.com")) {
+      embed = id ? `https://www.youtube.com/embed/${id}` : null;
+    } else if (host.endsWith("youtube.com")) {
       if (u.pathname === "/watch") {
         const id = u.searchParams.get("v");
-        return id ? `https://www.youtube.com/embed/${id}` : null;
-      }
-      if (u.pathname.startsWith("/embed/")) return url;
-      if (u.pathname.startsWith("/shorts/")) {
+        embed = id ? `https://www.youtube.com/embed/${id}` : null;
+      } else if (u.pathname.startsWith("/embed/")) {
+        embed = url;
+      } else if (u.pathname.startsWith("/shorts/")) {
         const id = u.pathname.split("/")[2];
-        return id ? `https://www.youtube.com/embed/${id}` : null;
+        embed = id ? `https://www.youtube.com/embed/${id}` : null;
       }
-      return null;
+    } else if (host.endsWith("vimeo.com")) {
+      if (host === "player.vimeo.com") {
+        embed = url;
+      } else {
+        const id = u.pathname.split("/").filter(Boolean)[0];
+        embed = id ? `https://player.vimeo.com/video/${id}` : null;
+      }
+    } else {
+      embed = url;
     }
-    if (host.endsWith("vimeo.com")) {
-      if (host === "player.vimeo.com") return url;
-      const id = u.pathname.split("/").filter(Boolean)[0];
-      return id ? `https://player.vimeo.com/video/${id}` : null;
+
+    if (!embed) return null;
+
+    if (typeof startTime === "number" && Number.isFinite(startTime) && startTime > 0) {
+      const start = Math.floor(startTime);
+      const separator = embed.includes("?") ? "&" : "?";
+      embed = `${embed}${separator}start=${start}`;
     }
-    return url;
+
+    return embed;
   } catch {
     return null;
   }
@@ -70,7 +83,7 @@ export default async function VideoPage() {
       <section className="px-6 md:px-12 max-w-screen-2xl mx-auto pb-32">
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-20">
           {videos.map((v) => {
-            const embed = toEmbedUrl(v.videoLink);
+            const embed = toEmbedUrl(v.videoLink, v.startTime);
             return (
               <li key={v._id} className="flex flex-col">
                 <div className="relative w-full aspect-video bg-on-surface/5 overflow-hidden">
