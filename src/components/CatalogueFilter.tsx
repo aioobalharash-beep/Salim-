@@ -2,6 +2,9 @@
 
 import { useMemo, useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import Pagination from "./Pagination";
+
+const ITEMS_PER_PAGE = 10;
 
 /* ── Option lists kept in lock-step with the Sanity schema ───────── */
 const INSTRUMENTATIONS = [
@@ -474,6 +477,7 @@ export default function CatalogueFilter({
     DURATION_MAX,
   ]);
   const [sort, setSort] = useState<SortKey>("yearDesc");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [activeSrc, setActiveSrc] = useState<string | null>(null);
@@ -525,6 +529,17 @@ export default function CatalogueFilter({
     });
     return sorted;
   }, [works, instrumentation, genre, duration, sort]);
+
+  // Reset to the first page when any filter or sort changes.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [instrumentation, genre, duration, sort]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+  const safePage = Math.min(currentPage, totalPages);
+  const indexOfLastItem = safePage * ITEMS_PER_PAGE;
+  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
+  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <>
@@ -610,7 +625,7 @@ export default function CatalogueFilter({
                 </p>
               </motion.div>
             ) : (
-              filtered.map((w) => (
+              currentItems.map((w) => (
                 <EntryCard
                   key={w._id}
                   work={w}
@@ -622,6 +637,15 @@ export default function CatalogueFilter({
             )}
           </AnimatePresence>
         </LayoutGroup>
+
+        {filtered.length > 0 && (
+          <Pagination
+            currentPage={safePage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            className="pt-16 pb-4"
+          />
+        )}
       </section>
     </>
   );

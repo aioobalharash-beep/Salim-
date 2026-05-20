@@ -1,9 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Pagination from "./Pagination";
 import ShopCard from "./ShopCard";
 import type { ShopSlide } from "./ShopCarousel";
 import type { ShopAudioTrack, ShopInfoRow } from "./ShopModal";
+
+const ITEMS_PER_PAGE = 8;
 
 export type ShopCategory = "albums" | "scores" | "books" | "others";
 export type CategoryFilter = "all" | ShopCategory;
@@ -44,6 +47,7 @@ export default function ShopGrid({ items }: ShopGridProps) {
   const [selectedCategory, setSelectedCategory] =
     useState<CategoryFilter>("all");
   const [sortOption, setSortOption] = useState<SortOption>("latest-year");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const visibleItems = useMemo(() => {
     const filtered = items.filter(
@@ -59,6 +63,17 @@ export default function ShopGrid({ items }: ShopGridProps) {
       return sortOption === "price-asc" ? pa - pb : pb - pa;
     });
   }, [items, selectedCategory, sortOption]);
+
+  // Reset to the first page whenever the active filter or sort changes.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, sortOption]);
+
+  const totalPages = Math.max(1, Math.ceil(visibleItems.length / ITEMS_PER_PAGE));
+  const safePage = Math.min(currentPage, totalPages);
+  const indexOfLastItem = safePage * ITEMS_PER_PAGE;
+  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
+  const currentItems = visibleItems.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <>
@@ -82,21 +97,30 @@ export default function ShopGrid({ items }: ShopGridProps) {
           No items match this filter.
         </p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 items-stretch justify-items-center sm:justify-items-stretch">
-          {visibleItems.map((item) => (
-            <ShopCard
-              key={item._id}
-              productId={item._id}
-              title={item.title}
-              priceText={item.priceText}
-              description={item.description}
-              purchaseUrl={item.purchaseUrl}
-              slides={item.slides}
-              additionalInfo={item.additionalInfo}
-              audioTracks={item.audioTracks}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 items-stretch justify-items-center sm:justify-items-stretch">
+            {currentItems.map((item) => (
+              <ShopCard
+                key={item._id}
+                productId={item._id}
+                title={item.title}
+                priceText={item.priceText}
+                description={item.description}
+                purchaseUrl={item.purchaseUrl}
+                slides={item.slides}
+                additionalInfo={item.additionalInfo}
+                audioTracks={item.audioTracks}
+              />
+            ))}
+          </div>
+
+          <Pagination
+            currentPage={safePage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            className="mt-16"
+          />
+        </>
       )}
     </>
   );

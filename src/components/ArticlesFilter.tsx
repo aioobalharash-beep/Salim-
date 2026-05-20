@@ -1,7 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Pagination from "./Pagination";
+
+const ITEMS_PER_PAGE = 5;
 
 interface Article {
   slug: string;
@@ -33,6 +36,7 @@ function formatDate(iso: string | null) {
 export default function ArticlesFilter({ articles }: { articles: Article[] }) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filtered = useMemo(() => {
     return articles.filter((a) => {
@@ -45,6 +49,17 @@ export default function ArticlesFilter({ articles }: { articles: Article[] }) {
       return matchesCategory && matchesSearch;
     });
   }, [articles, activeCategory, search]);
+
+  // Reset to page 1 when filter or search changes.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeCategory, search]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+  const safePage = Math.min(currentPage, totalPages);
+  const indexOfLastItem = safePage * ITEMS_PER_PAGE;
+  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
+  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <>
@@ -93,11 +108,11 @@ export default function ArticlesFilter({ articles }: { articles: Article[] }) {
           </div>
         )}
 
-        {filtered.map((article, i) => (
+        {currentItems.map((article, i) => (
           <article
             key={article.slug}
             className={`group py-14 md:py-16 ${
-              i < filtered.length - 1
+              i < currentItems.length - 1
                 ? "border-b border-foreground/[0.06]"
                 : ""
             }`}
@@ -142,6 +157,15 @@ export default function ArticlesFilter({ articles }: { articles: Article[] }) {
             </Link>
           </article>
         ))}
+
+        {filtered.length > 0 && (
+          <Pagination
+            currentPage={safePage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            className="pt-16 pb-4"
+          />
+        )}
       </section>
     </>
   );
