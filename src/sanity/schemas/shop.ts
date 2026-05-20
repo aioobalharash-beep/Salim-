@@ -36,6 +36,30 @@ export default defineType({
       validation: (Rule) => Rule.integer().min(1900).max(2100),
     }),
     defineField({
+      name: "month",
+      title: "Month of Publication",
+      type: "string",
+      description:
+        "Optional. Used together with the year for fine-grained chronological sorting.",
+      options: {
+        list: [
+          { title: "January", value: "01" },
+          { title: "February", value: "02" },
+          { title: "March", value: "03" },
+          { title: "April", value: "04" },
+          { title: "May", value: "05" },
+          { title: "June", value: "06" },
+          { title: "July", value: "07" },
+          { title: "August", value: "08" },
+          { title: "September", value: "09" },
+          { title: "October", value: "10" },
+          { title: "November", value: "11" },
+          { title: "December", value: "12" },
+        ],
+        layout: "dropdown",
+      },
+    }),
+    defineField({
       name: "images",
       title: "Images",
       type: "array",

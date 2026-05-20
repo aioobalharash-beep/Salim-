@@ -1,13 +1,20 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Pagination from "./Pagination";
 import ShopCard from "./ShopCard";
 import type { ShopSlide } from "./ShopCarousel";
 import type { ShopAudioTrack, ShopInfoRow } from "./ShopModal";
 
+const ITEMS_PER_PAGE = 8;
+
 export type ShopCategory = "albums" | "scores" | "books" | "others";
 export type CategoryFilter = "all" | ShopCategory;
-export type SortOption = "latest-year" | "price-asc" | "price-desc";
+export type SortOption =
+  | "latest-year"
+  | "oldest-year"
+  | "price-asc"
+  | "price-desc";
 
 export interface ShopGridItem {
   _id: string;
@@ -20,6 +27,20 @@ export interface ShopGridItem {
   audioTracks?: ShopAudioTrack[];
   category?: ShopCategory;
   year?: number;
+  month?: string;
+}
+
+// Combines year + month into a single comparable integer (YYYYMM).
+// Items without a year fall back to the supplied sentinel so they can be
+// pushed to the end of either sort direction.
+function publicationKey(
+  year: number | undefined,
+  month: string | undefined,
+  missing: number,
+): number {
+  if (year == null) return missing;
+  const m = month ? parseInt(month, 10) || 0 : 0;
+  return year * 100 + m;
 }
 
 interface ShopGridProps {
@@ -36,6 +57,7 @@ const CATEGORY_OPTIONS: { value: CategoryFilter; label: string }[] = [
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "latest-year", label: "Latest" },
+  { value: "oldest-year", label: "Oldest" },
   { value: "price-asc", label: "Price: Low to High" },
   { value: "price-desc", label: "Price: High to Low" },
 ];
@@ -44,6 +66,7 @@ export default function ShopGrid({ items }: ShopGridProps) {
   const [selectedCategory, setSelectedCategory] =
     useState<CategoryFilter>("all");
   const [sortOption, setSortOption] = useState<SortOption>("latest-year");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const visibleItems = useMemo(() => {
     const filtered = items.filter(
@@ -51,14 +74,39 @@ export default function ShopGrid({ items }: ShopGridProps) {
         selectedCategory === "all" || item.category === selectedCategory,
     );
     return [...filtered].sort((a, b) => {
-      if (sortOption === "latest-year") {
-        return (b.year ?? 0) - (a.year ?? 0);
+      switch (sortOption) {
+        case "latest-year": {
+          // Undated items get key 0 → fall to the bottom of a desc sort.
+          const ka = publicationKey(a.year, a.month, 0);
+          const kb = publicationKey(b.year, b.month, 0);
+          return kb - ka;
+        }
+        case "oldest-year": {
+          // Undated items get key Infinity → fall to the bottom of an asc sort.
+          const ka = publicationKey(a.year, a.month, Number.POSITIVE_INFINITY);
+          const kb = publicationKey(b.year, b.month, Number.POSITIVE_INFINITY);
+          return ka - kb;
+        }
+        case "price-asc":
+        case "price-desc": {
+          const pa = parseFloat(a.priceText) || 0;
+          const pb = parseFloat(b.priceText) || 0;
+          return sortOption === "price-asc" ? pa - pb : pb - pa;
+        }
       }
-      const pa = parseFloat(a.priceText) || 0;
-      const pb = parseFloat(b.priceText) || 0;
-      return sortOption === "price-asc" ? pa - pb : pb - pa;
     });
   }, [items, selectedCategory, sortOption]);
+
+  // Reset to the first page whenever the active filter or sort changes.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, sortOption]);
+
+  const totalPages = Math.max(1, Math.ceil(visibleItems.length / ITEMS_PER_PAGE));
+  const safePage = Math.min(currentPage, totalPages);
+  const indexOfLastItem = safePage * ITEMS_PER_PAGE;
+  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
+  const currentItems = visibleItems.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <>
@@ -82,21 +130,30 @@ export default function ShopGrid({ items }: ShopGridProps) {
           No items match this filter.
         </p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 items-stretch justify-items-center sm:justify-items-stretch">
-          {visibleItems.map((item) => (
-            <ShopCard
-              key={item._id}
-              productId={item._id}
-              title={item.title}
-              priceText={item.priceText}
-              description={item.description}
-              purchaseUrl={item.purchaseUrl}
-              slides={item.slides}
-              additionalInfo={item.additionalInfo}
-              audioTracks={item.audioTracks}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 items-stretch justify-items-center sm:justify-items-stretch">
+            {currentItems.map((item) => (
+              <ShopCard
+                key={item._id}
+                productId={item._id}
+                title={item.title}
+                priceText={item.priceText}
+                description={item.description}
+                purchaseUrl={item.purchaseUrl}
+                slides={item.slides}
+                additionalInfo={item.additionalInfo}
+                audioTracks={item.audioTracks}
+              />
+            ))}
+          </div>
+
+          <Pagination
+            currentPage={safePage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            className="mt-16"
+          />
+        </>
       )}
     </>
   );

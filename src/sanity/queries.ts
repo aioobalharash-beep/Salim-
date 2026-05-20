@@ -247,11 +247,12 @@ export const videoListQuery = groq`
 `;
 
 export const shopListQuery = groq`
-  *[_type == "shop"] | order(coalesce(year, 0) desc, _createdAt desc) {
+  *[_type == "shop"] | order(coalesce(year, 0) desc, coalesce(month, "00") desc, _createdAt desc) {
     _id,
     title,
     category,
     year,
+    month,
     priceText,
     description,
     purchaseUrl,
