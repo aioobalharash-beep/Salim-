@@ -14,6 +14,28 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: "category",
+      title: "Category",
+      type: "string",
+      options: {
+        list: [
+          { title: "Albums", value: "albums" },
+          { title: "Scores", value: "scores" },
+          { title: "Books", value: "books" },
+          { title: "Others", value: "others" },
+        ],
+        layout: "dropdown",
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "year",
+      title: "Year of Publication",
+      type: "number",
+      description: "Used for chronological sorting (e.g., 2026).",
+      validation: (Rule) => Rule.integer().min(1900).max(2100),
+    }),
+    defineField({
       name: "images",
       title: "Images",
       type: "array",

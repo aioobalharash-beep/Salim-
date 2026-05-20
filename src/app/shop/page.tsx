@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import PageHeader from "@/components/PageHeader";
-import ShopCard from "@/components/ShopCard";
+import ShopGrid, {
+  type ShopCategory,
+  type ShopGridItem,
+} from "@/components/ShopGrid";
 import type { ShopSlide } from "@/components/ShopCarousel";
 import type { ShopAudioTrack, ShopInfoRow } from "@/components/ShopModal";
 import { client } from "@/sanity/client";
@@ -20,6 +23,8 @@ type ShopImage = SanityImageSource & { alt?: string };
 type ShopItem = {
   _id: string;
   title: string;
+  category?: ShopCategory;
+  year?: number;
   priceText: string;
   description?: string;
   purchaseUrl: string;
@@ -54,6 +59,18 @@ function buildSlides(item: ShopItem): ShopSlide[] {
 
 export default async function ShopPage() {
   const items = await getShopItems();
+  const gridItems: ShopGridItem[] = items.map((item) => ({
+    _id: item._id,
+    title: item.title,
+    priceText: item.priceText,
+    description: item.description,
+    purchaseUrl: item.purchaseUrl,
+    slides: buildSlides(item),
+    additionalInfo: item.additionalInfo,
+    audioTracks: item.audioTracks,
+    category: item.category,
+    year: item.year,
+  }));
 
   return (
     <>
@@ -64,26 +81,12 @@ export default async function ShopPage() {
       />
 
       <section className="px-4 max-w-7xl mx-auto pb-32">
-        {items.length === 0 ? (
+        {gridItems.length === 0 ? (
           <p className="font-body text-sm text-on-surface-variant max-w-xl">
             New publications are being prepared. Please check back soon.
           </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 items-stretch justify-items-center sm:justify-items-stretch">
-            {items.map((item) => (
-              <ShopCard
-                key={item._id}
-                productId={item._id}
-                title={item.title}
-                priceText={item.priceText}
-                description={item.description}
-                purchaseUrl={item.purchaseUrl}
-                slides={buildSlides(item)}
-                additionalInfo={item.additionalInfo}
-                audioTracks={item.audioTracks}
-              />
-            ))}
-          </div>
+          <ShopGrid items={gridItems} />
         )}
       </section>
     </>
