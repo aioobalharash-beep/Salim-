@@ -1,0 +1,137 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import ShopCard from "./ShopCard";
+import type { ShopSlide } from "./ShopCarousel";
+import type { ShopAudioTrack, ShopInfoRow } from "./ShopModal";
+
+export type ShopCategory = "albums" | "scores" | "books" | "others";
+export type CategoryFilter = "all" | ShopCategory;
+export type SortOption = "latest-year" | "price-asc" | "price-desc";
+
+export interface ShopGridItem {
+  _id: string;
+  title: string;
+  priceText: string;
+  description?: string;
+  purchaseUrl: string;
+  slides: ShopSlide[];
+  additionalInfo?: ShopInfoRow[];
+  audioTracks?: ShopAudioTrack[];
+  category?: ShopCategory;
+  year?: number;
+}
+
+interface ShopGridProps {
+  items: ShopGridItem[];
+}
+
+const CATEGORY_OPTIONS: { value: CategoryFilter; label: string }[] = [
+  { value: "all", label: "All Categories" },
+  { value: "albums", label: "Albums" },
+  { value: "scores", label: "Scores" },
+  { value: "books", label: "Books" },
+  { value: "others", label: "Others" },
+];
+
+const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+  { value: "latest-year", label: "Latest" },
+  { value: "price-asc", label: "Price: Low to High" },
+  { value: "price-desc", label: "Price: High to Low" },
+];
+
+export default function ShopGrid({ items }: ShopGridProps) {
+  const [selectedCategory, setSelectedCategory] =
+    useState<CategoryFilter>("all");
+  const [sortOption, setSortOption] = useState<SortOption>("latest-year");
+
+  const visibleItems = useMemo(() => {
+    const filtered = items.filter(
+      (item) =>
+        selectedCategory === "all" || item.category === selectedCategory,
+    );
+    return [...filtered].sort((a, b) => {
+      if (sortOption === "latest-year") {
+        return (b.year ?? 0) - (a.year ?? 0);
+      }
+      const pa = parseFloat(a.priceText) || 0;
+      const pb = parseFloat(b.priceText) || 0;
+      return sortOption === "price-asc" ? pa - pb : pb - pa;
+    });
+  }, [items, selectedCategory, sortOption]);
+
+  return (
+    <>
+      <div className="flex flex-wrap items-center gap-3 mb-10">
+        <CleanSelect
+          ariaLabel="Filter by category"
+          value={selectedCategory}
+          onChange={(v) => setSelectedCategory(v as CategoryFilter)}
+          options={CATEGORY_OPTIONS}
+        />
+        <CleanSelect
+          ariaLabel="Sort products"
+          value={sortOption}
+          onChange={(v) => setSortOption(v as SortOption)}
+          options={SORT_OPTIONS}
+        />
+      </div>
+
+      {visibleItems.length === 0 ? (
+        <p className="font-body text-sm text-on-surface-variant max-w-xl">
+          No items match this filter.
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 items-stretch justify-items-center sm:justify-items-stretch">
+          {visibleItems.map((item) => (
+            <ShopCard
+              key={item._id}
+              productId={item._id}
+              title={item.title}
+              priceText={item.priceText}
+              description={item.description}
+              purchaseUrl={item.purchaseUrl}
+              slides={item.slides}
+              additionalInfo={item.additionalInfo}
+              audioTracks={item.audioTracks}
+            />
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+interface CleanSelectProps<T extends string> {
+  ariaLabel: string;
+  value: T;
+  onChange: (value: string) => void;
+  options: { value: T; label: string }[];
+}
+
+function CleanSelect<T extends string>({
+  ariaLabel,
+  value,
+  onChange,
+  options,
+}: CleanSelectProps<T>) {
+  return (
+    <div className="relative">
+      <select
+        aria-label={ariaLabel}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="appearance-none cursor-pointer bg-transparent border border-on-surface/20 hover:border-on-surface/60 focus:border-on-surface focus:outline-none transition-colors duration-300 font-label text-[11px] uppercase tracking-[0.15em] text-on-surface py-2.5 pl-4 pr-10"
+      >
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+      <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[16px] text-on-surface/60">
+        expand_more
+      </span>
+    </div>
+  );
+}
