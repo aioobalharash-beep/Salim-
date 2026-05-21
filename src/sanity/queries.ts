@@ -258,6 +258,7 @@ export const shopListQuery = groq`
     images[]{
       ...,
       "alt": coalesce(alt, asset->altText, ""),
+      "dimensions": asset->metadata.dimensions,
       asset
     },
     additionalInfo[]{

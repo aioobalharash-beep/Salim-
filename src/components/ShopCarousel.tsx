@@ -6,6 +6,7 @@ import { useCallback, useRef, useState } from "react";
 export type ShopSlide = {
   url: string;
   alt: string;
+  aspectRatio?: number;
 };
 
 interface ShopCarouselProps {
