@@ -30,17 +30,24 @@ export interface ShopGridItem {
   month?: string;
 }
 
-// Combines year + month into a single comparable integer (YYYYMM).
-// Items without a year fall back to the supplied sentinel so they can be
-// pushed to the end of either sort direction.
+// Combines year + month into a single comparable integer (YYYYMM) by
+// concatenating the strings — e.g. year 2026, month "05" -> 202605.
+// A missing or malformed month defaults to "01" so January stands in for
+// items where the editor only filled in the year. Items without a year
+// fall back to the supplied sentinel so they can be pushed to the end of
+// either sort direction.
 function publicationKey(
   year: number | undefined,
   month: string | undefined,
   missing: number,
 ): number {
   if (year == null) return missing;
-  const m = month ? parseInt(month, 10) || 0 : 0;
-  return year * 100 + m;
+  const monthStr =
+    month && /^\d{1,2}$/.test(month)
+      ? String(month).padStart(2, "0")
+      : "01";
+  const value = parseInt(`${year}${monthStr}`, 10);
+  return Number.isFinite(value) ? value : missing;
 }
 
 interface ShopGridProps {
@@ -76,16 +83,25 @@ export default function ShopGrid({ items }: ShopGridProps) {
     return [...filtered].sort((a, b) => {
       switch (sortOption) {
         case "latest-year": {
-          // Undated items get key 0 → fall to the bottom of a desc sort.
-          const ka = publicationKey(a.year, a.month, 0);
-          const kb = publicationKey(b.year, b.month, 0);
-          return kb - ka;
+          // Newest first. Undated items get 0 so they fall to the bottom.
+          const dateA = publicationKey(a.year, a.month, 0);
+          const dateB = publicationKey(b.year, b.month, 0);
+          return dateB - dateA;
         }
         case "oldest-year": {
-          // Undated items get key Infinity → fall to the bottom of an asc sort.
-          const ka = publicationKey(a.year, a.month, Number.POSITIVE_INFINITY);
-          const kb = publicationKey(b.year, b.month, Number.POSITIVE_INFINITY);
-          return ka - kb;
+          // Earliest first. Undated items get Infinity so they stay at
+          // the bottom in an ascending sort too.
+          const dateA = publicationKey(
+            a.year,
+            a.month,
+            Number.POSITIVE_INFINITY,
+          );
+          const dateB = publicationKey(
+            b.year,
+            b.month,
+            Number.POSITIVE_INFINITY,
+          );
+          return dateA - dateB;
         }
         case "price-asc":
         case "price-desc": {
