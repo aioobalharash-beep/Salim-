@@ -18,7 +18,11 @@ export const metadata: Metadata = {
     "Scores, albums, and books by Salim Dada — available for purchase.",
 };
 
-type ShopImage = SanityImageSource & { alt?: string };
+type ShopImage = SanityImageSource & {
+  alt?: string;
+  dimensions?: { width?: number; height?: number; aspectRatio?: number };
+  crop?: { top?: number; bottom?: number; left?: number; right?: number };
+};
 
 type ShopItem = {
   _id: string;
@@ -45,11 +49,30 @@ async function getShopItems(): Promise<ShopItem[]> {
 function buildSlides(item: ShopItem): ShopSlide[] {
   const images = item.images ?? [];
   return images
-    .map((img) => {
+    .map((img): ShopSlide | null => {
       try {
+        // Sanity reports the SOURCE asset dimensions. If the editor cropped
+        // the image in Studio, the delivered URL is cropped but
+        // asset->metadata.dimensions still reflects the original. Apply the
+        // crop rectangle here so the aspect ratio matches what actually
+        // renders.
+        const ow = img.dimensions?.width ?? 0;
+        const oh = img.dimensions?.height ?? 0;
+        const crop = img.crop;
+        let vw = ow;
+        let vh = oh;
+        if (crop && ow > 0 && oh > 0) {
+          vw = ow * (1 - (crop.left ?? 0) - (crop.right ?? 0));
+          vh = oh * (1 - (crop.top ?? 0) - (crop.bottom ?? 0));
+        }
+        const aspectRatio =
+          vw > 0 && vh > 0
+            ? vw / vh
+            : (img.dimensions?.aspectRatio ?? undefined);
         return {
           url: urlFor(img).width(1200).fit("max").auto("format").url(),
           alt: img.alt || item.title,
+          aspectRatio,
         };
       } catch {
         return null;

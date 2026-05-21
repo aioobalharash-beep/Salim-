@@ -35,17 +35,27 @@ export default function ShopCard({
       ? `${description.slice(0, 157).trimEnd()}…`
       : description;
 
+  // Mobile uses the first image's native aspect ratio so portrait covers
+  // fill the column width (and stay aligned with the title left edge)
+  // without any cropping or stretching. On sm+ we override that with a
+  // fixed 380px frame so squares can centre with consistent top/bottom
+  // gaps and the desktop grid keeps a single horizontal baseline.
+  const mobileAspect = slides[0]?.aspectRatio ?? 1;
+
   return (
     <>
-      <article className="w-full max-w-xs sm:max-w-none flex flex-col h-full justify-between">
+      <article className="w-full flex flex-col h-full justify-between">
         <button
           type="button"
           onClick={() => setOpen(true)}
           aria-label={`Quick view: ${title}`}
           className="text-left w-full flex flex-col group"
         >
-          <div className="relative w-full h-[70vw] sm:h-[380px] overflow-hidden bg-transparent">
-            <ShopCarousel slides={slides} title={title} fit="responsive" />
+          <div
+            className="relative w-full sm:h-[380px] overflow-hidden bg-transparent"
+            style={{ aspectRatio: mobileAspect }}
+          >
+            <ShopCarousel slides={slides} title={title} fit="contain" />
           </div>
 
           <div className="pt-4 flex flex-col">
