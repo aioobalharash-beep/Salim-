@@ -11,7 +11,7 @@ export type ShopSlide = {
 interface ShopCarouselProps {
   slides: ShopSlide[];
   title: string;
-  fit?: "cover" | "contain";
+  fit?: "cover" | "contain" | "responsive";
   sizes?: string;
 }
 
@@ -41,7 +41,12 @@ export default function ShopCarousel({
     return <div className="absolute inset-0 bg-transparent" />;
   }
 
-  const objectFit = fit === "contain" ? "object-contain" : "object-cover";
+  const objectFit =
+    fit === "contain"
+      ? "object-contain"
+      : fit === "responsive"
+        ? "object-cover object-top sm:object-contain"
+        : "object-cover";
 
   return (
     <>
