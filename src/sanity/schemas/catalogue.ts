@@ -8,7 +8,7 @@ export const INSTRUMENTATION_OPTIONS: { title: string; value: string }[] = [
   { title: "Winds", value: "Winds" },
   { title: "Voice & Orchestra", value: "Voice & Orchestra" },
   { title: "Voice & Accompaniment", value: "Voice & Accompaniment" },
-  { title: "Voice A Capella", value: "Voice A Capella" },
+  { title: "Voice a cappella", value: "Voice a cappella" },
   { title: "Takht Arabi", value: "Takht Arabi" },
   { title: "Hybrid Ensemble", value: "Hybrid Ensemble" },
   { title: "Guitar", value: "Guitar" },

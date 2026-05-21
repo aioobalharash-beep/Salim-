@@ -4,7 +4,7 @@ import { useMemo, useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import Pagination from "./Pagination";
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 20;
 
 /* ── Option lists kept in lock-step with the Sanity schema ───────── */
 const INSTRUMENTATIONS = [
@@ -15,7 +15,7 @@ const INSTRUMENTATIONS = [
   "Winds",
   "Voice & Orchestra",
   "Voice & Accompaniment",
-  "Voice A Capella",
+  "Voice a cappella",
   "Takht Arabi",
   "Hybrid Ensemble",
   "Guitar",
@@ -381,14 +381,10 @@ function EntryCard({
 
           {/* Footer Action Row */}
           <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-            <span className="inline-flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.25em]">
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  work.published ? "bg-tertiary" : "bg-foreground/25"
-                }`}
-              />
-              {work.published ? (
-                work.publicationUrl ? (
+            {work.published && (
+              <span className="inline-flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.25em]">
+                <span className="w-1.5 h-1.5 rounded-full bg-tertiary" />
+                {work.publicationUrl ? (
                   <a
                     href={work.publicationUrl}
                     target="_blank"
@@ -399,11 +395,9 @@ function EntryCard({
                   </a>
                 ) : (
                   <span className="text-foreground/55">Published</span>
-                )
-              ) : (
-                <span className="text-foreground/55">Unpublished</span>
-              )}
-            </span>
+                )}
+              </span>
+            )}
 
             {work.watchLink && (
               <a
