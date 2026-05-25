@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import LeadCaptureModal from "./LeadCaptureModal";
+import ServiceEnquiryModal from "./ServiceEnquiryModal";
 
 interface ServiceItem {
   _id: string;
@@ -12,54 +12,61 @@ interface ServiceItem {
   ctaLabel?: string;
   ctaLink?: string;
   action?: string;
+  // FUTURE: dedicated sales-lander path (e.g. "/services/music-composition").
+  // Left undefined while every card routes through the enquiry modal. When the
+  // unindexed, high-converting landers ship, populate this per card and switch
+  // the CTA below from the modal callback to a hard <a href={landerPath}>.
+  landerPath?: string;
 }
 
-// Seed data used when Sanity has no services
+// Static offering data. These four cards are the canonical B2B offering and
+// take over from any legacy Sanity entries (see resolution in the component).
+// Keep the minimalist typography + single Material Symbol per card intact.
 const seedServices: ServiceItem[] = [
   {
-    _id: "seed-1",
-    title: "Training",
+    _id: "service-music-composition",
+    title: "Music Composition",
+    icon: "music_note",
+    description:
+      "Custom commissions for orchestra, ensemble, soloist, film, opera, theatre, ballet, and large-scale cultural events — original works tailored to your artistic vision and production requirements.",
+    ctaLabel: "enquire",
+  },
+  {
+    _id: "service-composer-program",
+    title: "Composer Program",
     icon: "school",
     description:
-      "Advanced masterclasses for orchestral conductors and soloists focusing on interpretive emotional depth and precision.",
-    ctaLabel: "Guitar Course",
-    ctaLink: "/training/classical-guitar-course",
-    action: "link",
+      "Mentorship and professional support for advanced and emerging composers — from score editing to orchestral recording — drawing on 30 years of international compositional practice.",
+    ctaLabel: "enquire",
   },
   {
-    _id: "seed-2",
-    title: "Composition",
-    icon: "edit_note",
+    _id: "service-artistic-direction",
+    title: "Artistic Direction",
+    icon: "theater_comedy",
     description:
-      "Bespoke commissions for cinematic scores, theatrical performances, and chamber ensembles bridging East and West.",
-    ctaLabel: "Enquire",
-    ctaLink: "/#enquiry-section",
-    action: "link",
+      "Strategic and creative leadership for international festivals, cultural institutions, and mega shows — from concept development to full project management.",
+    ctaLabel: "enquire",
   },
   {
-    _id: "seed-3",
-    title: "Consulting",
-    icon: "forum",
-    description:
-      "A complimentary 15-minute introductory session to explore your artistic vision and how we might collaborate.",
-    ctaLabel: "Book Free Session",
-    action: "modal",
-  },
-  {
-    _id: "seed-4",
-    title: "Full Consulting",
+    _id: "service-cultural-expertise",
+    title: "Cultural Expertise",
     icon: "public",
     description:
-      "Comprehensive artistic direction for international festivals, cultural institutions, and heritage preservation projects.",
-    ctaLabel: "Begin Engagement",
-    ctaLink: "/training/full-consulting",
-    action: "link",
+      "Advisory, capacity building and technical reports on cultural diversity, cultural policies, creative industries, artists' condition, and the impact of digital technologies and AI on culture.",
+    ctaLabel: "enquire",
   },
 ];
 
 export default function Services({ items }: { items: ServiceItem[] }) {
-  const [modalOpen, setModalOpen] = useState(false);
-  const services = items.length > 0 ? items : seedServices;
+  // Tracks which card was clicked. Its title becomes the immutable subject of
+  // the enquiry. `null` means the modal is closed.
+  const [activeService, setActiveService] = useState<string | null>(null);
+
+  const onEnquire = (title: string) => setActiveService(title);
+
+  // The static offering is authoritative; legacy Sanity entries are a fallback
+  // only if the array above is somehow emptied.
+  const services = seedServices.length > 0 ? seedServices : items;
 
   return (
     <section className="py-32 bg-surface-container-low">
@@ -93,33 +100,38 @@ export default function Services({ items }: { items: ServiceItem[] }) {
                 {service.description}
               </p>
 
-              {service.action === "modal" ? (
-                <button
-                  onClick={() => setModalOpen(true)}
-                  className="font-label text-[10px] uppercase tracking-widest text-primary group mt-8 inline-block text-left"
-                >
-                  {service.ctaLabel || "Enquire"}{" "}
-                  <span className="inline-block transition-transform group-hover:translate-x-1">
-                    →
-                  </span>
-                </button>
-              ) : (
-                <a
-                  href={service.ctaLink || "#"}
-                  className="font-label text-[10px] uppercase tracking-widest text-primary group mt-8 inline-block"
-                >
-                  {service.ctaLabel || "Learn More"}{" "}
-                  <span className="inline-block transition-transform group-hover:translate-x-1">
-                    →
-                  </span>
-                </a>
-              )}
+              {/* CTA — currently opens the enquiry modal with this card's title
+                  as the locked subject. When the dedicated sales landers launch,
+                  swap this <button onClick={onEnquire}> for a hard link, e.g.:
+
+                    <a href={service.landerPath ?? "/services/..."}
+                       className="font-label text-[10px] uppercase tracking-widest text-primary group mt-8 inline-block">
+                      {service.ctaLabel || "enquire"} <span>→</span>
+                    </a>
+
+                  Until then, every card routes through onEnquire(service.title). */}
+              <button
+                type="button"
+                onClick={() => onEnquire(service.title)}
+                className="font-label text-[10px] uppercase tracking-widest text-primary group mt-8 inline-block text-left"
+              >
+                {service.ctaLabel || "enquire"}{" "}
+                <span className="inline-block transition-transform group-hover:translate-x-1">
+                  →
+                </span>
+              </button>
             </div>
           ))}
         </div>
       </div>
 
-      <LeadCaptureModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      {/* Global dynamic enquiry popup. A single modal instance is driven by
+          activeService, so all four cards share it. */}
+      <ServiceEnquiryModal
+        open={activeService !== null}
+        service={activeService}
+        onClose={() => setActiveService(null)}
+      />
     </section>
   );
 }
