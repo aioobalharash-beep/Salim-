@@ -35,6 +35,7 @@ type SanityImageWithMeta = SanityImageSource & {
 
 interface YouTubeBlock {
   url: string;
+  startTime?: number;
   caption?: RichOrString;
   credit?: RichOrString;
   size?: "column" | "wide" | "full";
@@ -370,11 +371,23 @@ function YouTubeEmbed({ value }: { value: YouTubeBlock }) {
   const size = value.size || "column";
   const mode = value.embedMode || "thumbnail";
   const captionText = richToPlainText(value.caption);
+  const start =
+    typeof value.startTime === "number" &&
+    Number.isFinite(value.startTime) &&
+    value.startTime > 0
+      ? Math.floor(value.startTime)
+      : null;
+  const iframeSrc = `https://www.youtube-nocookie.com/embed/${id}${
+    start ? `?start=${start}` : ""
+  }`;
+  const watchUrl = `https://www.youtube.com/watch?v=${id}${
+    start ? `&t=${start}s` : ""
+  }`;
   return (
     <figure className={`ed-figure ${size}`}>
       {mode === "iframe" ? (
         <iframe
-          src={`https://www.youtube-nocookie.com/embed/${id}`}
+          src={iframeSrc}
           title={captionText || "YouTube video"}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
@@ -383,7 +396,7 @@ function YouTubeEmbed({ value }: { value: YouTubeBlock }) {
       ) : (
         <a
           className="ed-youtube"
-          href={`https://www.youtube.com/watch?v=${id}`}
+          href={watchUrl}
           target="_blank"
           rel="noopener noreferrer"
           aria-label={captionText || "Watch on YouTube"}

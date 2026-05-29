@@ -507,6 +507,14 @@ export default defineType({
                 Rule.required().uri({ scheme: ["http", "https"] }),
             }),
             defineField({
+              name: "startTime",
+              title: "Start Time (in Seconds)",
+              type: "number",
+              description:
+                "Optional. The exact second where the video should begin playing (e.g., for 1 minute and 20 seconds, enter 80).",
+              validation: (Rule) => Rule.min(0).integer(),
+            }),
+            defineField({
               name: "caption",
               title: "Caption",
               description:
