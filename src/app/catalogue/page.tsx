@@ -84,18 +84,18 @@ export default async function CataloguePage() {
   const jsonLd = buildMusicCompositionJsonLd(works);
 
   return (
-    <div className="min-h-screen bg-background pt-44 pb-40">
+    <div className="min-h-screen bg-background pt-32 pb-24">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
       {/* ── Header ── */}
-      <section className="max-w-5xl mx-auto px-6 md:px-8 mb-20">
-        <p className="font-label text-[10px] uppercase tracking-[0.5em] text-primary/50 mb-8">
+      <section className="max-w-5xl mx-auto px-6 md:px-8 mb-12">
+        <p className="font-label text-[10px] uppercase tracking-[0.5em] text-primary/50 mb-5">
           Œuvre
         </p>
-        <h1 className="font-headline text-4xl sm:text-5xl md:text-7xl font-light text-foreground leading-[1.1] mb-8">
+        <h1 className="font-headline text-4xl sm:text-5xl md:text-7xl font-light text-foreground leading-[1.1] mb-6">
           Catalogue
         </h1>
         <p className="font-body text-base leading-relaxed text-foreground/55 max-w-2xl">
