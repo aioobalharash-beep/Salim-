@@ -14,6 +14,7 @@ const INSTRUMENTATIONS = [
   "Chamber Orchestra",
   "Strings",
   "Winds",
+  "Ensemble",
   "Voice & Orchestra",
   "Voice & Accompaniment",
   "Voice a cappella",
@@ -548,20 +549,16 @@ export default function CatalogueFilter({
 
       {/* ── Filter Bar ── */}
       <section className="max-w-5xl mx-auto px-6 md:px-8 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-6 pb-6 border-b border-foreground/[0.06]">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-6 pb-6 border-b border-foreground/[0.06] items-end">
           <SelectField
-            className="md:col-span-3"
-            label="Instrumentation"
-            value={instrumentation}
-            onChange={setInstrumentation}
-            options={["All", ...INSTRUMENTATIONS]}
-          />
-          <SelectField
-            className="md:col-span-3"
-            label="Genre"
-            value={genre}
-            onChange={setGenre}
-            options={["All", ...GENRES]}
+            className="md:col-span-2"
+            label="Sort"
+            value={sort}
+            onChange={(v) => setSort(v as SortKey)}
+            options={SORTS.map((s) => s.value)}
+            renderOption={(v) =>
+              SORTS.find((s) => s.value === v)?.label ?? v
+            }
           />
 
           <div className="md:col-span-4 flex items-end">
@@ -574,14 +571,19 @@ export default function CatalogueFilter({
           </div>
 
           <SelectField
-            className="md:col-span-2"
-            label="Sort"
-            value={sort}
-            onChange={(v) => setSort(v as SortKey)}
-            options={SORTS.map((s) => s.value)}
-            renderOption={(v) =>
-              SORTS.find((s) => s.value === v)?.label ?? v
-            }
+            className="md:col-span-3"
+            label="Genre"
+            value={genre}
+            onChange={setGenre}
+            options={["All", ...GENRES]}
+          />
+
+          <SelectField
+            className="md:col-span-3"
+            label="Instrumentation"
+            value={instrumentation}
+            onChange={setInstrumentation}
+            options={["All", ...INSTRUMENTATIONS]}
           />
         </div>
 
