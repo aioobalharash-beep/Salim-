@@ -3,6 +3,7 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import Pagination from "./Pagination";
+import { formatDuration } from "@/lib/time";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -71,8 +72,8 @@ export interface CatalogueWork {
   instrumentation: string | null;
   instrumentationDetail: string | null;
   genre: string | null;
-  durationMinutes: number | null;
-  durationDisplay: string | null;
+  /** Total duration of the piece, stored in whole SECONDS. */
+  duration: number | null;
   movements: number | null;
   published: boolean | null;
   publicationUrl: string | null;
@@ -347,14 +348,10 @@ function EntryCard({
                 }
               />
             )}
-            {(work.durationDisplay ||
-              typeof work.durationMinutes === "number") && (
+            {formatDuration(work.duration) && (
               <MetaRow
                 label="Duration"
-                value={
-                  work.durationDisplay ??
-                  `${work.durationMinutes} min`
-                }
+                value={formatDuration(work.duration)!}
               />
             )}
             {typeof work.movements === "number" && (
@@ -466,7 +463,8 @@ export default function CatalogueFilter({
 }) {
   const [instrumentation, setInstrumentation] = useState<string>("All");
   const [genre, setGenre] = useState<string>("All");
-  const [duration, setDuration] = useState<[number, number]>([
+  // Slider range expressed in MINUTES (data itself is stored in seconds).
+  const [durationRange, setDurationRange] = useState<[number, number]>([
     DURATION_MIN,
     DURATION_MAX,
   ]);
@@ -485,20 +483,29 @@ export default function CatalogueFilter({
   }, []);
 
   const filtered = useMemo(() => {
-    const [lo, hi] = duration;
-    const includeOver = hi >= DURATION_MAX;
+    const [sliderMin, sliderMax] = durationRange;
+    const includeOver = sliderMax >= DURATION_MAX;
+
+    // The slider speaks MINUTES; durations are stored in SECONDS. Convert the
+    // active slider bounds into seconds so the comparison shares one baseline.
+    const filterMinSeconds = sliderMin * 60;
+    const filterMaxSeconds = includeOver ? Infinity : sliderMax * 60;
+    const filteringByDuration = sliderMin > DURATION_MIN || !includeOver;
 
     const list = works.filter((w) => {
       if (instrumentation !== "All" && w.instrumentation !== instrumentation)
         return false;
       if (genre !== "All" && w.genre !== genre) return false;
 
-      const m = w.durationMinutes;
-      if (typeof m === "number") {
-        if (m < lo) return false;
-        if (!includeOver && m > hi) return false;
+      // Pieces without a recorded duration only surface when the duration
+      // filter is untouched, so short works can never leak into a higher range.
+      if (typeof w.duration !== "number") {
+        return !filteringByDuration;
       }
-      return true;
+
+      // Absolute numeric tracking: e.g. a 4:30 piece (270s) is correctly
+      // excluded from an 82–123 min range (4,920–7,380s).
+      return w.duration >= filterMinSeconds && w.duration <= filterMaxSeconds;
     });
 
     const sorted = [...list];
@@ -511,10 +518,9 @@ export default function CatalogueFilter({
         case "titleAsc":
           return a.title.localeCompare(b.title);
         case "durationDesc":
-          return (b.durationMinutes ?? -1) - (a.durationMinutes ?? -1);
+          return (b.duration ?? -1) - (a.duration ?? -1);
         case "durationAsc":
-          return (a.durationMinutes ?? Infinity) -
-            (b.durationMinutes ?? Infinity);
+          return (a.duration ?? Infinity) - (b.duration ?? Infinity);
         case "movementsDesc":
           return (b.movements ?? -1) - (a.movements ?? -1);
         case "movementsAsc":
@@ -522,12 +528,12 @@ export default function CatalogueFilter({
       }
     });
     return sorted;
-  }, [works, instrumentation, genre, duration, sort]);
+  }, [works, instrumentation, genre, durationRange, sort]);
 
   // Reset to the first page when any filter or sort changes.
   useEffect(() => {
     setCurrentPage(1);
-  }, [instrumentation, genre, duration, sort]);
+  }, [instrumentation, genre, durationRange, sort]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
   const safePage = Math.min(currentPage, totalPages);
@@ -562,8 +568,8 @@ export default function CatalogueFilter({
             <DurationRange
               min={DURATION_MIN}
               max={DURATION_MAX}
-              value={duration}
-              onChange={setDuration}
+              value={durationRange}
+              onChange={setDurationRange}
             />
           </div>
 
@@ -586,13 +592,13 @@ export default function CatalogueFilter({
           </p>
           {(instrumentation !== "All" ||
             genre !== "All" ||
-            duration[0] !== DURATION_MIN ||
-            duration[1] !== DURATION_MAX) && (
+            durationRange[0] !== DURATION_MIN ||
+            durationRange[1] !== DURATION_MAX) && (
             <button
               onClick={() => {
                 setInstrumentation("All");
                 setGenre("All");
-                setDuration([DURATION_MIN, DURATION_MAX]);
+                setDurationRange([DURATION_MIN, DURATION_MAX]);
               }}
               className="font-label text-[10px] uppercase tracking-[0.25em] text-foreground/40 hover:text-foreground transition-colors"
             >
