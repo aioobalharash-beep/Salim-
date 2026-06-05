@@ -84,27 +84,15 @@ export default function TestimonialForm({
           value={name}
           onChange={setName}
           required
-          placeholder="Sergio Puccini"
         />
         <Field
           label="Profession"
           value={profession}
           onChange={setProfession}
-          placeholder="Guitarist"
         />
         <div className="grid grid-cols-2 gap-4">
-          <Field
-            label="City"
-            value={city}
-            onChange={setCity}
-            placeholder="Rosario"
-          />
-          <Field
-            label="Country"
-            value={country}
-            onChange={setCountry}
-            placeholder="Argentina"
-          />
+          <Field label="City" value={city} onChange={setCity} />
+          <Field label="Country" value={country} onChange={setCountry} />
         </div>
 
         <div className="flex flex-col space-y-2">
@@ -116,7 +104,6 @@ export default function TestimonialForm({
             rows={4}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Share your experience..."
             className="bg-transparent border-t-0 border-x-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-sm transition-all resize-none"
           />
         </div>
@@ -142,13 +129,11 @@ function Field({
   value,
   onChange,
   required = false,
-  placeholder,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   required?: boolean;
-  placeholder?: string;
 }) {
   return (
     <div className="flex flex-col space-y-2">
@@ -161,7 +146,6 @@ function Field({
         required={required}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
         className="bg-transparent border-t-0 border-x-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-sm transition-all"
       />
     </div>
