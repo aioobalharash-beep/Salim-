@@ -6,6 +6,7 @@ export const INSTRUMENTATION_OPTIONS: { title: string; value: string }[] = [
   { title: "Chamber Orchestra", value: "Chamber Orchestra" },
   { title: "Strings", value: "Strings" },
   { title: "Winds", value: "Winds" },
+  { title: "Ensemble", value: "Ensemble" },
   { title: "Voice & Orchestra", value: "Voice & Orchestra" },
   { title: "Voice & Accompaniment", value: "Voice & Accompaniment" },
   { title: "Voice a cappella", value: "Voice a cappella" },
