@@ -264,10 +264,10 @@ function EntryCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="group py-10 md:py-12 border-b border-foreground/[0.06]"
+      className="group py-5 md:py-6 border-b border-foreground/[0.06]"
     >
       {/* Top Line — Title + Year */}
-      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 mb-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 mb-2">
         <h2 className="min-w-0 break-words font-headline text-2xl sm:text-3xl md:text-[2.4rem] leading-[1.15] text-foreground">
           {work.title}
         </h2>
@@ -280,7 +280,7 @@ function EntryCard({
 
       {/* Subtitle */}
       {work.subtitle && (
-        <p className="font-headline italic text-base md:text-lg text-foreground/55 mb-5 break-words">
+        <p className="font-headline italic text-base md:text-lg text-foreground/55 mb-3 break-words">
           {work.subtitle}
         </p>
       )}
@@ -324,7 +324,7 @@ function EntryCard({
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         style={{ overflow: "hidden" }}
       >
-        <div className="pt-8">
+        <div className="pt-5">
           {/* Description */}
           {work.description && (
             <p className="font-headline not-italic font-normal text-[15px] leading-[1.85] text-foreground/55 max-w-2xl mb-8 whitespace-pre-line">
@@ -541,8 +541,8 @@ export default function CatalogueFilter({
       <audio ref={audioRef} preload="none" className="hidden" />
 
       {/* ── Filter Bar ── */}
-      <section className="max-w-5xl mx-auto px-6 md:px-8 mb-10">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-8 pb-10 border-b border-foreground/[0.06]">
+      <section className="max-w-5xl mx-auto px-6 md:px-8 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-6 pb-6 border-b border-foreground/[0.06]">
           <SelectField
             className="md:col-span-3"
             label="Instrumentation"

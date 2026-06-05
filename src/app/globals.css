@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Cross-browser scrollbar hiding for horizontal mobile carousels. */
+@layer utilities {
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 :root {
   /* --- MASTER SWITCHES — Palette #3: Ivory & Ebony --- */
   --bg-main: #F4F1EA;     /* Warm Ivory */

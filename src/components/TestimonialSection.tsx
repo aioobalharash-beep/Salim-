@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import TestimonialForm from "./TestimonialForm";
 
@@ -27,6 +27,39 @@ export default function TestimonialSection({
   const [page, setPage] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
 
+  // Mobile single-item carousel state
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+
+  const handleScroll = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const center = el.scrollLeft + el.clientWidth / 2;
+    let nearest = 0;
+    let min = Infinity;
+    Array.from(el.children).forEach((child, i) => {
+      const c = child as HTMLElement;
+      const childCenter = c.offsetLeft + c.offsetWidth / 2;
+      const d = Math.abs(childCenter - center);
+      if (d < min) {
+        min = d;
+        nearest = i;
+      }
+    });
+    setActive((prev) => (prev !== nearest ? nearest : prev));
+  }, []);
+
+  const goTo = useCallback((i: number) => {
+    const el = trackRef.current;
+    if (!el) return;
+    const child = el.children[i] as HTMLElement | undefined;
+    if (!child) return;
+    el.scrollTo({
+      left: child.offsetLeft - (el.clientWidth - child.offsetWidth) / 2,
+      behavior: "smooth",
+    });
+  }, []);
+
   if (items.length === 0) return null;
 
   const perPage = 3;
@@ -49,8 +82,8 @@ export default function TestimonialSection({
           </h3>
         </div>
 
-        {/* Grid with hidden arrows */}
-        <div className="relative group/slider">
+        {/* ── Desktop: 3-up grid with hidden arrows ── */}
+        <div className="relative hidden md:block group/slider">
           <AnimatePresence mode="wait">
             <motion.div
               key={visiblePage}
@@ -96,6 +129,48 @@ export default function TestimonialSection({
                 <span className="text-on-surface text-sm">→</span>
               </button>
             </>
+          )}
+        </div>
+
+        {/* ── Mobile: one testimonial per slide, side-swipe ── */}
+        <div className="md:hidden">
+          <div
+            ref={trackRef}
+            onScroll={handleScroll}
+            className="flex overflow-x-auto snap-x snap-mandatory scrollbar-none gap-4 -mx-6 px-6 pb-1"
+          >
+            {items.map((t) => (
+              <div key={t._id} className="snap-center shrink-0 w-full">
+                <div className="p-8 border border-outline-variant/15 bg-surface flex flex-col min-h-[260px] h-full">
+                  <p className="font-headline text-sm leading-[1.9] text-on-surface-variant/70 flex-grow">
+                    {t.content}
+                  </p>
+                  <div className="mt-8 pt-6 border-t border-outline-variant/10">
+                    <p className="font-body text-[11px] tracking-normal text-on-surface/70">
+                      {formatByline(t)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {items.length > 1 && (
+            <div className="flex justify-center gap-2 mt-8">
+              {items.map((t, i) => (
+                <button
+                  key={t._id}
+                  type="button"
+                  onClick={() => goTo(i)}
+                  aria-label={`Show testimonial ${i + 1} of ${items.length}`}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    i === active
+                      ? "w-6 bg-on-surface"
+                      : "w-1.5 bg-on-surface/25 hover:bg-on-surface/50"
+                  }`}
+                />
+              ))}
+            </div>
           )}
         </div>
 

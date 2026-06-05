@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { urlFor } from "@/sanity/image";
@@ -181,69 +181,180 @@ function buildPages(items: PortfolioItem[]): PortfolioItem[][] {
   return pages;
 }
 
-export default function PortfolioSlider({
-  items,
+function getImageSrc(item: PortfolioItem, index: number, useSeed: boolean) {
+  const orientation: Orientation = item.orientation ?? "vertical";
+  if (useSeed || !item.image) {
+    const pool = seedImages[orientation];
+    return pool[index % pool.length];
+  }
+  if (orientation === "vertical") {
+    return urlFor(item.image).width(600).height(800).url();
+  }
+  return urlFor(item.image).width(900).height(600).url();
+}
+
+/* ── Shared visual card (used by both desktop grid and mobile slider) ── */
+function PortfolioCard({
+  item,
+  src,
+  aspect,
+  sizes,
+  className = "",
 }: {
-  items: PortfolioItem[];
+  item: PortfolioItem;
+  src: string;
+  aspect: string;
+  sizes: string;
+  className?: string;
 }) {
-  const useSeed = items.length === 0;
-  const all = useSeed ? seedItems : items;
+  const Wrapper = item.link ? "a" : "div";
+  const wrapperProps = item.link
+    ? {
+        href: item.link,
+        target: item.link.startsWith("http")
+          ? ("_blank" as const)
+          : undefined,
+        rel: item.link.startsWith("http") ? "noopener noreferrer" : undefined,
+      }
+    : {};
 
-  const [activeTab, setActiveTab] = useState<"work" | "event">("work");
-  const [page, setPage] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const pages = useMemo(
-    () => buildPages(all.filter((i) => i.type === activeTab)),
-    [all, activeTab],
+  return (
+    <Wrapper
+      {...wrapperProps}
+      className={`block group cursor-pointer text-center ${className}`}
+    >
+      <div
+        className={`${aspect} w-full overflow-hidden relative bg-surface-container-low border border-outline-variant/20 shadow-[0_2px_18px_rgba(0,0,0,0.04)]`}
+      >
+        <Image
+          src={src}
+          alt={item.title}
+          fill
+          sizes={sizes}
+          className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+        />
+      </div>
+      <div className="mt-6">
+        {item.eyebrow && (
+          <span className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/60 mb-3 block">
+            {item.eyebrow}
+          </span>
+        )}
+        <h4 className="font-serif-brand text-xl md:text-2xl text-on-surface leading-snug group-hover:text-primary transition-colors duration-300">
+          {item.title}
+        </h4>
+        {item.description && (
+          <p className="font-body text-sm md:text-[15px] leading-relaxed text-on-surface-variant/70 mt-4 max-w-prose mx-auto">
+            {item.description}
+          </p>
+        )}
+      </div>
+    </Wrapper>
   );
+}
 
+/* ── Minimalist slider dots ──────────────────────────────────────────── */
+function SliderDots({
+  count,
+  active,
+  onSelect,
+}: {
+  count: number;
+  active: number;
+  onSelect: (i: number) => void;
+}) {
+  if (count <= 1) return null;
+  return (
+    <div className="flex justify-center gap-2 mt-8">
+      {Array.from({ length: count }).map((_, i) => (
+        <button
+          key={i}
+          type="button"
+          onClick={() => onSelect(i)}
+          aria-label={`Go to item ${i + 1} of ${count}`}
+          className={`h-1.5 rounded-full transition-all duration-300 ${
+            i === active
+              ? "w-6 bg-on-surface"
+              : "w-1.5 bg-on-surface/25 hover:bg-on-surface/50"
+          }`}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ── One independent block (e.g. "Latest Work" or "Events") ──────────── */
+function PortfolioBlock({
+  title,
+  items,
+  useSeed,
+}: {
+  title: string;
+  items: PortfolioItem[];
+  useSeed: boolean;
+}) {
+  /* Desktop paged-grid state */
+  const [page, setPage] = useState(0);
+  const pages = useMemo(() => buildPages(items), [items]);
   const maxPage = Math.max(0, pages.length - 1);
   const visiblePage = Math.min(page, maxPage);
   const visible = pages[visiblePage] ?? [];
   const layout = classifyGroup(visible);
 
-  const handleTabChange = (tab: "work" | "event") => {
-    setActiveTab(tab);
-    setPage(0);
-  };
+  /* Mobile horizontal-slider state */
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
 
-  function getImageSrc(item: PortfolioItem, index: number) {
-    const orientation: Orientation = item.orientation ?? "vertical";
-    if (useSeed || !item.image) {
-      const pool = seedImages[orientation];
-      return pool[index % pool.length];
-    }
-    if (orientation === "vertical") {
-      return urlFor(item.image).width(600).height(800).url();
-    }
-    return urlFor(item.image).width(900).height(600).url();
-  }
+  const handleScroll = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const center = el.scrollLeft + el.clientWidth / 2;
+    let nearest = 0;
+    let min = Infinity;
+    Array.from(el.children).forEach((child, i) => {
+      const c = child as HTMLElement;
+      const childCenter = c.offsetLeft + c.offsetWidth / 2;
+      const d = Math.abs(childCenter - center);
+      if (d < min) {
+        min = d;
+        nearest = i;
+      }
+    });
+    setActive((prev) => (prev !== nearest ? nearest : prev));
+  }, []);
 
-  // Always use a 3-column grid so card width stays consistent across pages.
-  // - All-vertical pages: each card spans 1 column (and any missing 3rd slot
-  //   is just left empty, which is fine).
-  // - 1V + 1H pages: the vertical spans 1 column at aspect 3:4, and the
-  //   horizontal spans 2 columns at aspect 3:2 — the two card heights then
-  //   match exactly (W·4/3 = 2W·2/3), keeping the row visually balanced.
-  const gridClass = "grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14 items-start";
+  const goTo = useCallback((i: number) => {
+    const el = trackRef.current;
+    if (!el) return;
+    const child = el.children[i] as HTMLElement | undefined;
+    if (!child) return;
+    el.scrollTo({
+      left: child.offsetLeft - (el.clientWidth - child.offsetWidth) / 2,
+      behavior: "smooth",
+    });
+  }, []);
 
-  function aspectClass(item: PortfolioItem) {
-    return (item.orientation ?? "vertical") === "horizontal"
+  if (items.length === 0) return null;
+
+  /* Desktop grid: keep card width consistent across pages. */
+  const gridClass =
+    "grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14 items-start";
+
+  const aspectClass = (item: PortfolioItem) =>
+    (item.orientation ?? "vertical") === "horizontal"
       ? "aspect-[3/2]"
       : "aspect-[3/4]";
-  }
 
-  function colSpanClass(item: PortfolioItem) {
+  const colSpanClass = (item: PortfolioItem) => {
     if (layout === "verticalPlusHorizontal") {
       return (item.orientation ?? "vertical") === "horizontal"
         ? "md:col-span-2"
         : "md:col-span-1";
     }
     return "md:col-span-1";
-  }
+  };
 
-  function sizesAttr(item: PortfolioItem) {
+  const sizesAttr = (item: PortfolioItem) => {
     if (
       layout === "verticalPlusHorizontal" &&
       (item.orientation ?? "vertical") === "horizontal"
@@ -251,124 +362,65 @@ export default function PortfolioSlider({
       return "(max-width: 768px) 100vw, 66vw";
     }
     return "(max-width: 768px) 100vw, 33vw";
-  }
+  };
 
   return (
-    <section className="min-h-screen flex flex-col justify-center py-20 px-6 md:px-8 lg:px-12 max-w-[1600px] mx-auto">
-      {/* Header with tabs */}
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 md:mb-16">
-        <div>
-          <h3 className="font-headline text-2xl sm:text-3xl md:text-4xl font-light mb-4">
-            Work &amp; Events
-          </h3>
-          <div className="w-16 h-[1px] bg-primary/30" />
-        </div>
-        <div className="flex gap-8 mt-6 md:mt-0">
-          {(["work", "event"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => handleTabChange(tab)}
-              className={`font-label text-[11px] uppercase tracking-[0.2em] pb-2 border-b transition-all duration-300 ${
-                activeTab === tab
-                  ? "text-on-surface border-on-surface"
-                  : "text-on-surface/30 border-transparent hover:text-on-surface/60"
-              }`}
-            >
-              {tab === "work" ? "Work" : "Events"}
-            </button>
-          ))}
-        </div>
+    <div className="mb-24 last:mb-0 md:mb-32">
+      {/* Section heading */}
+      <div className="mb-10 md:mb-14">
+        <h3 className="font-headline text-2xl sm:text-3xl md:text-4xl font-light mb-4">
+          {title}
+        </h3>
+        <div className="w-16 h-[1px] bg-primary/30" />
       </div>
 
-      {/* Slider */}
-      <div ref={containerRef} className="relative group/slider">
+      {/* ── Desktop: paged grid slider (stacked, distinct) ── */}
+      <div className="relative hidden md:block group/slider">
         <AnimatePresence mode="wait">
           <motion.div
-            key={`${activeTab}-${visiblePage}`}
+            key={visiblePage}
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
             className={gridClass}
           >
-            {visible.map((item, i) => {
-              const Wrapper = item.link ? "a" : "div";
-              const wrapperProps = item.link
-                ? {
-                    href: item.link,
-                    target: item.link.startsWith("http")
-                      ? ("_blank" as const)
-                      : undefined,
-                    rel: item.link.startsWith("http")
-                      ? "noopener noreferrer"
-                      : undefined,
-                  }
-                : {};
-              return (
-                <Wrapper
-                  key={item._id}
-                  {...wrapperProps}
-                  className={`block group cursor-pointer text-center ${colSpanClass(item)}`}
-                >
-                  <div
-                    className={`${aspectClass(item)} w-full overflow-hidden relative bg-surface-container-low border border-outline-variant/20 shadow-[0_2px_18px_rgba(0,0,0,0.04)]`}
-                  >
-                    <Image
-                      src={getImageSrc(item, i)}
-                      alt={item.title}
-                      fill
-                      sizes={sizesAttr(item)}
-                      className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
-                    />
-                  </div>
-                  <div className="mt-6">
-                    {item.eyebrow && (
-                      <span className="font-label text-[10px] uppercase tracking-[0.25em] text-primary/60 mb-3 block">
-                        {item.eyebrow}
-                      </span>
-                    )}
-                    <h4 className="font-serif-brand text-xl md:text-2xl text-on-surface leading-snug group-hover:text-primary transition-colors duration-300">
-                      {item.title}
-                    </h4>
-                    {item.description && (
-                      <p className="font-body text-sm md:text-[15px] leading-relaxed text-on-surface-variant/70 mt-4 max-w-prose mx-auto">
-                        {item.description}
-                      </p>
-                    )}
-                  </div>
-                </Wrapper>
-              );
-            })}
+            {visible.map((item, i) => (
+              <PortfolioCard
+                key={item._id}
+                item={item}
+                src={getImageSrc(item, i, useSeed)}
+                aspect={aspectClass(item)}
+                sizes={sizesAttr(item)}
+                className={colSpanClass(item)}
+              />
+            ))}
           </motion.div>
         </AnimatePresence>
 
         {/* Hidden arrows — appear on hover when there's more than one page */}
         {pages.length > 1 && (
           <>
-            <motion.button
-              initial={{ opacity: 0 }}
-              whileHover={{ opacity: 1 }}
+            <button
               className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300 w-12 h-12 flex items-center justify-center bg-surface/90 shadow-card border border-outline-variant/10"
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={visiblePage === 0}
               aria-label="Previous page"
             >
               <span className="text-on-surface text-sm">←</span>
-            </motion.button>
-            <motion.button
-              initial={{ opacity: 0 }}
-              whileHover={{ opacity: 1 }}
+            </button>
+            <button
               className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300 w-12 h-12 flex items-center justify-center bg-surface/90 shadow-card border border-outline-variant/10"
               onClick={() => setPage((p) => Math.min(maxPage, p + 1))}
               disabled={visiblePage >= maxPage}
               aria-label="Next page"
             >
               <span className="text-on-surface text-sm">→</span>
-            </motion.button>
+            </button>
           </>
         )}
 
-        {/* Page dots */}
+        {/* Desktop page dots */}
         {pages.length > 1 && (
           <div className="flex justify-center gap-2 mt-10">
             {pages.map((_, i) => (
@@ -386,6 +438,47 @@ export default function PortfolioSlider({
           </div>
         )}
       </div>
+
+      {/* ── Mobile: touch-responsive horizontal slider ── */}
+      <div className="md:hidden">
+        <div
+          ref={trackRef}
+          onScroll={handleScroll}
+          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-none gap-4 -mx-6 px-6 pb-1"
+        >
+          {items.map((item, i) => (
+            <div
+              key={item._id}
+              className="snap-center shrink-0 w-[80%] first:ml-0"
+            >
+              <PortfolioCard
+                item={item}
+                src={getImageSrc(item, i, useSeed)}
+                aspect={aspectClass(item)}
+                sizes="80vw"
+              />
+            </div>
+          ))}
+        </div>
+
+        <SliderDots count={items.length} active={active} onSelect={goTo} />
+      </div>
+    </div>
+  );
+}
+
+export default function PortfolioSlider({ items }: { items: PortfolioItem[] }) {
+  const useSeed = items.length === 0;
+  const all = useSeed ? seedItems : items;
+
+  const works = useMemo(() => all.filter((i) => i.type === "work"), [all]);
+  const events = useMemo(() => all.filter((i) => i.type === "event"), [all]);
+
+  return (
+    <section className="py-20 md:py-28 px-6 md:px-8 lg:px-12 max-w-[1600px] mx-auto">
+      {/* Two completely independent, vertically stacked sections. */}
+      <PortfolioBlock title="Latest Work" items={works} useSeed={useSeed} />
+      <PortfolioBlock title="Events" items={events} useSeed={useSeed} />
     </section>
   );
 }
