@@ -101,7 +101,7 @@ export default async function CataloguePage() {
         <p className="font-body text-base leading-relaxed text-foreground/55 max-w-2xl">
           A curated record of compositions — chamber, orchestral, choral, and
           contemporary — with premiere histories, performer credits, and
-          listening links where available.
+          and audio and video links where available.
         </p>
       </section>
 
