@@ -35,7 +35,7 @@ export async function sendInquiry(formData: FormData): Promise<InquiryResult> {
 
   const allowedSubject = (INQUIRY_SUBJECTS as readonly string[]).includes(subject)
     ? (subject as InquirySubject)
-    : "Others";
+    : "Other";
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {

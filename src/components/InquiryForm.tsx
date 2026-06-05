@@ -65,7 +65,6 @@ export default function InquiryForm() {
                   name="name"
                   type="text"
                   required
-                  placeholder="Enter your name"
                   className="bg-transparent border-t-0 border-x-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-sm transition-all"
                 />
               </div>
@@ -81,7 +80,6 @@ export default function InquiryForm() {
                   name="email"
                   type="email"
                   required
-                  placeholder="Enter your email"
                   className="bg-transparent border-t-0 border-x-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-sm transition-all"
                 />
               </div>
@@ -120,7 +118,6 @@ export default function InquiryForm() {
                 id="inquiry-message"
                 name="message"
                 required
-                placeholder="How can we assist you?"
                 rows={4}
                 className="bg-transparent border-t-0 border-x-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-sm transition-all resize-none"
               />
