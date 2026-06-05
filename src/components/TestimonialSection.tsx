@@ -70,10 +70,10 @@ export default function TestimonialSection({
   const handleCloseModal = () => setModalOpen(false);
 
   return (
-    <section className="py-32 bg-surface-container-low">
+    <section className="py-20 md:py-32 bg-surface-container-low">
       <div className="px-6 md:px-12 max-w-screen-2xl mx-auto">
         {/* Header */}
-        <div className="mb-20 text-center">
+        <div className="mb-12 md:mb-20 text-center">
           <p className="font-label text-[10px] uppercase tracking-[0.4em] text-primary/60 mb-4">
             Testimonials
           </p>
@@ -133,19 +133,21 @@ export default function TestimonialSection({
         </div>
 
         {/* ── Mobile: one testimonial per slide, side-swipe ── */}
+        {/* items-start lets each card size to its own content (h-auto) instead
+            of every slide stretching to the tallest quote — kills the canyon. */}
         <div className="md:hidden">
           <div
             ref={trackRef}
             onScroll={handleScroll}
-            className="flex overflow-x-auto snap-x snap-mandatory scrollbar-none gap-4 -mx-6 px-6 pb-1"
+            className="flex items-start overflow-x-auto snap-x snap-mandatory scrollbar-none gap-4 -mx-6 px-6 pb-1"
           >
             {items.map((t) => (
               <div key={t._id} className="snap-center shrink-0 w-full">
-                <div className="p-8 border border-outline-variant/15 bg-surface flex flex-col min-h-[260px] h-full">
-                  <p className="font-headline text-sm leading-[1.9] text-on-surface-variant/70 flex-grow">
+                <div className="py-6 px-4 border border-outline-variant/15 bg-surface">
+                  <p className="font-headline text-sm leading-[1.75] text-on-surface-variant/70">
                     {t.content}
                   </p>
-                  <div className="mt-8 pt-6 border-t border-outline-variant/10">
+                  <div className="mt-4 pt-4 border-t border-outline-variant/10">
                     <p className="font-body text-[11px] tracking-normal text-on-surface/70">
                       {formatByline(t)}
                     </p>
@@ -156,7 +158,7 @@ export default function TestimonialSection({
           </div>
 
           {items.length > 1 && (
-            <div className="flex justify-center gap-2 mt-8">
+            <div className="flex justify-center gap-2 mt-5">
               {items.map((t, i) => (
                 <button
                   key={t._id}
@@ -175,7 +177,7 @@ export default function TestimonialSection({
         </div>
 
         {/* Write Your Own */}
-        <div className="mt-16 text-center">
+        <div className="mt-10 md:mt-16 text-center">
           <button
             onClick={() => setModalOpen(true)}
             className="font-label tracking-[0.15em] text-[11px] uppercase px-8 py-3 border border-on-surface/20 text-on-surface hover:bg-on-surface hover:text-surface transition-all duration-300"
