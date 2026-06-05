@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "migrate:duration": "node scripts/migrate-duration.mjs"
   },
   "dependencies": {
     "@sanity/image-url": "^2.1.1",
