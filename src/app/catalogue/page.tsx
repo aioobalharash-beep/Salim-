@@ -10,7 +10,7 @@ export const revalidate = 60;
 
 const FALLBACK_TITLE = "Catalogue";
 const FALLBACK_DESCRIPTION =
-  "The complete catalogue of compositions by Salim Dada — chamber, symphonic, vocal, and contemporary works, with premiere histories and listening links.";
+  "The complete catalogue of compositions by Salim Dada — chamber, symphonic, vocal, and contemporary works, with premiere histories and audio and video links.";
 
 async function getWorks(): Promise<CatalogueWork[]> {
   try {
