@@ -134,9 +134,31 @@ function classifyGroup(items: PortfolioItem[]): Layout {
   return "fallback";
 }
 
+/* Hard ceiling of items shown per desktop view. The grid is 3 columns wide,
+ * so a page must never exceed 3 items or it wraps onto a messy second row. */
+const MAX_PER_PAGE = 3;
+
+/* Split any oversized page into chunks of at most MAX_PER_PAGE, preserving
+ * order. This is the safety net that keeps items 4, 5, … on the next page
+ * (reachable via the arrows / dots) instead of leaking below the row. */
+function capPages(pages: PortfolioItem[][]): PortfolioItem[][] {
+  const out: PortfolioItem[][] = [];
+  for (const page of pages) {
+    if (page.length <= MAX_PER_PAGE) {
+      out.push(page);
+      continue;
+    }
+    for (let i = 0; i < page.length; i += MAX_PER_PAGE) {
+      out.push(page.slice(i, i + MAX_PER_PAGE));
+    }
+  }
+  return out;
+}
+
 /* Group items by pageGroup. If pageGroup is missing, fall back to
  * auto-chunking based on orientation: greedily emit 3-vertical pages
- * when possible, otherwise pair a vertical with a horizontal. */
+ * when possible, otherwise pair a vertical with a horizontal. Either way
+ * the result is capped so no page ever exceeds 3 items. */
 function buildPages(items: PortfolioItem[]): PortfolioItem[][] {
   const haveGroups = items.some((i) => typeof i.pageGroup === "number");
 
@@ -147,9 +169,10 @@ function buildPages(items: PortfolioItem[]): PortfolioItem[][] {
       if (!buckets.has(key)) buckets.set(key, []);
       buckets.get(key)!.push(item);
     }
-    return Array.from(buckets.entries())
+    const grouped = Array.from(buckets.entries())
       .sort((a, b) => a[0] - b[0])
       .map(([, list]) => list);
+    return capPages(grouped);
   }
 
   // Auto-chunk fallback for legacy entries.
@@ -178,7 +201,7 @@ function buildPages(items: PortfolioItem[]): PortfolioItem[][] {
     }
     pages.push(queue.splice(0, Math.min(2, queue.length)));
   }
-  return pages;
+  return capPages(pages);
 }
 
 function getImageSrc(item: PortfolioItem, index: number, useSeed: boolean) {
@@ -298,7 +321,9 @@ function PortfolioBlock({
   const pages = useMemo(() => buildPages(items), [items]);
   const maxPage = Math.max(0, pages.length - 1);
   const visiblePage = Math.min(page, maxPage);
-  const visible = pages[visiblePage] ?? [];
+  // Defensive cap: the desktop grid renders at most 3 columns, so never map
+  // more than 3 items into a single view (pages are already capped upstream).
+  const visible = (pages[visiblePage] ?? []).slice(0, MAX_PER_PAGE);
   const layout = classifyGroup(visible);
 
   /* Mobile horizontal-slider state */
