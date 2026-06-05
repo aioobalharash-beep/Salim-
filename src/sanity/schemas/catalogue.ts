@@ -110,19 +110,13 @@ export default defineType({
 
     /* ── Technical ─────────────────────────────────────────────── */
     defineField({
-      name: "durationMinutes",
-      title: "Duration (Total Minutes)",
+      name: "duration",
+      title: "Duration (Seconds)",
       type: "number",
       group: "technical",
-      description: "Used for filtering & sorting. Round to the nearest minute.",
-      validation: (Rule) => Rule.min(0).max(600),
-    }),
-    defineField({
-      name: "durationDisplay",
-      title: "Duration (Display)",
-      type: "string",
-      group: "technical",
-      description: "Human-readable duration shown on the card (e.g. '1h 20m', '12'').",
+      description:
+        "Enter the total duration of the piece in SECONDS (e.g., for a 4 minute 30 second piece, enter 270. For a 15 minute piece, enter 900).",
+      validation: (Rule) => Rule.min(0).integer(),
     }),
     defineField({
       name: "movements",
@@ -251,12 +245,12 @@ export default defineType({
     {
       title: "Duration (Longest)",
       name: "durationDesc",
-      by: [{ field: "durationMinutes", direction: "desc" }],
+      by: [{ field: "duration", direction: "desc" }],
     },
     {
       title: "Duration (Shortest)",
       name: "durationAsc",
-      by: [{ field: "durationMinutes", direction: "asc" }],
+      by: [{ field: "duration", direction: "asc" }],
     },
     {
       title: "Movements (Most)",
