@@ -92,19 +92,38 @@ export default function InquiryForm() {
               >
                 Nature of Request
               </label>
-              <select
-                id="inquiry-subject"
-                name="subject"
-                required
-                defaultValue={INQUIRY_SUBJECTS[0]}
-                className="bg-transparent border-t-0 border-x-0 border-b border-outline-variant/30 focus:border-primary focus:ring-0 px-0 py-3 font-body text-sm appearance-none transition-all"
-              >
-                {INQUIRY_SUBJECTS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+              <div className="relative w-full">
+                <select
+                  id="inquiry-subject"
+                  name="subject"
+                  required
+                  defaultValue={INQUIRY_SUBJECTS[0]}
+                  className="appearance-none cursor-pointer w-full bg-background border border-foreground/15 rounded-sm px-4 py-3 pr-10 font-body text-sm text-foreground outline-none focus:border-foreground focus:ring-0 transition-colors duration-200"
+                >
+                  {INQUIRY_SUBJECTS.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+                {/* Custom minimalist chevron — bronze metadata tone */}
+                <svg
+                  className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-primary/60"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M4 6l4 4 4-4"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
             </div>
 
             <div className="flex flex-col space-y-2">
