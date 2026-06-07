@@ -226,6 +226,52 @@ export const catalogueListQuery = groq`
   }
 `;
 
+export const projectsListQuery = groq`
+  *[_type == "project" && defined(slug.current)] | order(coalesce(year, 0) desc, title asc) {
+    _id,
+    title,
+    "slug": slug.current,
+    subtitle,
+    year,
+    coverImage{
+      ...,
+      "alt": coalesce(alt, asset->altText, ""),
+      "dimensions": asset->metadata.dimensions,
+      asset
+    }
+  }
+`;
+
+export const projectBySlugQuery = groq`
+  *[_type == "project" && slug.current == $slug][0] {
+    _id,
+    title,
+    "slug": slug.current,
+    subtitle,
+    year,
+    overview,
+    coverImage{
+      ...,
+      "alt": coalesce(alt, asset->altText, ""),
+      "dimensions": asset->metadata.dimensions,
+      asset
+    },
+    gallery[]{
+      ...,
+      "alt": coalesce(alt, asset->altText, ""),
+      "dimensions": asset->metadata.dimensions,
+      asset
+    },
+    projectDetails[]{
+      label,
+      value
+    },
+    seo{
+      ${seoProjection}
+    }
+  }
+`;
+
 export const legalQuery = groq`
   *[_type == "legal"][0] {
     title,
