@@ -8,7 +8,7 @@ export const revalidate = 60;
 
 const FALLBACK_TITLE = "Projects";
 const FALLBACK_DESCRIPTION =
-  "A curated archive of projects by Salim Dada — artistic direction, productions, and collaborations.";
+  " Archive and press files of Salim Dada's flagship projects in terms of artistic & music direction, productions and collaborations.";
 
 async function getProjects(): Promise<ProjectListItem[]> {
   try {
@@ -34,7 +34,7 @@ export default async function ProjectsPage() {
       {/* ── Header ── */}
       <section className="max-w-6xl mx-auto px-6 md:px-8 mb-12 md:mb-16">
         <p className="font-label text-[10px] uppercase tracking-[0.5em] text-primary/50 mb-5">
-          Selected Work
+          Selected Works
         </p>
         <h1 className="font-headline text-4xl sm:text-5xl md:text-7xl font-light text-foreground leading-[1.1] mb-6">
           Projects
