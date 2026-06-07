@@ -8,7 +8,7 @@ export const revalidate = 60;
 
 const FALLBACK_TITLE = "Projects";
 const FALLBACK_DESCRIPTION =
-  "A curated archive of projects by Salim Dada — artistic direction, productions, and collaborations, presented as a clean visual grid with full case studies.";
+  "A curated archive of projects by Salim Dada — artistic direction, productions, and collaborations.";
 
 async function getProjects(): Promise<ProjectListItem[]> {
   try {
