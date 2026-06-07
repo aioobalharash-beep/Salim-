@@ -11,6 +11,7 @@ import catalogue from "./catalogue";
 import legal from "./legal";
 import seoSettings from "./seoSettings";
 import shop from "./shop";
+import project from "./project";
 
 export const schemaTypes = [
   articles,
@@ -26,4 +27,5 @@ export const schemaTypes = [
   legal,
   seoSettings,
   shop,
+  project,
 ];

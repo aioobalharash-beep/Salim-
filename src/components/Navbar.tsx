@@ -13,6 +13,7 @@ const mediaSubLinks = [
 
 const links = [
   { href: "/", label: "Home" },
+  { href: "/projects", label: "Projects" },
   { href: "/catalogue", label: "Catalogue" },
   { href: "/shop", label: "Shop" },
   // Temporarily hidden — re-enable when ready to launch publicly.
