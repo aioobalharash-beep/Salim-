@@ -69,10 +69,10 @@ export default function Services({ items }: { items: ServiceItem[] }) {
   const services = seedServices.length > 0 ? seedServices : items;
 
   return (
-    <section className="py-32 bg-surface-container-low">
+    <section className="py-12 md:py-32 bg-surface-container-low">
       <div className="px-6 md:px-12 max-w-screen-2xl mx-auto">
         {/* Section Header */}
-        <div className="mb-20 text-center">
+        <div className="mb-12 md:mb-20 text-center">
           <p className="font-label text-[10px] uppercase tracking-[0.4em] text-primary/60 mb-4">
             Professional Offering
           </p>

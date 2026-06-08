@@ -154,13 +154,14 @@ function GalleryMedia({
       start ? `?start=${start}` : ""
     }`;
     return (
-      <div className="relative w-full aspect-video overflow-hidden bg-on-surface/5">
+      <div className="relative w-full aspect-video overflow-hidden bg-surface">
         <iframe
           src={src}
           title={item.title || "YouTube video"}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
-          loading="lazy"
+          loading="eager"
+          style={{ backgroundColor: "#F4F1EA" }}
           className="absolute inset-0 w-full h-full"
         />
       </div>

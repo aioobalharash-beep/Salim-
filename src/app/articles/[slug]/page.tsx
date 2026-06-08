@@ -391,7 +391,8 @@ function YouTubeEmbed({ value }: { value: YouTubeBlock }) {
           title={captionText || "YouTube video"}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
-          loading="lazy"
+          loading="eager"
+          style={{ backgroundColor: "#F4F1EA" }}
         />
       ) : (
         <a
@@ -405,7 +406,7 @@ function YouTubeEmbed({ value }: { value: YouTubeBlock }) {
           <img
             src={`https://i.ytimg.com/vi/${id}/maxresdefault.jpg`}
             alt={captionText || "YouTube thumbnail"}
-            loading="lazy"
+            loading="eager"
           />
           <span className="ed-yt-play" aria-hidden />
         </a>
