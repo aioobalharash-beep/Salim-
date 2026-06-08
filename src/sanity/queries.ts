@@ -252,15 +252,36 @@ export const projectBySlugQuery = groq`
       asset
     },
     gallery[]{
-      ...,
-      "alt": coalesce(alt, asset->altText, ""),
-      "dimensions": asset->metadata.dimensions,
-      asset
+      _key,
+      _type,
+      _type == "galleryImage" => {
+        ...,
+        "alt": coalesce(alt, asset->altText, ""),
+        title,
+        description,
+        "dimensions": asset->metadata.dimensions,
+        asset
+      },
+      _type == "youtube" => {
+        url,
+        startTime,
+        title,
+        description
+      },
+      _type == "videoFile" => {
+        title,
+        description,
+        "videoUrl": file.asset->url
+      }
     },
     projectDetails[]{
       label,
       value
     },
+    footerText,
+    showContactBar,
+    contactBarText,
+    contactButtonLabel,
     seo{
       ${seoProjection}
     }
