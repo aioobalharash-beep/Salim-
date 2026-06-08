@@ -2,16 +2,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { PortableText, type PortableTextBlock } from "next-sanity";
+import type { PortableTextComponents } from "@portabletext/react";
 import { client } from "@/sanity/client";
 import { urlFor, type SanityImageSource } from "@/sanity/image";
 import { projectBySlugQuery } from "@/sanity/queries";
 import { buildMetadata, type SeoSettings } from "@/sanity/seo";
+import ProjectContactBar from "@/components/ProjectContactBar";
 
 export const revalidate = 60;
 
 /* ── Types — mirror src/sanity/schemas/project.ts ──────────────────── */
 type ProjectImage = SanityImageSource & {
   alt?: string | null;
+  title?: string | null;
+  description?: string | null;
   dimensions?: { width: number; height: number; aspectRatio: number };
 };
 
@@ -19,6 +24,27 @@ interface ProjectDetail {
   label: string | null;
   value: string | null;
 }
+
+/* Gallery rows are a discriminated union keyed on `_type`. Image, YouTube,
+ * and uploaded video each share optional title/description for the editorial
+ * left column. */
+type GalleryItem =
+  | ({ _key: string; _type: "galleryImage" } & ProjectImage)
+  | {
+      _key: string;
+      _type: "youtube";
+      url: string | null;
+      startTime?: number | null;
+      title?: string | null;
+      description?: string | null;
+    }
+  | {
+      _key: string;
+      _type: "videoFile";
+      videoUrl: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
 
 interface Project {
   _id: string;
@@ -28,8 +54,12 @@ interface Project {
   year: number | null;
   overview: string | null;
   coverImage: ProjectImage | null;
-  gallery: ProjectImage[] | null;
+  gallery: GalleryItem[] | null;
   projectDetails: ProjectDetail[] | null;
+  footerText: PortableTextBlock[] | null;
+  showContactBar: boolean | null;
+  contactBarText: string | null;
+  contactButtonLabel: string | null;
   seo?: SeoSettings | null;
 }
 
@@ -55,6 +85,23 @@ export async function generateMetadata({
   });
 }
 
+/* Extract a YouTube video id from any common URL shape. */
+function getYouTubeId(url: string): string | null {
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    if (u.hostname === "youtu.be") return u.pathname.slice(1) || null;
+    if (u.hostname.endsWith("youtube.com")) {
+      if (u.pathname === "/watch") return u.searchParams.get("v");
+      const m = u.pathname.match(/^\/(embed|shorts|v)\/([^/?#]+)/);
+      if (m) return m[2];
+    }
+  } catch {
+    /* fall through */
+  }
+  return null;
+}
+
 /* ── Single uncropped gallery image ────────────────────────────────── */
 function GalleryImage({
   image,
@@ -66,7 +113,7 @@ function GalleryImage({
   priority?: boolean;
 }) {
   const dims = image.dimensions;
-  const renderedWidth = 1800;
+  const renderedWidth = 1600;
   const renderedHeight = dims
     ? Math.round(renderedWidth / dims.aspectRatio)
     : Math.round((renderedWidth * 2) / 3);
@@ -78,7 +125,7 @@ function GalleryImage({
         .quality(90)
         .auto("format")
         .url()}
-      alt={image.alt || ""}
+      alt={image.alt || image.title || ""}
       width={renderedWidth}
       height={renderedHeight}
       sizes={sizes}
@@ -88,29 +135,93 @@ function GalleryImage({
   );
 }
 
-/* ── Stagger the gallery into alternating full-bleed and 2-up rows.
- *   On mobile every row collapses to a single vertical full-width block. */
-type GalleryRow =
-  | { kind: "full"; images: [ProjectImage] }
-  | { kind: "pair"; images: ProjectImage[] };
-
-function buildGalleryRows(images: ProjectImage[]): GalleryRow[] {
-  const rows: GalleryRow[] = [];
-  let i = 0;
-  let full = true; // start with a full-bleed showcase block
-
-  while (i < images.length) {
-    if (full || i === images.length - 1) {
-      rows.push({ kind: "full", images: [images[i]] });
-      i += 1;
-    } else {
-      rows.push({ kind: "pair", images: [images[i], images[i + 1]] });
-      i += 2;
-    }
-    full = !full;
+/* ── Media renderer — image, YouTube embed, or local video player ──── */
+function GalleryMedia({
+  item,
+  priority,
+}: {
+  item: GalleryItem;
+  priority?: boolean;
+}) {
+  if (item._type === "youtube") {
+    const id = getYouTubeId(item.url || "");
+    if (!id) return null;
+    const start =
+      typeof item.startTime === "number" && item.startTime > 0
+        ? Math.floor(item.startTime)
+        : null;
+    const src = `https://www.youtube-nocookie.com/embed/${id}${
+      start ? `?start=${start}` : ""
+    }`;
+    return (
+      <div className="relative w-full aspect-video overflow-hidden bg-on-surface/5">
+        <iframe
+          src={src}
+          title={item.title || "YouTube video"}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          loading="lazy"
+          className="absolute inset-0 w-full h-full"
+        />
+      </div>
+    );
   }
-  return rows;
+
+  if (item._type === "videoFile") {
+    if (!item.videoUrl) return null;
+    return (
+      <video
+        controls
+        preload="metadata"
+        className="w-full h-auto bg-on-surface/5"
+        src={item.videoUrl}
+      />
+    );
+  }
+
+  return (
+    <GalleryImage
+      image={item}
+      priority={priority}
+      sizes="(max-width: 1024px) 100vw, 50vw"
+    />
+  );
 }
+
+/* ── Footer rich-text components — understated typography ───────────── */
+const footerComponents: PortableTextComponents = {
+  block: {
+    normal: ({ children }) => (
+      <p className="font-body text-sm md:text-[15px] leading-relaxed text-foreground/55 mb-4">
+        {children}
+      </p>
+    ),
+    h3: ({ children }) => (
+      <h3 className="font-headline text-xl text-foreground mt-8 mb-3">
+        {children}
+      </h3>
+    ),
+  },
+  marks: {
+    strong: ({ children }) => (
+      <strong className="font-medium text-foreground/80">{children}</strong>
+    ),
+    em: ({ children }) => <em>{children}</em>,
+    link: ({ value, children }) => {
+      const blank = (value as { blank?: boolean })?.blank;
+      return (
+        <a
+          href={(value as { href?: string })?.href || "#"}
+          target={blank ? "_blank" : undefined}
+          rel={blank ? "noopener noreferrer" : undefined}
+          className="text-primary underline underline-offset-4 decoration-primary/30 hover:decoration-primary transition-colors"
+        >
+          {children}
+        </a>
+      );
+    },
+  },
+};
 
 export default async function ProjectPage({
   params,
@@ -121,14 +232,15 @@ export default async function ProjectPage({
   if (!project) notFound();
 
   const gallery = (project.gallery ?? []).filter(Boolean);
-  const rows = buildGalleryRows(gallery);
   const details = (project.projectDetails ?? []).filter(
     (d) => d?.label && d?.value,
   );
+  const hasFooterText =
+    Array.isArray(project.footerText) && project.footerText.length > 0;
 
   return (
-    <div className="min-h-screen bg-background pt-28 pb-24">
-      <article className="max-w-6xl mx-auto px-6 md:px-8">
+    <div className="min-h-screen bg-background pt-28">
+      <article className="max-w-6xl mx-auto px-6 md:px-8 pb-24">
         {/* ── Back link ── */}
         <Link
           href="/projects"
@@ -187,38 +299,57 @@ export default async function ProjectPage({
           </section>
         )}
 
-        {/* ── Master Imagery Grid (Artboard case-study mimic) ── */}
-        {rows.length > 0 && (
-          <section className="mt-16 md:mt-24 space-y-8 md:space-y-12">
-            {rows.map((row, idx) =>
-              row.kind === "full" ? (
-                <div key={idx} className="w-full bg-transparent">
-                  <GalleryImage
-                    image={row.images[0]}
-                    sizes="(max-width: 1152px) 100vw, 1152px"
-                    priority={idx === 0}
-                  />
-                </div>
-              ) : (
+        {/* ── Multimedia Gallery — asymmetrical content/media rows ── */}
+        {gallery.length > 0 && (
+          <section className="mt-20 md:mt-28 space-y-20 md:space-y-28">
+            {gallery.map((item, idx) => {
+              const hasText = !!(item.title || item.description);
+              return (
                 <div
-                  key={idx}
-                  className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8"
+                  key={item._key}
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center"
                 >
-                  {row.images.map((image, j) => (
-                    <div key={j} className="w-full bg-transparent">
-                      <GalleryImage
-                        image={image}
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                      />
-                    </div>
-                  ))}
+                  {/* Content — below media on mobile, left on desktop.
+                      When there is no title the description sits at the top
+                      and fills the space on its own. */}
+                  <div
+                    className={`order-2 lg:order-1 ${
+                      hasText ? "" : "hidden lg:block"
+                    }`}
+                  >
+                    {item.title && (
+                      <h2 className="font-headline font-light text-3xl md:text-4xl leading-tight text-foreground mb-5">
+                        {item.title}
+                      </h2>
+                    )}
+                    {item.description && (
+                      <p className="font-body text-base leading-relaxed text-foreground/60 whitespace-pre-line">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Media — above text on mobile, right on desktop. */}
+                  <div className="order-1 lg:order-2 w-full bg-transparent">
+                    <GalleryMedia item={item} priority={idx === 0} />
+                  </div>
                 </div>
-              ),
-            )}
+              );
+            })}
           </section>
         )}
 
-        {/* ── Footer back link ── */}
+        {/* ── Project Footer ── */}
+        {hasFooterText && (
+          <section className="mt-20 md:mt-28 pt-10 border-t border-foreground/[0.08] max-w-3xl">
+            <PortableText
+              value={project.footerText!}
+              components={footerComponents}
+            />
+          </section>
+        )}
+
+        {/* ── Back link ── */}
         <footer className="mt-20 pt-10 border-t border-foreground/[0.08]">
           <Link
             href="/projects"
@@ -228,6 +359,15 @@ export default async function ProjectPage({
           </Link>
         </footer>
       </article>
+
+      {/* ── Conditional full-width Contact Bar ── */}
+      {project.showContactBar && (
+        <ProjectContactBar
+          projectTitle={project.title}
+          text={project.contactBarText}
+          buttonLabel={project.contactButtonLabel}
+        />
+      )}
     </div>
   );
 }

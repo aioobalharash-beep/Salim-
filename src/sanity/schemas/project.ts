@@ -9,6 +9,7 @@ export default defineType({
     { name: "basic", title: "Basic Info", default: true },
     { name: "media", title: "Media" },
     { name: "details", title: "Project Details" },
+    { name: "footer", title: "Footer & Contact" },
     { name: "seo", title: "SEO" },
   ],
   fields: [
@@ -82,10 +83,13 @@ export default defineType({
       type: "array",
       group: "media",
       description:
-        "High-resolution showcase images displayed on the individual project page.",
+        "Multimedia showcase shown on the individual project page. Mix images, YouTube videos, and uploaded video files — each renders as an editorial row with an optional title and description.",
       of: [
+        /* — Image — */
         defineArrayMember({
           type: "image",
+          name: "galleryImage",
+          title: "Image",
           options: { hotspot: true },
           fields: [
             defineField({
@@ -95,7 +99,98 @@ export default defineType({
               description:
                 "Short description of the image for accessibility and SEO.",
             }),
+            defineField({
+              name: "title",
+              title: "Title",
+              type: "string",
+              description: "Optional heading shown beside the image (serif).",
+            }),
+            defineField({
+              name: "description",
+              title: "Description",
+              type: "text",
+              rows: 4,
+              description: "Optional descriptive text shown beside the image.",
+            }),
           ],
+          preview: {
+            select: { title: "title", subtitle: "alt", media: "asset" },
+            prepare({ title, subtitle, media }) {
+              return { title: title || "Image", subtitle, media };
+            },
+          },
+        }),
+        /* — YouTube Video — */
+        defineArrayMember({
+          type: "object",
+          name: "youtube",
+          title: "YouTube Video",
+          fields: [
+            defineField({
+              name: "url",
+              title: "YouTube URL",
+              type: "url",
+              validation: (Rule) =>
+                Rule.required().uri({ scheme: ["http", "https"] }),
+            }),
+            defineField({
+              name: "startTime",
+              title: "Start Time (seconds)",
+              type: "number",
+              description: "Optional. Begin playback this many seconds in.",
+              validation: (Rule) => Rule.min(0).integer(),
+            }),
+            defineField({
+              name: "title",
+              title: "Title",
+              type: "string",
+            }),
+            defineField({
+              name: "description",
+              title: "Description",
+              type: "text",
+              rows: 4,
+            }),
+          ],
+          preview: {
+            select: { title: "title", subtitle: "url" },
+            prepare({ title, subtitle }) {
+              return { title: title || "YouTube Video", subtitle };
+            },
+          },
+        }),
+        /* — Local Video File — */
+        defineArrayMember({
+          type: "object",
+          name: "videoFile",
+          title: "Video File",
+          fields: [
+            defineField({
+              name: "file",
+              title: "Video File",
+              type: "file",
+              options: { accept: "video/*" },
+              description: "Upload a local video (e.g. mp4).",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "title",
+              title: "Title",
+              type: "string",
+            }),
+            defineField({
+              name: "description",
+              title: "Description",
+              type: "text",
+              rows: 4,
+            }),
+          ],
+          preview: {
+            select: { title: "title" },
+            prepare({ title }) {
+              return { title: title || "Video File" };
+            },
+          },
         }),
       ],
     }),
@@ -135,6 +230,84 @@ export default defineType({
           },
         }),
       ],
+    }),
+
+    /* ── Project Footer ────────────────────────────────────────── */
+    defineField({
+      name: "footerText",
+      title: "Footer Text",
+      type: "array",
+      group: "footer",
+      description:
+        "Final project notes and external links, shown beneath the gallery in understated typography.",
+      of: [
+        defineArrayMember({
+          type: "block",
+          styles: [
+            { title: "Normal", value: "normal" },
+            { title: "Heading", value: "h3" },
+          ],
+          lists: [],
+          marks: {
+            decorators: [
+              { title: "Bold", value: "strong" },
+              { title: "Italic", value: "em" },
+            ],
+            annotations: [
+              {
+                name: "link",
+                type: "object",
+                title: "External Link",
+                fields: [
+                  defineField({
+                    name: "href",
+                    title: "URL",
+                    type: "url",
+                    validation: (Rule) =>
+                      Rule.required().uri({
+                        scheme: ["http", "https", "mailto", "tel"],
+                      }),
+                  }),
+                  defineField({
+                    name: "blank",
+                    title: "Open in new tab",
+                    type: "boolean",
+                    initialValue: true,
+                  }),
+                ],
+              },
+            ],
+          },
+        }),
+      ],
+    }),
+
+    /* ── Contact Bar ───────────────────────────────────────────── */
+    defineField({
+      name: "showContactBar",
+      title: "Show Contact Bar",
+      type: "boolean",
+      group: "footer",
+      initialValue: false,
+      description:
+        "Toggle the full-width contact bar at the very bottom of the project page.",
+    }),
+    defineField({
+      name: "contactBarText",
+      title: "Contact Bar Text",
+      type: "string",
+      group: "footer",
+      description: "The text appearing on the left of the bar.",
+      hidden: ({ parent }) => !parent?.showContactBar,
+    }),
+    defineField({
+      name: "contactButtonLabel",
+      title: "Contact Button Label",
+      type: "string",
+      group: "footer",
+      initialValue: "contact",
+      description: "Label for the button on the right of the bar.",
+      hidden: ({ parent }) => !parent?.showContactBar,
     }),
 
     /* ── SEO ───────────────────────────────────────────────────── */

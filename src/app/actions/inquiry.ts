@@ -91,6 +91,84 @@ export async function sendInquiry(formData: FormData): Promise<InquiryResult> {
   }
 }
 
+// Project enquiries from an individual project page's contact bar. The
+// subject is locked to the project the visitor is viewing — its title is
+// dynamic (one per project), so unlike service enquiries it can't be matched
+// against a fixed allowlist; we sanitise it and cap its length instead.
+export async function sendProjectEnquiry(
+  formData: FormData,
+): Promise<InquiryResult> {
+  const name = String(formData.get("name") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim();
+  const message = String(formData.get("message") ?? "").trim();
+  // Collapse any newlines so the value can't smuggle extra email headers.
+  const project = String(formData.get("project") ?? "")
+    .replace(/[\r\n]+/g, " ")
+    .trim()
+    .slice(0, 120);
+
+  if (!name || !email || !project || !message) {
+    return { ok: false, error: "All fields are required." };
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { ok: false, error: "Please provide a valid email address." };
+  }
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error("RESEND_API_KEY is not configured.");
+    return { ok: false, error: "Email service is not configured." };
+  }
+
+  const resend = new Resend(apiKey);
+  const emailSubject = `[Project Enquiry] - ${project}`;
+
+  const html = `
+    <div style="font-family: Georgia, serif; color: #1A1A1A; background: #F4F1EA; padding: 32px;">
+      <h2 style="font-weight: 300; letter-spacing: 0.05em; border-bottom: 1px solid #8C7851; padding-bottom: 12px;">
+        New Project Enquiry
+      </h2>
+      <p><strong>Project:</strong> ${escapeHtml(project)}</p>
+      <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+      <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+      <p><strong>Message:</strong></p>
+      <p style="white-space: pre-wrap; border-left: 2px solid #8C7851; padding-left: 16px;">${escapeHtml(message)}</p>
+    </div>
+  `;
+
+  const text = [
+    `New Project Enquiry`,
+    `Project: ${project}`,
+    `Name: ${name}`,
+    `Email: ${email}`,
+    ``,
+    `Message:`,
+    message,
+  ].join("\n");
+
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM_ADDRESS,
+      to: RECIPIENT,
+      replyTo: email,
+      subject: emailSubject,
+      html,
+      text,
+    });
+
+    if (error) {
+      console.error("Resend send error:", error);
+      return { ok: false, error: "Email delivery failed." };
+    }
+
+    return { ok: true };
+  } catch (err) {
+    console.error("Project enquiry send exception:", err);
+    return { ok: false, error: "Unexpected error sending enquiry." };
+  }
+}
+
 // Service-card enquiries from the homepage Offering grid. Shares the same
 // Resend pipeline as the contact form, but the subject is locked to the
 // clicked service so Salim can instantly tell which segment a lead belongs to.
