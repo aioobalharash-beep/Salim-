@@ -101,10 +101,10 @@ export default function TestimonialSection({
   const ready = shuffledTestimonials.length > 0;
 
   return (
-    <section className="py-20 md:py-32 bg-surface-container-low">
+    <section className="py-12 md:py-32 bg-surface-container-low">
       <div className="px-6 md:px-12 max-w-screen-2xl mx-auto">
         {/* Header */}
-        <div className="mb-12 md:mb-20 text-center">
+        <div className="mb-8 md:mb-20 text-center">
           <p className="font-label text-[10px] uppercase tracking-[0.4em] text-primary/60 mb-4">
             Testimonials
           </p>
@@ -113,9 +113,11 @@ export default function TestimonialSection({
           </h3>
         </div>
 
-        {/* Reserve the slider's footprint so cards popping in after the
-            client-side shuffle don't shift the layout. */}
-        <div className="min-h-[300px] md:min-h-[340px]">
+        {/* Reserve the slider's footprint on desktop so the 3-up cards popping
+            in after the client-side shuffle don't shift the layout. On mobile
+            the single card sizes to its own content — no fixed floor — so short
+            quotes never leave a dead-zone of white space. */}
+        <div className="md:min-h-[340px]">
           {ready && (
             <>
               {/* ── Desktop: 3-up grid with hidden arrows ── */}
@@ -219,7 +221,7 @@ export default function TestimonialSection({
         </div>
 
         {/* Write Your Own */}
-        <div className="mt-10 md:mt-16 text-center">
+        <div className="mt-8 md:mt-16 text-center">
           <button
             onClick={() => setModalOpen(true)}
             className="font-label tracking-[0.15em] text-[11px] uppercase px-8 py-3 border border-on-surface/20 text-on-surface hover:bg-on-surface hover:text-surface transition-all duration-300"

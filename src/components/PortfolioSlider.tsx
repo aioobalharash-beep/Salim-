@@ -390,7 +390,7 @@ function PortfolioBlock({
   };
 
   return (
-    <div className="mb-24 last:mb-0 md:mb-32">
+    <div className="mb-16 last:mb-0 md:mb-32">
       {/* Section heading */}
       <div className="mb-10 md:mb-14">
         <h3 className="font-headline text-2xl sm:text-3xl md:text-4xl font-light mb-4">
@@ -500,7 +500,7 @@ export default function PortfolioSlider({ items }: { items: PortfolioItem[] }) {
   const events = useMemo(() => all.filter((i) => i.type === "event"), [all]);
 
   return (
-    <section className="py-20 md:py-28 px-6 md:px-8 lg:px-12 max-w-[1600px] mx-auto">
+    <section className="py-12 md:py-28 px-6 md:px-8 lg:px-12 max-w-[1600px] mx-auto">
       {/* Two completely independent, vertically stacked sections. */}
       <PortfolioBlock title="Latest Work" items={works} useSeed={useSeed} />
       <PortfolioBlock title="Events" items={events} useSeed={useSeed} />

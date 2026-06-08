@@ -22,7 +22,7 @@ export default function InquiryForm() {
   return (
     <section
       id="enquiry-section"
-      className="py-20 md:py-32 px-6 md:px-12 max-w-screen-2xl mx-auto"
+      className="py-12 md:py-32 px-6 md:px-12 max-w-screen-2xl mx-auto"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24">
         {/* Left Column — Info */}
