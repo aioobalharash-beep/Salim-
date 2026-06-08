@@ -104,11 +104,6 @@ export const aboutQuery = groq`
     shortIntro,
     pullQuote,
     timelineTitle,
-    chronology[] {
-      year,
-      title,
-      description
-    },
     seo{
       ${seoProjection}
     }

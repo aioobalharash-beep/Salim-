@@ -30,12 +30,6 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-interface ChronologyItem {
-  year: string;
-  title: string;
-  description?: string;
-}
-
 interface AboutData {
   profileImage?: SanityImageSource & { alt?: string };
   imageCaption?: string;
@@ -47,7 +41,6 @@ interface AboutData {
   shortIntro?: string;
   pullQuote?: string;
   timelineTitle?: string;
-  chronology?: ChronologyItem[];
   seo?: SeoSettings | null;
 }
 
@@ -64,26 +57,6 @@ const seed = {
   ],
   pullQuote:
     "The baton does not just direct the orchestra; it directs the memory of a people back into the present air.",
-  chronology: [
-    {
-      year: "2012",
-      title: "Orchestre Symphonique National",
-      description:
-        "Appointed as Resident Composer, premiering \u2018The Symphony of Sand\u2019 to international acclaim.",
-    },
-    {
-      year: "2018",
-      title: "UNESCO ICH Expert",
-      description:
-        "Formal induction into the International Committee for the Safeguarding of Intangible Cultural Heritage.",
-    },
-    {
-      year: "2023",
-      title: "Global Merit Award",
-      description:
-        "Recognition for a lifetime of work bridging musical diplomacy and archival science across three continents.",
-    },
-  ],
 };
 
 // Shared PortableText components — scholarly serif typography matching Articles
@@ -194,10 +167,6 @@ export default async function AboutPage() {
   const hasSanityImage = !!about?.profileImage;
   const hasSanityBio = (about?.bio?.length ?? 0) > 0;
   const hasSanityMainBio = (about?.mainBio?.length ?? 0) > 0;
-  const chronology =
-    about?.chronology && about.chronology.length > 0
-      ? about.chronology
-      : seed.chronology;
 
   return (
     <div className="pt-32 pb-24">
@@ -313,7 +282,7 @@ export default async function AboutPage() {
           </h2>
         </div>
 
-        <Timeline fallback={chronology} />
+        <Timeline />
       </section>
     </div>
   );

@@ -14,42 +14,12 @@ interface YearBlock {
   milestones: Milestone[];
 }
 
-/* Legacy shape: the flat chronology array still embedded on the About
- * document. Used as a graceful fallback until content is migrated to the
- * dedicated `timeline` documents. */
-export interface LegacyEntry {
-  year: string;
-  title: string;
-  description?: string;
-}
-
 async function getTimeline(): Promise<YearBlock[]> {
   try {
     return (await client.fetch<YearBlock[]>(timelineQuery)) ?? [];
   } catch {
     return [];
   }
-}
-
-/* Collapse the flat legacy entries into the nested year→milestones model so
- * the same single-stem layout renders regardless of the data source. */
-function groupLegacy(entries: LegacyEntry[]): YearBlock[] {
-  const byYear = new Map<string, YearBlock>();
-  for (const entry of entries) {
-    const key = entry.year;
-    if (!byYear.has(key)) {
-      byYear.set(key, {
-        _id: key,
-        year: parseInt(key, 10) || 0,
-        milestones: [],
-      });
-    }
-    byYear.get(key)!.milestones.push({
-      title: entry.title,
-      description: entry.description,
-    });
-  }
-  return Array.from(byYear.values()).sort((a, b) => a.year - b.year);
 }
 
 function MilestoneItem({
@@ -78,13 +48,8 @@ function MilestoneItem({
   );
 }
 
-export default async function Timeline({
-  fallback = [],
-}: {
-  fallback?: LegacyEntry[];
-}) {
-  const fetched = await getTimeline();
-  const blocks = fetched.length > 0 ? fetched : groupLegacy(fallback);
+export default async function Timeline() {
+  const blocks = await getTimeline();
 
   if (blocks.length === 0) return null;
 
