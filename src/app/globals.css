@@ -440,16 +440,20 @@ textarea:focus {
 }
 .editorial blockquote.pullquote p {
   font-family: "EB Garamond", Georgia, serif;
-  font-size: 1.5rem;
+  font-size: 1.125rem;
   font-style: italic;
   color: var(--ed-deep);
   line-height: 1.5;
   margin: 0;
 }
+@media (min-width: 640px) {
+  .editorial blockquote.pullquote p {
+    font-size: 1.5rem;
+  }
+}
 .editorial blockquote.pullquote footer {
   font-family: "Outfit", system-ui, sans-serif;
   font-size: 0.7rem;
-  text-transform: uppercase;
   letter-spacing: 0.14em;
   color: var(--ed-warm-grey);
   margin-top: 0.8rem;

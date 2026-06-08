@@ -6,6 +6,7 @@ import { aboutQuery, catalogueListQuery } from "@/sanity/queries";
 import { urlFor, type SanityImageSource } from "@/sanity/image";
 import { buildMetadata, type SeoSettings } from "@/sanity/seo";
 import type { CatalogueWork } from "@/components/CatalogueFilter";
+import Timeline from "@/components/Timeline";
 
 export const revalidate = 60;
 
@@ -242,7 +243,7 @@ export default async function AboutPage() {
               </div>
               <div className="mt-8 flex items-center gap-4">
                 <div className="h-[1px] w-12 bg-outline-variant/30" />
-                <span className="font-label text-[10px] uppercase tracking-widest text-primary">
+                <span className="font-label text-[10px] tracking-widest text-primary">
                   {imageCaption}
                 </span>
               </div>
@@ -312,94 +313,7 @@ export default async function AboutPage() {
           </h2>
         </div>
 
-        <div className="relative max-w-5xl mx-auto">
-          {/* Central vertical line — Bronze (var(--accent)) at 40% for clear visibility on Ivory */}
-          <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-primary/40 md:-translate-x-px" />
-
-          <div className="space-y-0">
-            {chronology.map((item, i) => {
-              const isLeft = i % 2 === 0;
-              return (
-                <div
-                  key={`${item.year}-${i}`}
-                  className="relative grid grid-cols-1 md:grid-cols-2"
-                >
-                  {/* ── Dot on the centre line — vertically centered with the Year text ── */}
-                  <div className="absolute left-4 md:left-1/2 top-[14px] md:top-[18px] w-[7px] h-[7px] -translate-x-[3px] md:-translate-x-[3.5px] rounded-full bg-primary ring-[3px] ring-background z-10" />
-
-                  {/* ── LEFT column ── */}
-                  <div
-                    className={`pl-12 md:pl-0 ${
-                      isLeft
-                        ? "md:pr-16 md:text-right"
-                        : "md:pr-16 md:text-right md:order-1"
-                    } pb-5 md:pb-7`}
-                  >
-                    {isLeft ? (
-                      <>
-                        <span className="font-serif-brand font-bold text-2xl md:text-3xl text-primary block leading-none mb-2">
-                          {item.year}
-                        </span>
-                        <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-2">
-                          {item.title}
-                        </h4>
-                        {item.description && (
-                          <p className="font-body text-sm leading-relaxed text-on-surface-variant/60 max-w-sm md:ml-auto">
-                            {item.description}
-                          </p>
-                        )}
-                      </>
-                    ) : (
-                      <div className="hidden md:block" />
-                    )}
-                  </div>
-
-                  {/* ── RIGHT column ── */}
-                  <div
-                    className={`hidden md:block ${
-                      isLeft
-                        ? "md:pl-16"
-                        : "md:pl-16 md:order-2"
-                    } pb-7`}
-                  >
-                    {!isLeft && (
-                      <>
-                        <span className="font-serif-brand font-bold text-2xl md:text-3xl text-primary block leading-none mb-2">
-                          {item.year}
-                        </span>
-                        <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-2">
-                          {item.title}
-                        </h4>
-                        {item.description && (
-                          <p className="font-body text-sm leading-relaxed text-on-surface-variant/60 max-w-sm">
-                            {item.description}
-                          </p>
-                        )}
-                      </>
-                    )}
-                  </div>
-
-                  {/* ── Mobile: right-side items render in left col ── */}
-                  {!isLeft && (
-                    <div className="md:hidden pl-12 pb-5">
-                      <span className="font-serif-brand font-bold text-2xl text-primary block leading-none mb-2">
-                        {item.year}
-                      </span>
-                      <h4 className="font-label text-[10px] uppercase tracking-[0.25em] text-on-surface font-medium mb-2">
-                        {item.title}
-                      </h4>
-                      {item.description && (
-                        <p className="font-body text-sm leading-relaxed text-on-surface-variant/60 max-w-sm">
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <Timeline fallback={chronology} />
       </section>
     </div>
   );

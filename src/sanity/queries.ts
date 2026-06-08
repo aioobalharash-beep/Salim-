@@ -272,6 +272,18 @@ export const projectBySlugQuery = groq`
   }
 `;
 
+export const timelineQuery = groq`
+  *[_type == "timeline" && defined(year)] | order(year asc) {
+    _id,
+    year,
+    milestones[]{
+      title,
+      description,
+      location
+    }
+  }
+`;
+
 export const legalQuery = groq`
   *[_type == "legal"][0] {
     title,
