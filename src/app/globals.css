@@ -573,9 +573,21 @@ textarea:focus {
   border-color: transparent transparent transparent #fff;
   margin-left: 4px;
 }
-.editorial figure.ed-figure iframe {
+/* Wrap the iframe in a sized, positioned box so the embedded player always
+ * gets a concrete height. Relying on aspect-ratio alone on the <iframe> lets
+ * the player collapse to a blank box on mobile Safari. */
+.editorial figure.ed-figure .ed-youtube-frame {
+  position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
+  background: #000;
+  overflow: hidden;
+}
+.editorial figure.ed-figure .ed-youtube-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   border: 0;
   display: block;
 }
