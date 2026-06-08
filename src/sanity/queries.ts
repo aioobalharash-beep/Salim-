@@ -104,11 +104,6 @@ export const aboutQuery = groq`
     shortIntro,
     pullQuote,
     timelineTitle,
-    chronology[] {
-      year,
-      title,
-      description
-    },
     seo{
       ${seoProjection}
     }
@@ -268,6 +263,18 @@ export const projectBySlugQuery = groq`
     },
     seo{
       ${seoProjection}
+    }
+  }
+`;
+
+export const timelineQuery = groq`
+  *[_type == "timeline" && defined(year)] | order(year asc) {
+    _id,
+    year,
+    milestones[]{
+      title,
+      description,
+      location
     }
   }
 `;
