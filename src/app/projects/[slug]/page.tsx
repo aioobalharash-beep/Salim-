@@ -307,26 +307,36 @@ export default async function ProjectPage({
               return (
                 <div
                   key={item._key}
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center"
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start"
                 >
-                  {/* Content — below media on mobile, left on desktop.
-                      When there is no title the description sits at the top
-                      and fills the space on its own. */}
+                  {/* Content — below media on mobile, left on desktop. Both
+                      columns share the same top horizon (items-start). When
+                      there is no title, an editorial dash anchors the
+                      description so it reads as an intentional caption. */}
                   <div
                     className={`order-2 lg:order-1 ${
                       hasText ? "" : "hidden lg:block"
                     }`}
                   >
-                    {item.title && (
-                      <h2 className="font-headline font-light text-3xl md:text-4xl leading-tight text-foreground mb-5">
-                        {item.title}
-                      </h2>
-                    )}
-                    {item.description && (
-                      <p className="font-body text-base leading-relaxed text-foreground/60 whitespace-pre-line">
-                        {item.description}
-                      </p>
-                    )}
+                    <div className="max-w-xl">
+                      {item.title ? (
+                        <h2 className="font-headline font-light text-3xl md:text-4xl leading-tight text-foreground mb-5">
+                          {item.title}
+                        </h2>
+                      ) : (
+                        item.description && (
+                          <div
+                            className="w-6 h-[1px] bg-foreground/20 mt-2 mb-4"
+                            aria-hidden="true"
+                          />
+                        )
+                      )}
+                      {item.description && (
+                        <p className="font-body text-base leading-relaxed text-foreground/60 whitespace-pre-line">
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
                   </div>
 
                   {/* Media — above text on mobile, right on desktop. */}
@@ -339,18 +349,17 @@ export default async function ProjectPage({
           </section>
         )}
 
-        {/* ── Project Footer ── */}
-        {hasFooterText && (
-          <section className="mt-20 md:mt-28 pt-10 border-t border-foreground/[0.08] max-w-3xl">
-            <PortableText
-              value={project.footerText!}
-              components={footerComponents}
-            />
-          </section>
-        )}
-
-        {/* ── Back link ── */}
-        <footer className="mt-20 pt-10 border-t border-foreground/[0.08]">
+        {/* ── Closing block: footer notes + back link, anchored together
+              under a single divider so they read as definitive end matter. ── */}
+        <footer className="mt-20 md:mt-28 pt-10 border-t border-foreground/[0.08]">
+          {hasFooterText && (
+            <div className="max-w-xl mb-10 md:mb-12">
+              <PortableText
+                value={project.footerText!}
+                components={footerComponents}
+              />
+            </div>
+          )}
           <Link
             href="/projects"
             className="inline-flex items-center font-label text-[10px] uppercase tracking-[0.22em] text-foreground/45 hover:text-foreground transition-colors"

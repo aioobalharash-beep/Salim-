@@ -58,16 +58,16 @@ export default function ProjectContactBar({
   return (
     <>
       {/* ── Full-width, high-contrast contact bar ── */}
-      <section className="w-full py-6 px-8 flex flex-col sm:flex-row gap-4 sm:gap-6 justify-between items-center bg-on-surface text-surface">
+      <section className="w-full py-8 px-8 md:px-12 flex flex-col sm:flex-row gap-5 sm:gap-6 justify-between items-center bg-on-surface text-surface">
         {text && (
-          <p className="font-headline text-lg md:text-xl font-light leading-snug text-surface text-center sm:text-left">
+          <p className="font-headline text-lg md:text-xl font-light leading-snug tracking-wide text-surface text-center sm:text-left">
             {text}
           </p>
         )}
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="shrink-0 inline-flex items-center justify-center px-8 py-3 border border-surface/30 text-surface font-label text-[11px] lowercase tracking-[0.25em] hover:bg-surface hover:text-on-surface transition-colors duration-300"
+          className="shrink-0 inline-flex items-center justify-center px-10 py-3.5 border border-surface/40 text-surface font-label text-[11px] lowercase tracking-[0.25em] hover:bg-surface hover:text-on-surface hover:border-surface transition-colors duration-300"
         >
           {label}
         </button>
