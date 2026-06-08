@@ -386,14 +386,15 @@ function YouTubeEmbed({ value }: { value: YouTubeBlock }) {
   return (
     <figure className={`ed-figure ${size}`}>
       {mode === "iframe" ? (
-        <iframe
-          src={iframeSrc}
-          title={captionText || "YouTube video"}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          loading="eager"
-          style={{ backgroundColor: "#F4F1EA" }}
-        />
+        <div className="ed-youtube-frame">
+          <iframe
+            src={iframeSrc}
+            title={captionText || "YouTube video"}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            loading="eager"
+          />
+        </div>
       ) : (
         <a
           className="ed-youtube"
@@ -404,7 +405,7 @@ function YouTubeEmbed({ value }: { value: YouTubeBlock }) {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={`https://i.ytimg.com/vi/${id}/maxresdefault.jpg`}
+            src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`}
             alt={captionText || "YouTube thumbnail"}
             loading="eager"
           />
