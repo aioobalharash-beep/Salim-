@@ -32,16 +32,16 @@ function MilestoneItem({
 }) {
   return (
     <div className={`max-w-md ${alignRight ? "md:ml-auto" : ""}`}>
-      <h4 className="font-headline text-lg md:text-xl leading-snug text-on-surface mb-1.5">
+      <h4 className="font-headline text-lg md:text-xl font-medium leading-snug text-on-surface mb-1">
         {milestone.title}
       </h4>
       {milestone.location && (
-        <p className="font-label text-xs md:text-sm tracking-[0.08em] text-primary/70 mb-2">
+        <p className="font-label text-[11px] uppercase tracking-[0.2em] text-primary/60 mb-3">
           {milestone.location}
         </p>
       )}
       {milestone.description && (
-        <p className="font-body text-base md:text-[17px] leading-relaxed text-on-surface-variant/70 whitespace-pre-line">
+        <p className="font-body text-sm md:text-base leading-relaxed text-on-surface-variant/55 whitespace-pre-line">
           {milestone.description}
         </p>
       )}
