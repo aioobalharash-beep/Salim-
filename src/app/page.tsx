@@ -1,6 +1,7 @@
 import Hero from "@/components/Hero";
 import PortfolioSlider from "@/components/PortfolioSlider";
 import Services from "@/components/Services";
+import ConsultationSection from "@/components/ConsultationSection";
 import TestimonialSection from "@/components/TestimonialSection";
 import InquiryForm from "@/components/InquiryForm";
 import { client } from "@/sanity/client";
@@ -24,6 +25,7 @@ export default async function HomePage() {
     <>
       <Hero />
       <PortfolioSlider items={portfolio ?? []} />
+      <ConsultationSection />
       <Services items={services ?? []} />
       <TestimonialSection items={testimonials ?? []} />
       <InquiryForm />
