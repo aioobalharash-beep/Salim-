@@ -6,23 +6,20 @@ export default defineType({
   type: "document",
   icon: () => "🪧",
   description:
-    "Each document is a single chronological YEAR on the About-page timeline. Stack every milestone that happened in that year inside the Milestones array — the stem renders one year indicator with all of its milestones grouped beneath it.",
+    "Each document is a single chronological entry on the About-page timeline. Stack every milestone that happened in that period inside the Milestones array — the stem renders one date indicator with all of its milestones grouped beneath it.",
   fields: [
     defineField({
       name: "year",
-      title: "Year",
-      type: "number",
+      title: "Year / Period",
+      type: "string",
       description:
-        "The unique year for this block (e.g., 2026). Used to sort the stem chronologically.",
+        "Flexible date header — a single year (\"1975\"), a range (\"2025-2026\"), or an ongoing status (\"2026 - present\"). Start the value with the 4-digit start year so the timeline sorts chronologically.",
       validation: (Rule) =>
         Rule.required()
-          .integer()
-          .min(1900)
-          .max(2100)
-          // Enforce one document per year so the stem never renders duplicate
-          // year circles.
+          // Enforce one document per period so the stem never renders duplicate
+          // date circles.
           .custom(async (year, context) => {
-            if (year === undefined || year === null) return true;
+            if (!year) return true;
             const { document, getClient } = context;
             const client = getClient({ apiVersion: "2024-01-01" });
             const id = (document?._id || "").replace(/^drafts\./, "");
@@ -34,7 +31,9 @@ export default defineType({
                 published: id,
               },
             );
-            return isUnique ? true : "Another timeline block already uses this year.";
+            return isUnique
+              ? true
+              : "Another timeline block already uses this period.";
           }),
     }),
     defineField({
