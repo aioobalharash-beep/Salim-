@@ -76,12 +76,12 @@ export default function ConsultationSection() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="relative max-w-3xl w-full h-auto max-h-[90vh] bg-[#faf8f5] flex flex-col rounded-sm overflow-hidden shadow-2xl"
+              className="relative max-w-4xl w-full h-auto max-h-[90vh] bg-[#faf8f5] flex flex-col rounded-sm overflow-hidden shadow-2xl p-8 md:p-12"
             >
               <button
                 onClick={() => setIsOpen(false)}
                 aria-label="Close"
-                className="absolute top-4 right-4 z-30 w-9 h-9 flex items-center justify-center text-on-surface-variant/60 hover:text-on-surface transition-colors bg-surface/80 backdrop-blur-sm rounded-full"
+                className="absolute top-6 right-6 md:top-8 md:right-8 z-30 w-9 h-9 flex items-center justify-center text-on-surface-variant/60 hover:text-on-surface transition-colors bg-surface/80 backdrop-blur-sm rounded-full"
               >
                 <span className="material-symbols-outlined text-xl">close</span>
               </button>
@@ -90,7 +90,7 @@ export default function ConsultationSection() {
                 src="https://tally.so/embed/dWz4jo?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
                 title="Free 15-Minute Written Work Consultation"
                 loading="eager"
-                className="w-full h-[620px] md:h-[650px] border-0 overflow-y-auto bg-transparent"
+                className="w-full h-[680px] md:h-[720px] border-0 overflow-y-auto bg-transparent"
               />
             </motion.div>
           </motion.div>
