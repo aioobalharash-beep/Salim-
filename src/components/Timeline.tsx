@@ -41,7 +41,7 @@ function MilestoneItem({
         </p>
       )}
       {milestone.description && (
-        <p className="font-body text-base md:text-[17px] leading-relaxed text-on-surface-variant/70">
+        <p className="font-body text-base md:text-[17px] leading-relaxed text-on-surface-variant/70 whitespace-pre-line">
           {milestone.description}
         </p>
       )}
