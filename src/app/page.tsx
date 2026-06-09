@@ -25,8 +25,8 @@ export default async function HomePage() {
     <>
       <Hero />
       <PortfolioSlider items={portfolio ?? []} />
-      <ConsultationSection />
       <Services items={services ?? []} />
+      <ConsultationSection />
       <TestimonialSection items={testimonials ?? []} />
       <InquiryForm />
     </>
