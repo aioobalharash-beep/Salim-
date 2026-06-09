@@ -26,14 +26,14 @@ export default function ConsultationSection() {
   }, [isOpen]);
 
   return (
-    <section className="max-w-6xl mx-auto px-4 md:px-8 py-12 md:py-16">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
-        {/* Left — compact typography hierarchy. */}
+    <section className="max-w-screen-2xl mx-auto px-6 md:px-12 py-16 md:py-24">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-8">
+        {/* Left — bold typography hierarchy aligned to the site grid. */}
         <div className="max-w-2xl">
-          <h2 className="font-serif-brand text-2xl font-light text-on-surface">
+          <h2 className="font-serif-brand text-3xl md:text-4xl lg:text-5xl tracking-tight font-light text-on-surface mb-4">
             Free 15-Minute Written Work Consultation
           </h2>
-          <p className="font-body text-sm leading-relaxed text-on-surface-variant mt-3">
+          <p className="font-body text-base md:text-lg leading-relaxed text-on-surface-variant max-w-2xl">
             Submit your emerging compositions, scores, or project details for a
             direct professional review and live strategic breakdown with Salim
             Dada.
@@ -45,7 +45,7 @@ export default function ConsultationSection() {
           <button
             type="button"
             onClick={() => setIsOpen(true)}
-            className="font-label text-[11px] uppercase tracking-[0.15em] px-6 py-2.5 border border-on-surface/20 text-on-surface hover:bg-on-surface hover:text-surface transition-all duration-300"
+            className="font-label text-xs lg:text-sm uppercase tracking-widest px-8 py-3.5 border border-on-surface/20 text-on-surface hover:bg-on-surface hover:text-surface transition-all duration-300"
           >
             Book Consultation
           </button>
@@ -76,7 +76,7 @@ export default function ConsultationSection() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="relative w-full max-w-2xl bg-surface shadow-card p-4 md:p-6"
+              className="relative max-w-3xl w-full h-auto max-h-[90vh] bg-[#faf8f5] flex flex-col rounded-sm overflow-hidden shadow-2xl"
             >
               <button
                 onClick={() => setIsOpen(false)}
@@ -90,7 +90,7 @@ export default function ConsultationSection() {
                 src="https://tally.so/embed/dWz4jo?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
                 title="Free 15-Minute Written Work Consultation"
                 loading="eager"
-                className="w-full h-[80vh] border-0"
+                className="w-full h-[620px] md:h-[650px] border-0 overflow-y-auto bg-transparent"
               />
             </motion.div>
           </motion.div>
