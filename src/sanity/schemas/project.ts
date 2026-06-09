@@ -120,6 +120,63 @@ export default defineType({
             },
           },
         }),
+        /* — Image Gallery (Slider) — */
+        defineArrayMember({
+          type: "object",
+          name: "imageGroup",
+          title: "Image Gallery (Slider)",
+          description:
+            "A set of images for one row. A single image renders as a static uncropped block; multiple images render as an interactive carousel with a thumbnail track.",
+          fields: [
+            defineField({
+              name: "images",
+              title: "Images",
+              type: "array",
+              of: [
+                {
+                  type: "image",
+                  options: { hotspot: true },
+                  fields: [
+                    defineField({
+                      name: "alt",
+                      title: "Alt text",
+                      type: "string",
+                      description:
+                        "Short description of the image for accessibility and SEO.",
+                    }),
+                  ],
+                },
+              ],
+              validation: (Rule) => Rule.required().min(1),
+            }),
+            defineField({
+              name: "title",
+              title: "Title",
+              type: "string",
+            }),
+            defineField({
+              name: "description",
+              title: "Description",
+              type: "text",
+              rows: 4,
+            }),
+          ],
+          preview: {
+            select: {
+              title: "title",
+              images: "images",
+              media: "images.0",
+            },
+            prepare({ title, images, media }) {
+              const n = Array.isArray(images) ? images.length : 0;
+              return {
+                title: title || "Image Gallery",
+                subtitle: `${n} image${n === 1 ? "" : "s"}`,
+                media,
+              };
+            },
+          },
+        }),
         /* — YouTube Video — */
         defineArrayMember({
           type: "object",

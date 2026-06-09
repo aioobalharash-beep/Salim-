@@ -9,6 +9,7 @@ import { urlFor, type SanityImageSource } from "@/sanity/image";
 import { projectBySlugQuery } from "@/sanity/queries";
 import { buildMetadata, type SeoSettings } from "@/sanity/seo";
 import ProjectContactBar from "@/components/ProjectContactBar";
+import ProjectImageSlider from "@/components/ProjectImageSlider";
 
 export const revalidate = 60;
 
@@ -30,6 +31,13 @@ interface ProjectDetail {
  * left column. */
 type GalleryItem =
   | ({ _key: string; _type: "galleryImage" } & ProjectImage)
+  | {
+      _key: string;
+      _type: "imageGroup";
+      images: ProjectImage[] | null;
+      title?: string | null;
+      description?: string | null;
+    }
   | {
       _key: string;
       _type: "youtube";
@@ -177,6 +185,23 @@ function GalleryMedia({
         src={item.videoUrl}
       />
     );
+  }
+
+  if (item._type === "imageGroup") {
+    const imgs = (item.images ?? []).filter(Boolean);
+    if (imgs.length === 0) return null;
+    // A single image keeps the static, uncropped display intact.
+    if (imgs.length === 1) {
+      return (
+        <GalleryImage
+          image={imgs[0]}
+          priority={priority}
+          sizes="(max-width: 1024px) 100vw, 50vw"
+        />
+      );
+    }
+    // Multiple images become an interactive carousel with a thumbnail track.
+    return <ProjectImageSlider images={imgs} />;
   }
 
   return (

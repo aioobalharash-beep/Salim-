@@ -10,7 +10,8 @@ interface Milestone {
 
 interface YearBlock {
   _id: string;
-  year: number;
+  /** Flexible date header: "1975", "2025-2026", or "2026 - present". */
+  year: string;
   milestones: Milestone[];
 }
 
@@ -30,17 +31,17 @@ function MilestoneItem({
   alignRight: boolean;
 }) {
   return (
-    <div className={`max-w-sm ${alignRight ? "md:ml-auto" : ""}`}>
-      <h4 className="font-headline text-base md:text-lg leading-snug text-on-surface mb-1">
+    <div className={`max-w-md ${alignRight ? "md:ml-auto" : ""}`}>
+      <h4 className="font-headline text-lg md:text-xl leading-snug text-on-surface mb-1.5">
         {milestone.title}
       </h4>
       {milestone.location && (
-        <p className="font-label text-[10px] tracking-[0.18em] text-primary/60 mb-1.5">
+        <p className="font-label text-xs md:text-sm tracking-[0.08em] text-primary/70 mb-2">
           {milestone.location}
         </p>
       )}
       {milestone.description && (
-        <p className="font-body text-sm leading-relaxed text-on-surface-variant/60">
+        <p className="font-body text-base md:text-[17px] leading-relaxed text-on-surface-variant/70">
           {milestone.description}
         </p>
       )}
@@ -71,18 +72,18 @@ export default async function Timeline() {
 
               {/* ── Single year block — alternates sides on desktop ── */}
               <div
-                className={`pl-12 md:pl-0 pb-10 md:pb-14 ${
+                className={`pl-12 md:pl-0 pb-8 md:pb-10 ${
                   isLeft
                     ? "md:pr-16 md:text-right"
                     : "md:col-start-2 md:pl-16 md:text-left"
                 }`}
               >
-                <span className="font-serif-brand font-bold text-2xl md:text-3xl text-primary block leading-none mb-5">
+                <span className="font-serif-brand font-bold text-2xl md:text-3xl text-primary block leading-none mb-3 md:mb-4">
                   {block.year}
                 </span>
 
                 {/* Stack every milestone inside this single chronological bracket */}
-                <div className="space-y-6">
+                <div className="space-y-4 md:space-y-5">
                   {block.milestones.map((milestone, j) => (
                     <MilestoneItem
                       key={j}

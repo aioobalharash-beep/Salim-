@@ -262,6 +262,16 @@ export const projectBySlugQuery = groq`
         "dimensions": asset->metadata.dimensions,
         asset
       },
+      _type == "imageGroup" => {
+        title,
+        description,
+        images[]{
+          ...,
+          "alt": coalesce(alt, asset->altText, ""),
+          "dimensions": asset->metadata.dimensions,
+          asset
+        }
+      },
       _type == "youtube" => {
         url,
         startTime,
@@ -288,6 +298,10 @@ export const projectBySlugQuery = groq`
   }
 `;
 
+// Chronological order: OLDEST at the top → most RECENT at the bottom.
+// `year` is a string ("1975", "2025-2026", "2026 - present"); because every
+// value starts with its 4-digit start year, a lexicographic ascending sort
+// resolves to true chronological order.
 export const timelineQuery = groq`
   *[_type == "timeline" && defined(year)] | order(year asc) {
     _id,

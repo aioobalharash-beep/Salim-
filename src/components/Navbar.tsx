@@ -13,13 +13,13 @@ const mediaSubLinks = [
 
 const links = [
   { href: "/", label: "Home" },
-  { href: "/projects", label: "Projects" },
   { href: "/catalogue", label: "Catalogue" },
+  { href: "/media", label: "Media", children: mediaSubLinks },
+  { href: "/projects", label: "Projects" },
+  { href: "/articles", label: "Articles" },
   { href: "/shop", label: "Shop" },
   // Temporarily hidden — re-enable when ready to launch publicly.
   // { href: "/training", label: "Training" },
-  { href: "/media", label: "Media", children: mediaSubLinks },
-  { href: "/articles", label: "Articles" },
   { href: "/about", label: "About Dada" },
 ];
 
