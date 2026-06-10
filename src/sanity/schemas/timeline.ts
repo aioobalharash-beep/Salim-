@@ -59,10 +59,23 @@ export default defineType({
             defineField({
               name: "description",
               title: "Description",
-              type: "text",
-              rows: 3,
+              type: "array",
+              of: [
+                {
+                  type: "block",
+                  styles: [{ title: "Normal", value: "normal" }],
+                  lists: [{ title: "Bullet", value: "bullet" }],
+                  marks: {
+                    decorators: [
+                      { title: "Italic", value: "em" },
+                      { title: "Bold", value: "strong" },
+                    ],
+                    annotations: [],
+                  },
+                },
+              ],
               description:
-                "Short descriptive summary, e.g. 'Integration of the EU/UNESCO Expert Facility…'.",
+                "Short descriptive summary. Supports italics, bold and bullet lists, e.g. 'Integration of the EU/UNESCO Expert Facility…'.",
             }),
             defineField({
               name: "location",

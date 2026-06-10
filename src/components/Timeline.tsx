@@ -1,10 +1,13 @@
+import { PortableText, type PortableTextBlock } from "next-sanity";
+import type { PortableTextComponents } from "@portabletext/react";
 import { client } from "@/sanity/client";
 import { timelineQuery } from "@/sanity/queries";
 
 /* ── Types — mirror src/sanity/schemas/timeline.ts ─────────────────── */
 interface Milestone {
   title: string;
-  description?: string | null;
+  /** Rich text (Portable Text); legacy entries may still be a plain string. */
+  description?: string | PortableTextBlock[] | null;
   location?: string | null;
 }
 
@@ -23,6 +26,36 @@ async function getTimeline(): Promise<YearBlock[]> {
   }
 }
 
+/* Portable Text serializers — keep the clean muted hierarchy and render
+ * studio italics/bold/bullets with standard browser formatting. */
+const descriptionComponents: PortableTextComponents = {
+  block: {
+    normal: ({ children }) => (
+      <p className="font-body text-sm md:text-base text-on-surface-variant/55 leading-relaxed mb-2 last:mb-0">
+        {children}
+      </p>
+    ),
+  },
+  list: {
+    bullet: ({ children }) => (
+      <ul className="list-disc pl-5 space-y-1 text-sm md:text-base text-on-surface-variant/55 leading-relaxed mb-2 last:mb-0">
+        {children}
+      </ul>
+    ),
+  },
+  listItem: {
+    bullet: ({ children }) => <li>{children}</li>,
+  },
+  marks: {
+    em: ({ children }) => <em className="italic">{children}</em>,
+    strong: ({ children }) => (
+      <strong className="font-medium text-on-surface-variant/75">
+        {children}
+      </strong>
+    ),
+  },
+};
+
 function MilestoneItem({
   milestone,
   alignRight,
@@ -30,21 +63,26 @@ function MilestoneItem({
   milestone: Milestone;
   alignRight: boolean;
 }) {
+  const { description } = milestone;
   return (
     <div className={`max-w-md ${alignRight ? "md:ml-auto" : ""}`}>
       <h4 className="font-headline text-lg md:text-xl font-medium leading-snug text-on-surface mb-1">
         {milestone.title}
       </h4>
       {milestone.location && (
-        <p className="font-label text-[11px] uppercase tracking-[0.2em] text-primary/60 mb-3">
+        <p className="font-label text-xs md:text-sm normal-case text-primary/60 mb-3">
           {milestone.location}
         </p>
       )}
-      {milestone.description && (
-        <p className="font-body text-sm md:text-base leading-relaxed text-on-surface-variant/55 whitespace-pre-line">
-          {milestone.description}
+      {/* Rich text when present; legacy plain strings fall back to a
+          newline-preserving paragraph so nothing breaks pre-migration. */}
+      {Array.isArray(description) ? (
+        <PortableText value={description} components={descriptionComponents} />
+      ) : description ? (
+        <p className="font-body text-sm md:text-base text-on-surface-variant/55 leading-relaxed whitespace-pre-line">
+          {description}
         </p>
-      )}
+      ) : null}
     </div>
   );
 }
