@@ -110,6 +110,15 @@ function getYouTubeId(url: string): string | null {
   return null;
 }
 
+/* A Sanity image is only renderable once an asset has actually been uploaded.
+ * urlFor() throws on a sourceless image, which would crash the whole server
+ * render — so guard every image path against empty/partial blocks. */
+function hasAsset(img?: ProjectImage | null): img is ProjectImage {
+  const asset = (img as { asset?: { _ref?: string; _id?: string } } | null)
+    ?.asset;
+  return !!(asset && (asset._ref || asset._id));
+}
+
 /* ── Single uncropped gallery image ────────────────────────────────── */
 function GalleryImage({
   image,
@@ -120,6 +129,8 @@ function GalleryImage({
   sizes: string;
   priority?: boolean;
 }) {
+  if (!hasAsset(image)) return null;
+
   const dims = image.dimensions;
   const renderedWidth = 1600;
   const renderedHeight = dims
@@ -188,7 +199,8 @@ function GalleryMedia({
   }
 
   if (item._type === "imageGroup") {
-    const imgs = (item.images ?? []).filter(Boolean);
+    // Drop any empty image blocks so a half-filled gallery can't crash render.
+    const imgs = (item.images ?? []).filter(hasAsset);
     if (imgs.length === 0) return null;
     // A single image keeps the static, uncropped display intact.
     if (imgs.length === 1) {

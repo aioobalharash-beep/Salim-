@@ -10,17 +10,26 @@ export type SliderImage = SanityImageSource & {
   dimensions?: { width: number; height: number; aspectRatio: number };
 };
 
+function hasAsset(img?: SliderImage | null): img is SliderImage {
+  const asset = (img as { asset?: { _ref?: string; _id?: string } } | null)
+    ?.asset;
+  return !!(asset && (asset._ref || asset._id));
+}
+
 export default function ProjectImageSlider({
-  images,
+  images: rawImages,
 }: {
   images: SliderImage[];
 }) {
+  const images = (rawImages ?? []).filter(hasAsset);
   const [active, setActive] = useState(0);
   const count = images.length;
-  const safe = Math.min(active, count - 1);
+  const safe = Math.min(active, Math.max(0, count - 1));
   const current = images[safe];
 
   const go = (dir: number) => setActive((a) => (a + dir + count) % count);
+
+  if (count === 0 || !current) return null;
 
   return (
     <div className="w-full">
