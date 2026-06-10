@@ -26,6 +26,12 @@ export interface ProjectListItem {
 /* ── Single project card ─────────────────────────────────────────── */
 function ProjectCard({ project }: { project: ProjectListItem }) {
   const cover = project.coverImage;
+  // urlFor() throws on an image with no uploaded asset; only render once one
+  // actually exists, otherwise fall back to the placeholder block.
+  const coverAsset = (
+    cover as { asset?: { _ref?: string; _id?: string } } | null
+  )?.asset;
+  const coverReady = !!(coverAsset && (coverAsset._ref || coverAsset._id));
   const dims = cover?.dimensions;
   const renderedWidth = 1200;
   const renderedHeight = dims
@@ -41,7 +47,7 @@ function ProjectCard({ project }: { project: ProjectListItem }) {
       <Link href={`/projects/${project.slug}`} className="group block">
         {/* Image container — transparent bg, artwork never cropped */}
         <div className="overflow-hidden bg-transparent">
-          {cover ? (
+          {cover && coverReady ? (
             <Image
               src={urlFor(cover)
                 .width(renderedWidth)
