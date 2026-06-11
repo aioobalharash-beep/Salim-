@@ -1,4 +1,5 @@
 import { defineType, defineField } from "sanity";
+import { orderRankField, orderRankOrdering } from "@sanity/orderable-document-list";
 
 export default defineType({
   name: "portfolio",
@@ -6,6 +7,10 @@ export default defineType({
   type: "document",
   icon: () => "🎭",
   fields: [
+    // Hidden field that stores the drag-and-drop weight. Managed automatically
+    // by the orderable document list in the Portfolio desk panel — editors set
+    // the order by dragging items, never by editing this field directly.
+    orderRankField({ type: "portfolio" }),
     defineField({
       name: "title",
       title: "Title",
@@ -73,27 +78,12 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: "pageGroup",
-      title: "Slider page number",
-      type: "number",
-      initialValue: 1,
-      description:
-        "Items with the same number appear together on the same slider page. Group items so each page contains either three verticals OR one vertical + one horizontal.",
-      validation: (Rule) => Rule.required().integer().positive(),
-    }),
-    defineField({
       name: "link",
       title: "Link URL",
       type: "url",
       description: "External or internal URL this item links to.",
       validation: (Rule) =>
         Rule.uri({ allowRelative: true, scheme: ["http", "https"] }),
-    }),
-    defineField({
-      name: "order",
-      title: "Sort Order (within page)",
-      type: "number",
-      description: "Lower numbers appear first inside the slider page.",
     }),
   ],
   preview: {
@@ -102,27 +92,12 @@ export default defineType({
       subtitle: "type",
       media: "image",
       orientation: "orientation",
-      pageGroup: "pageGroup",
     },
-    prepare: ({ title, subtitle, media, orientation, pageGroup }) => ({
+    prepare: ({ title, subtitle, media, orientation }) => ({
       title,
-      subtitle: `${subtitle ?? ""} · ${orientation ?? "?"} · page ${pageGroup ?? "?"}`,
+      subtitle: `${subtitle ?? ""} · ${orientation ?? "?"}`,
       media,
     }),
   },
-  orderings: [
-    {
-      title: "Slider page, then order",
-      name: "pageGroupAsc",
-      by: [
-        { field: "pageGroup", direction: "asc" },
-        { field: "order", direction: "asc" },
-      ],
-    },
-    {
-      title: "Sort Order",
-      name: "orderAsc",
-      by: [{ field: "order", direction: "asc" }],
-    },
-  ],
+  orderings: [orderRankOrdering],
 });
