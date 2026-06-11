@@ -60,10 +60,10 @@ export default function ProjectImageSlider({
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto">
+    <div className="w-full max-w-6xl mx-auto">
       {/* ── Coverflow track ── */}
       <div
-        className="relative w-full h-[300px] sm:h-[380px] md:h-[440px] flex items-center justify-center overflow-hidden select-none"
+        className="relative w-full h-[380px] sm:h-[480px] md:h-[560px] flex items-center justify-center overflow-hidden select-none"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
@@ -88,7 +88,7 @@ export default function ProjectImageSlider({
                 opacity,
                 zIndex: 20 - abs,
               }}
-              className="absolute left-1/2 top-1/2 w-[180px] sm:w-[220px] md:w-[270px] aspect-[3/4] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform"
+              className="absolute left-1/2 top-1/2 w-[240px] sm:w-[300px] md:w-[360px] aspect-[3/4] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform"
             >
               <div
                 className={`relative w-full h-full overflow-hidden bg-on-surface/[0.04] ${
@@ -99,13 +99,13 @@ export default function ProjectImageSlider({
               >
                 <Image
                   src={urlFor(img)
-                    .width(700)
+                    .width(900)
                     .quality(85)
                     .auto("format")
                     .url()}
                   alt={img.alt || img.title || ""}
                   fill
-                  sizes="(max-width: 768px) 60vw, 270px"
+                  sizes="(max-width: 768px) 70vw, 360px"
                   className="object-cover"
                 />
                 {/* Muted ivory veil over the inactive wings for depth. */}
