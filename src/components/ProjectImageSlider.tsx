@@ -13,8 +13,13 @@ export type SliderImage = SanityImageSource & {
   dimensions?: { width: number; height: number; aspectRatio: number };
 };
 
-/* Cards rendered on each side of the active focal card. */
-const MAX_WING = 3;
+/* Cards visible on each side of the focal card, plus one buffer card that sits
+ * just out of view (opacity 0) so neighbours slide in/out smoothly rather than
+ * popping. Nothing wraps around — edge cards simply fade away. */
+const VISIBLE = 3;
+const BUFFER = VISIBLE + 1;
+/* Horizontal step between cards, as a % of the track width (responsive). */
+const GAP = 15;
 
 function hasAsset(img?: SliderImage | null): img is SliderImage {
   const asset = (img as { asset?: { _ref?: string; _id?: string } } | null)
@@ -34,20 +39,12 @@ export default function ProjectImageSlider({
 
   if (count === 0) return null;
 
-  // `active` runs unbounded; `safe` is the wrapped index of the focal card.
-  const safe = ((active % count) + count) % count;
+  const safe = Math.min(Math.max(active, 0), count - 1);
   const current = images[safe];
 
-  const go = (dir: number) => setActive((a) => a + dir);
-
-  // Signed shortest-path offset of card `i` from the focal card, so the
-  // wings wrap symmetrically around the centre.
-  const offsetOf = (i: number) => {
-    let d = i - safe;
-    if (d > count / 2) d -= count;
-    if (d < -count / 2) d += count;
-    return d;
-  };
+  // Clamp at the ends — no wrap-around.
+  const go = (dir: number) =>
+    setActive((a) => Math.min(count - 1, Math.max(0, a + dir)));
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -63,69 +60,91 @@ export default function ProjectImageSlider({
     <div className="w-full max-w-6xl mx-auto">
       {/* ── Coverflow track ── */}
       <div
-        className="relative w-full h-[380px] sm:h-[480px] md:h-[560px] flex items-center justify-center overflow-hidden select-none"
+        className="relative w-full h-[360px] sm:h-[460px] md:h-[540px] flex items-center justify-center overflow-hidden select-none"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
         {images.map((img, i) => {
-          const offset = offsetOf(i);
-          if (Math.abs(offset) > MAX_WING) return null;
+          // Linear offset — no modulo wrap, so far cards fade out in place.
+          const offset = i - safe;
           const abs = Math.abs(offset);
+          if (abs > BUFFER) return null;
+
           const isCenter = offset === 0;
-          const scale = isCenter ? 1 : 1 - abs * 0.12;
-          const opacity = isCenter ? 1 : Math.max(0, 1 - abs * 0.28);
+          const inView = abs <= VISIBLE;
+          const opacity = isCenter
+            ? 1
+            : inView
+              ? Math.max(0.15, 1 - abs * 0.22)
+              : 0;
+          const scale = isCenter ? 1 : 1 - abs * 0.06;
+
+          const dims = img.dimensions;
+          const w = dims?.width ?? 1000;
+          const h = dims?.height ?? 1250;
+
           return (
             <button
               key={img._key ?? i}
               type="button"
-              onClick={() => setActive(active + offset)}
-              aria-label={
-                isCenter ? "Current image" : `Go to image ${i + 1}`
-              }
+              onClick={() => setActive(i)}
+              aria-label={isCenter ? "Current image" : `Go to image ${i + 1}`}
               tabIndex={isCenter ? 0 : -1}
               style={{
-                transform: `translate(-50%, -50%) translateX(${offset * 64}%) scale(${scale})`,
+                left: `${50 + offset * GAP}%`,
+                transform: `translate(-50%, -50%) scale(${scale})`,
                 opacity,
-                zIndex: 20 - abs,
+                zIndex: 30 - abs,
               }}
-              className="absolute left-1/2 top-1/2 w-[240px] sm:w-[300px] md:w-[360px] aspect-[3/4] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform"
+              className="absolute top-1/2 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform"
             >
-              <div
-                className={`relative w-full h-full overflow-hidden bg-on-surface/[0.04] ${
-                  isCenter
-                    ? "shadow-[0_24px_60px_rgba(26,26,26,0.18)]"
-                    : "shadow-[0_12px_30px_rgba(26,26,26,0.08)]"
-                }`}
-              >
+              {isCenter ? (
+                /* Focal card — natural aspect ratio, uncropped, bounded. */
                 <Image
                   src={urlFor(img)
-                    .width(900)
-                    .quality(85)
+                    .width(1200)
+                    .quality(88)
                     .auto("format")
                     .url()}
                   alt={img.alt || img.title || ""}
-                  fill
-                  sizes="(max-width: 768px) 70vw, 360px"
-                  className="object-cover"
+                  width={w}
+                  height={h}
+                  sizes="(max-width: 768px) 82vw, 620px"
+                  className="w-auto h-auto max-h-[340px] sm:max-h-[440px] md:max-h-[520px] max-w-[82vw] md:max-w-[620px] object-contain shadow-[0_28px_64px_rgba(26,26,26,0.20)]"
+                  priority
                 />
-                {/* Muted ivory veil over the inactive wings for depth. */}
-                {!isCenter && (
+              ) : (
+                /* Wing card — smaller, fixed crop, muted. */
+                <div className="relative w-[140px] sm:w-[180px] md:w-[220px] aspect-[3/4] overflow-hidden bg-on-surface/[0.04] shadow-[0_12px_30px_rgba(26,26,26,0.08)]">
+                  <Image
+                    src={urlFor(img)
+                      .width(500)
+                      .quality(80)
+                      .auto("format")
+                      .url()}
+                    alt={img.alt || img.title || ""}
+                    fill
+                    sizes="220px"
+                    className="object-cover"
+                  />
+                  {/* Muted ivory veil for depth on the wings. */}
                   <span
                     aria-hidden="true"
                     className="absolute inset-0 bg-surface/30"
                   />
-                )}
-              </div>
+                </div>
+              )}
             </button>
           );
         })}
 
-        {/* Arrows — muted Ivory/Ebony */}
+        {/* Arrows — muted Ivory/Ebony, disabled at the ends */}
         <button
           type="button"
           onClick={() => go(-1)}
+          disabled={safe === 0}
           aria-label="Previous image"
-          className="absolute left-1 sm:left-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 flex items-center justify-center rounded-full bg-surface/90 backdrop-blur-sm text-on-surface shadow-card hover:bg-surface transition-colors duration-200"
+          className="absolute left-1 sm:left-3 top-1/2 -translate-y-1/2 z-40 w-10 h-10 flex items-center justify-center rounded-full bg-surface/90 backdrop-blur-sm text-on-surface shadow-card hover:bg-surface transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <span className="material-symbols-outlined text-[20px]">
             chevron_left
@@ -134,8 +153,9 @@ export default function ProjectImageSlider({
         <button
           type="button"
           onClick={() => go(1)}
+          disabled={safe === count - 1}
           aria-label="Next image"
-          className="absolute right-1 sm:right-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 flex items-center justify-center rounded-full bg-surface/90 backdrop-blur-sm text-on-surface shadow-card hover:bg-surface transition-colors duration-200"
+          className="absolute right-1 sm:right-3 top-1/2 -translate-y-1/2 z-40 w-10 h-10 flex items-center justify-center rounded-full bg-surface/90 backdrop-blur-sm text-on-surface shadow-card hover:bg-surface transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <span className="material-symbols-outlined text-[20px]">
             chevron_right
@@ -145,12 +165,12 @@ export default function ProjectImageSlider({
 
       {/* ── Dots ── */}
       {count > 1 && (
-        <div className="flex justify-center gap-2 mt-6">
+        <div className="flex justify-center flex-wrap gap-2 mt-6">
           {images.map((img, i) => (
             <button
               key={img._key ?? i}
               type="button"
-              onClick={() => setActive(active + offsetOf(i))}
+              onClick={() => setActive(i)}
               aria-label={`Go to image ${i + 1} of ${count}`}
               aria-current={i === safe ? "true" : undefined}
               className={`h-1.5 rounded-full transition-all duration-300 ${
