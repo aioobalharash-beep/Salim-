@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { urlFor, type SanityImageSource } from "@/sanity/image";
@@ -13,13 +13,15 @@ export type SliderImage = SanityImageSource & {
   dimensions?: { width: number; height: number; aspectRatio: number };
 };
 
-/* Cards visible on each side of the focal card, plus one buffer card that sits
- * just out of view (opacity 0) so neighbours slide in/out smoothly rather than
- * popping. Nothing wraps around — edge cards simply fade away. */
+/* Cards shown clearly on each side of the focal card, plus one hidden buffer
+ * slot used only on large sets for a smooth slide-in. */
 const VISIBLE = 3;
 const BUFFER = VISIBLE + 1;
-/* Horizontal step between cards, as a % of the track width (responsive). */
+/* Horizontal step between card centres, as a % of the track width. */
 const GAP = 15;
+const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+const SLIDE =
+  "left 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1), opacity 0.5s cubic-bezier(0.22,1,0.36,1)";
 
 function hasAsset(img?: SliderImage | null): img is SliderImage {
   const asset = (img as { asset?: { _ref?: string; _id?: string } } | null)
@@ -36,15 +38,34 @@ export default function ProjectImageSlider({
   const count = images.length;
   const [active, setActive] = useState(0);
   const touchStartX = useRef<number | null>(null);
+  // Last committed slot per card, so we can detect a wrap-around jump and let
+  // that card teleport (transition disabled) instead of sliding across screen.
+  const prevOffsets = useRef<Map<string, number>>(new Map());
+
+  // `active` runs unbounded; the ring wraps via modulo.
+  const safe = count > 0 ? ((active % count) + count) % count : 0;
+
+  // Signed shortest-path offset of card `i` from the focal card.
+  const offsetOf = (i: number) => {
+    let d = i - safe;
+    if (d > count / 2) d -= count;
+    if (d < -count / 2) d += count;
+    return d;
+  };
+
+  // Persist the committed slots after each paint (read during the next render).
+  useEffect(() => {
+    if (count === 0) return;
+    const m = new Map<string, number>();
+    images.forEach((img, i) => m.set(img._key ?? String(i), offsetOf(i)));
+    prevOffsets.current = m;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [safe, count]);
 
   if (count === 0) return null;
 
-  const safe = Math.min(Math.max(active, 0), count - 1);
   const current = images[safe];
-
-  // Clamp at the ends — no wrap-around.
-  const go = (dir: number) =>
-    setActive((a) => Math.min(count - 1, Math.max(0, a + dir)));
+  const go = (dir: number) => setActive((a) => a + dir);
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -65,18 +86,20 @@ export default function ProjectImageSlider({
         onTouchEnd={onTouchEnd}
       >
         {images.map((img, i) => {
-          // Linear offset — no modulo wrap, so far cards fade out in place.
-          const offset = i - safe;
+          const offset = offsetOf(i);
           const abs = Math.abs(offset);
           if (abs > BUFFER) return null;
 
+          const key = img._key ?? String(i);
+          const prev = prevOffsets.current.get(key);
+          // A jump of more than one slot is a wrap-around → teleport (no slide)
+          // so the card never travels across the viewport from the far side.
+          const teleport = prev !== undefined && Math.abs(offset - prev) > 1;
+
           const isCenter = offset === 0;
           const inView = abs <= VISIBLE;
-          // Every card shares one natural-ratio structure; only transform
-          // scale, opacity and an ivory wash differ — and all of those animate,
-          // so a wing morphs seamlessly into the focal card with no shape snap.
-          const cardOpacity = isCenter ? 1 : inView ? Math.max(0.25, 1 - abs * 0.1) : 0;
-          const veilOpacity = isCenter ? 0 : Math.min(0.78, abs * 0.24);
+          const cardOpacity = isCenter ? 1 : inView ? 1 - abs * 0.1 : 0;
+          const veilOpacity = isCenter ? 0 : Math.min(0.78, abs * 0.22);
           const scale = isCenter ? 1 : 1 - abs * 0.16;
 
           const dims = img.dimensions;
@@ -85,9 +108,9 @@ export default function ProjectImageSlider({
 
           return (
             <button
-              key={img._key ?? i}
+              key={key}
               type="button"
-              onClick={() => setActive(i)}
+              onClick={() => setActive(active + offset)}
               aria-label={isCenter ? "Current image" : `Go to image ${i + 1}`}
               tabIndex={isCenter ? 0 : -1}
               style={{
@@ -95,8 +118,9 @@ export default function ProjectImageSlider({
                 transform: `translate(-50%, -50%) scale(${scale})`,
                 opacity: cardOpacity,
                 zIndex: 30 - abs,
+                transition: teleport ? "none" : SLIDE,
               }}
-              className="absolute top-1/2 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform"
+              className="absolute top-1/2 will-change-transform"
             >
               <div className="relative shadow-[0_20px_48px_rgba(26,26,26,0.16)]">
                 <Image
@@ -115,21 +139,23 @@ export default function ProjectImageSlider({
                 {/* Muted ivory wash deepens with distance for premium depth. */}
                 <span
                   aria-hidden="true"
-                  className="absolute inset-0 bg-surface transition-opacity duration-500"
-                  style={{ opacity: veilOpacity }}
+                  className="absolute inset-0 bg-surface"
+                  style={{
+                    opacity: veilOpacity,
+                    transition: teleport ? "none" : `opacity 0.5s ${EASE}`,
+                  }}
                 />
               </div>
             </button>
           );
         })}
 
-        {/* Arrows — muted Ivory/Ebony, disabled at the ends */}
+        {/* Arrows — muted Ivory/Ebony */}
         <button
           type="button"
           onClick={() => go(-1)}
-          disabled={safe === 0}
           aria-label="Previous image"
-          className="absolute left-1 sm:left-3 top-1/2 -translate-y-1/2 z-40 w-10 h-10 flex items-center justify-center rounded-full bg-surface/90 backdrop-blur-sm text-on-surface shadow-card hover:bg-surface transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="absolute left-1 sm:left-3 top-1/2 -translate-y-1/2 z-40 w-10 h-10 flex items-center justify-center rounded-full bg-surface/90 backdrop-blur-sm text-on-surface shadow-card hover:bg-surface transition-colors duration-200"
         >
           <span className="material-symbols-outlined text-[20px]">
             chevron_left
@@ -138,9 +164,8 @@ export default function ProjectImageSlider({
         <button
           type="button"
           onClick={() => go(1)}
-          disabled={safe === count - 1}
           aria-label="Next image"
-          className="absolute right-1 sm:right-3 top-1/2 -translate-y-1/2 z-40 w-10 h-10 flex items-center justify-center rounded-full bg-surface/90 backdrop-blur-sm text-on-surface shadow-card hover:bg-surface transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="absolute right-1 sm:right-3 top-1/2 -translate-y-1/2 z-40 w-10 h-10 flex items-center justify-center rounded-full bg-surface/90 backdrop-blur-sm text-on-surface shadow-card hover:bg-surface transition-colors duration-200"
         >
           <span className="material-symbols-outlined text-[20px]">
             chevron_right
@@ -155,7 +180,7 @@ export default function ProjectImageSlider({
             <button
               key={img._key ?? i}
               type="button"
-              onClick={() => setActive(i)}
+              onClick={() => setActive(active + offsetOf(i))}
               aria-label={`Go to image ${i + 1} of ${count}`}
               aria-current={i === safe ? "true" : undefined}
               className={`h-1.5 rounded-full transition-all duration-300 ${
