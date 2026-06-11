@@ -59,7 +59,7 @@ interface Project {
   title: string;
   slug: string | null;
   subtitle: string | null;
-  year: number | null;
+  year: string | null;
   overview: string | null;
   coverImage: ProjectImage | null;
   heroImage: ProjectImage | null;
@@ -381,7 +381,7 @@ export default async function ProjectPage({
                 {project.year && (
                   <div className="flex flex-col">
                     <dt className="font-label text-[10px] uppercase tracking-[0.25em] text-foreground/40 mb-1.5">
-                      Year
+                      Duration
                     </dt>
                     <dd className="font-body text-sm leading-relaxed text-foreground/75 tabular-nums">
                       {project.year}

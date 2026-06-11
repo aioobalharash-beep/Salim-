@@ -42,11 +42,11 @@ export default defineType({
     }),
     defineField({
       name: "year",
-      title: "Year",
-      type: "number",
+      title: "Year / Duration",
+      type: "string",
       group: "basic",
-      description: "Used for chronological sorting (e.g., 2026).",
-      validation: (Rule) => Rule.integer().min(1900).max(2100),
+      description:
+        "Project duration — a single year (\"2014\"), a range (\"2014–2016\"), or an ongoing status (\"2014 – present\"). Start the value with the 4-digit start year so projects sort chronologically.",
     }),
     defineField({
       name: "overview",

@@ -222,7 +222,7 @@ export const catalogueListQuery = groq`
 `;
 
 export const projectsListQuery = groq`
-  *[_type == "project" && defined(slug.current)] | order(coalesce(year, 0) desc, title asc) {
+  *[_type == "project" && defined(slug.current)] | order(coalesce(year, "") desc, title asc) {
     _id,
     title,
     "slug": slug.current,
