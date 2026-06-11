@@ -60,7 +60,7 @@ export default function ProjectImageSlider({
     <div className="w-full max-w-6xl mx-auto">
       {/* ── Coverflow track ── */}
       <div
-        className="relative w-full h-[360px] sm:h-[460px] md:h-[540px] flex items-center justify-center overflow-hidden select-none"
+        className="relative w-full h-[360px] sm:h-[480px] md:h-[560px] flex items-center justify-center overflow-hidden select-none"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
@@ -72,12 +72,12 @@ export default function ProjectImageSlider({
 
           const isCenter = offset === 0;
           const inView = abs <= VISIBLE;
-          const opacity = isCenter
-            ? 1
-            : inView
-              ? Math.max(0.15, 1 - abs * 0.22)
-              : 0;
-          const scale = isCenter ? 1 : 1 - abs * 0.06;
+          // Every card shares one natural-ratio structure; only transform
+          // scale, opacity and an ivory wash differ — and all of those animate,
+          // so a wing morphs seamlessly into the focal card with no shape snap.
+          const cardOpacity = isCenter ? 1 : inView ? Math.max(0.25, 1 - abs * 0.1) : 0;
+          const veilOpacity = isCenter ? 0 : Math.min(0.78, abs * 0.24);
+          const scale = isCenter ? 1 : 1 - abs * 0.16;
 
           const dims = img.dimensions;
           const w = dims?.width ?? 1000;
@@ -93,47 +93,32 @@ export default function ProjectImageSlider({
               style={{
                 left: `${50 + offset * GAP}%`,
                 transform: `translate(-50%, -50%) scale(${scale})`,
-                opacity,
+                opacity: cardOpacity,
                 zIndex: 30 - abs,
               }}
               className="absolute top-1/2 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform"
             >
-              {isCenter ? (
-                /* Focal card — natural aspect ratio, uncropped, bounded. */
+              <div className="relative shadow-[0_20px_48px_rgba(26,26,26,0.16)]">
                 <Image
                   src={urlFor(img)
-                    .width(1200)
-                    .quality(88)
+                    .width(1100)
+                    .quality(85)
                     .auto("format")
                     .url()}
                   alt={img.alt || img.title || ""}
                   width={w}
                   height={h}
-                  sizes="(max-width: 768px) 82vw, 620px"
-                  className="w-auto h-auto max-h-[340px] sm:max-h-[440px] md:max-h-[520px] max-w-[82vw] md:max-w-[620px] object-contain shadow-[0_28px_64px_rgba(26,26,26,0.20)]"
-                  priority
+                  sizes="(max-width: 768px) 80vw, 600px"
+                  className="block w-auto h-auto max-h-[300px] sm:max-h-[420px] md:max-h-[500px] max-w-[80vw] md:max-w-[600px] object-contain"
+                  priority={i === 0}
                 />
-              ) : (
-                /* Wing card — smaller, fixed crop, muted. */
-                <div className="relative w-[140px] sm:w-[180px] md:w-[220px] aspect-[3/4] overflow-hidden bg-on-surface/[0.04] shadow-[0_12px_30px_rgba(26,26,26,0.08)]">
-                  <Image
-                    src={urlFor(img)
-                      .width(500)
-                      .quality(80)
-                      .auto("format")
-                      .url()}
-                    alt={img.alt || img.title || ""}
-                    fill
-                    sizes="220px"
-                    className="object-cover"
-                  />
-                  {/* Muted ivory veil for depth on the wings. */}
-                  <span
-                    aria-hidden="true"
-                    className="absolute inset-0 bg-surface/30"
-                  />
-                </div>
-              )}
+                {/* Muted ivory wash deepens with distance for premium depth. */}
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-surface transition-opacity duration-500"
+                  style={{ opacity: veilOpacity }}
+                />
+              </div>
             </button>
           );
         })}
