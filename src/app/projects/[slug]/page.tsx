@@ -62,6 +62,7 @@ interface Project {
   year: number | null;
   overview: string | null;
   coverImage: ProjectImage | null;
+  heroImage: ProjectImage | null;
   gallery: GalleryItem[] | null;
   projectDetails: ProjectDetail[] | null;
   footerText: PortableTextBlock[] | null;
@@ -154,8 +155,33 @@ function GalleryImage({
   );
 }
 
-/* ── Media renderer — image, YouTube embed, or local video player ──── */
-function GalleryMedia({
+/* ── Caption shown directly beneath a standalone media block ────────── */
+function MediaCaption({
+  title,
+  description,
+}: {
+  title?: string | null;
+  description?: string | null;
+}) {
+  if (!title && !description) return null;
+  return (
+    <div className="max-w-2xl mx-auto mt-6 text-center">
+      {title && (
+        <h2 className="font-headline text-2xl md:text-3xl text-foreground mb-3">
+          {title}
+        </h2>
+      )}
+      {description && (
+        <p className="font-body text-base md:text-lg leading-relaxed text-foreground/60 whitespace-pre-line">
+          {description}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/* ── Bare media element — image, YouTube embed, or local video player ── */
+function StandaloneMediaElement({
   item,
   priority,
 }: {
@@ -198,30 +224,58 @@ function GalleryMedia({
     );
   }
 
-  if (item._type === "imageGroup") {
-    // Drop any empty image blocks so a half-filled gallery can't crash render.
-    const imgs = (item.images ?? []).filter(hasAsset);
-    if (imgs.length === 0) return null;
-    // A single image keeps the static, uncropped display intact.
-    if (imgs.length === 1) {
-      return (
-        <GalleryImage
-          image={imgs[0]}
-          priority={priority}
-          sizes="(max-width: 1024px) 100vw, 50vw"
-        />
-      );
-    }
-    // Multiple images become an interactive carousel with a thumbnail track.
-    return <ProjectImageSlider images={imgs} />;
-  }
+  // imageGroup is handled by GalleryBlock; only galleryImage remains here.
+  if (item._type === "imageGroup") return null;
 
   return (
     <GalleryImage
       image={item}
       priority={priority}
-      sizes="(max-width: 1024px) 100vw, 50vw"
+      sizes="(max-width: 896px) 100vw, 896px"
     />
+  );
+}
+
+/* ── One gallery block — centered standalone media + caption, or the
+      symmetrical coverflow carousel for a multi-image group. ────────── */
+function GalleryBlock({
+  item,
+  priority,
+}: {
+  item: GalleryItem;
+  priority?: boolean;
+}) {
+  if (item._type === "imageGroup") {
+    const imgs = (item.images ?? []).filter(hasAsset);
+    if (imgs.length === 0) return null;
+    // Multiple images → premium symmetrical coverflow with reactive caption.
+    if (imgs.length > 1) {
+      return <ProjectImageSlider images={imgs} />;
+    }
+    // Single image keeps the centered, uncropped standalone display.
+    const only = imgs[0];
+    return (
+      <div className="max-w-4xl mx-auto w-full flex flex-col items-center">
+        <GalleryImage
+          image={only}
+          priority={priority}
+          sizes="(max-width: 896px) 100vw, 896px"
+        />
+        <MediaCaption
+          title={only.title ?? item.title}
+          description={only.description ?? item.description}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto w-full flex flex-col items-center">
+      <div className="w-full">
+        <StandaloneMediaElement item={item} priority={priority} />
+      </div>
+      <MediaCaption title={item.title} description={item.description} />
+    </div>
   );
 }
 
@@ -229,7 +283,7 @@ function GalleryMedia({
 const footerComponents: PortableTextComponents = {
   block: {
     normal: ({ children }) => (
-      <p className="font-body text-sm md:text-[15px] leading-relaxed text-foreground/55 mb-4">
+      <p className="font-body text-base md:text-lg leading-relaxed text-foreground/55 text-justify mb-5">
         {children}
       </p>
     ),
@@ -277,7 +331,7 @@ export default async function ProjectPage({
 
   return (
     <div className="min-h-screen bg-background pt-28">
-      <article className="max-w-6xl mx-auto px-6 md:px-8 pb-24">
+      <div className="max-w-7xl mx-auto px-6 md:px-8 pb-24">
         {/* ── Back link ── */}
         <Link
           href="/projects"
@@ -286,7 +340,7 @@ export default async function ProjectPage({
           ← Projects
         </Link>
 
-        {/* ── Header Hero: title + pinned details sidebar ── */}
+        {/* ── Header Hero: title + hero image (left) · credits (right) ── */}
         <header className="mt-10 md:mt-14 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
           <div className="lg:col-span-8">
             {project.subtitle && (
@@ -297,6 +351,18 @@ export default async function ProjectPage({
             <h1 className="font-headline font-light text-4xl sm:text-6xl md:text-7xl leading-[1.05] text-foreground">
               {project.title}
             </h1>
+
+            {/* Hero image fills the space under the title, balancing the
+                credit lines pinned on the right. */}
+            {hasAsset(project.heroImage) && (
+              <div className="mt-8 md:mt-10">
+                <GalleryImage
+                  image={project.heroImage}
+                  sizes="(max-width: 1024px) 100vw, 66vw"
+                  priority
+                />
+              </div>
+            )}
           </div>
 
           {(details.length > 0 || project.year) && (
@@ -327,70 +393,29 @@ export default async function ProjectPage({
           )}
         </header>
 
-        {/* ── Overview ── */}
+        {/* ── Overview — full-width, formally justified ── */}
         {project.overview && (
-          <section className="mt-16 md:mt-20 max-w-3xl">
-            <p className="font-headline font-light text-xl sm:text-2xl leading-[1.6] text-foreground/70 whitespace-pre-line">
+          <section className="mt-16 md:mt-20">
+            <p className="font-headline font-light text-base md:text-lg leading-relaxed text-foreground/70 text-justify whitespace-pre-line [text-indent:1.5em]">
               {project.overview}
             </p>
           </section>
         )}
 
-        {/* ── Multimedia Gallery — asymmetrical content/media rows ── */}
+        {/* ── Media — centered standalone blocks + coverflow galleries ── */}
         {gallery.length > 0 && (
-          <section className="mt-20 md:mt-28 space-y-20 md:space-y-28">
-            {gallery.map((item, idx) => {
-              const hasText = !!(item.title || item.description);
-              return (
-                <div
-                  key={item._key}
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start"
-                >
-                  {/* Content — below media on mobile, left on desktop. Both
-                      columns share the same top horizon (items-start). When
-                      there is no title, an editorial dash anchors the
-                      description so it reads as an intentional caption. */}
-                  <div
-                    className={`order-2 lg:order-1 ${
-                      hasText ? "" : "hidden lg:block"
-                    }`}
-                  >
-                    <div className="max-w-xl">
-                      {item.title ? (
-                        <h2 className="font-headline font-light text-3xl md:text-4xl leading-tight text-foreground mb-5">
-                          {item.title}
-                        </h2>
-                      ) : (
-                        item.description && (
-                          <div
-                            className="w-6 h-[1px] bg-foreground/20 mt-2 mb-4"
-                            aria-hidden="true"
-                          />
-                        )
-                      )}
-                      {item.description && (
-                        <p className="font-body text-base leading-relaxed text-foreground/60 whitespace-pre-line">
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Media — above text on mobile, right on desktop. */}
-                  <div className="order-1 lg:order-2 w-full bg-transparent">
-                    <GalleryMedia item={item} priority={idx === 0} />
-                  </div>
-                </div>
-              );
-            })}
+          <section className="mt-20 md:mt-28 space-y-24 md:space-y-32">
+            {gallery.map((item, idx) => (
+              <GalleryBlock key={item._key} item={item} priority={idx === 0} />
+            ))}
           </section>
         )}
 
-        {/* ── Closing block: footer notes + back link, anchored together
-              under a single divider so they read as definitive end matter. ── */}
+        {/* ── Closing block: footer notes (full-width, justified) + back
+              link, anchored together as definitive end matter. ── */}
         <footer className="mt-20 md:mt-28 pt-10 border-t border-foreground/[0.08]">
           {hasFooterText && (
-            <div className="max-w-xl mb-10 md:mb-12">
+            <div className="w-full mb-10 md:mb-12">
               <PortableText
                 value={project.footerText!}
                 components={footerComponents}
@@ -404,7 +429,7 @@ export default async function ProjectPage({
             ← All Projects
           </Link>
         </footer>
-      </article>
+      </div>
 
       {/* ── Conditional full-width Contact Bar ── */}
       {project.showContactBar && (

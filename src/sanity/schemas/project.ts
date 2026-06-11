@@ -78,6 +78,24 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: "heroImage",
+      title: "Hero Image",
+      type: "image",
+      group: "media",
+      options: { hotspot: true },
+      description:
+        "Optional. Rendered directly beneath the project title to balance the header against the credit lines. Displayed uncropped.",
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          description:
+            "Short description of the image for accessibility and SEO.",
+        }),
+      ],
+    }),
+    defineField({
       name: "gallery",
       title: "Gallery",
       type: "array",
@@ -144,7 +162,28 @@ export default defineType({
                       description:
                         "Short description of the image for accessibility and SEO.",
                     }),
+                    defineField({
+                      name: "title",
+                      title: "Title",
+                      type: "string",
+                      description:
+                        "Caption heading shown beneath the carousel when this image is active.",
+                    }),
+                    defineField({
+                      name: "description",
+                      title: "Description",
+                      type: "text",
+                      rows: 3,
+                      description:
+                        "Caption text shown beneath the carousel when this image is active.",
+                    }),
                   ],
+                  preview: {
+                    select: { title: "title", subtitle: "alt", media: "asset" },
+                    prepare({ title, subtitle, media }) {
+                      return { title: title || "Image", subtitle, media };
+                    },
+                  },
                 },
               ],
               validation: (Rule) => Rule.required().min(1),
