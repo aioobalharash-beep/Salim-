@@ -100,7 +100,9 @@ export default function ProjectImageSlider({
           const inView = abs <= VISIBLE;
           const cardOpacity = isCenter ? 1 : inView ? 1 - abs * 0.1 : 0;
           const veilOpacity = isCenter ? 0 : Math.min(0.78, abs * 0.22);
-          const scale = isCenter ? 1 : 1 - abs * 0.16;
+          // Wings step down sharply from the focal card so a tall portrait
+          // never rivals the centre — the first wing is already clearly small.
+          const scale = isCenter ? 1 : 0.62 - (abs - 1) * 0.14;
 
           const dims = img.dimensions;
           const w = dims?.width ?? 1000;
