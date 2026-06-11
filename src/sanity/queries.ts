@@ -111,14 +111,13 @@ export const aboutQuery = groq`
 `;
 
 export const portfolioQuery = groq`
-  *[_type == "portfolio"] | order(pageGroup asc, order asc) {
+  *[_type == "portfolio"] | order(orderRank asc) {
     _id,
     title,
     eyebrow,
     description,
     type,
     orientation,
-    pageGroup,
     image,
     link
   }
