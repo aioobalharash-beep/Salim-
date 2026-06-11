@@ -222,7 +222,7 @@ export const catalogueListQuery = groq`
 `;
 
 export const projectsListQuery = groq`
-  *[_type == "project" && defined(slug.current)] | order(coalesce(year, 0) desc, title asc) {
+  *[_type == "project" && defined(slug.current)] | order(coalesce(year, "") desc, title asc) {
     _id,
     title,
     "slug": slug.current,
@@ -251,6 +251,12 @@ export const projectBySlugQuery = groq`
       "dimensions": asset->metadata.dimensions,
       asset
     },
+    heroImage{
+      ...,
+      "alt": coalesce(alt, asset->altText, ""),
+      "dimensions": asset->metadata.dimensions,
+      asset
+    },
     gallery[]{
       _key,
       _type,
@@ -268,6 +274,8 @@ export const projectBySlugQuery = groq`
         images[]{
           ...,
           "alt": coalesce(alt, asset->altText, ""),
+          title,
+          description,
           "dimensions": asset->metadata.dimensions,
           asset
         }

@@ -42,11 +42,11 @@ export default defineType({
     }),
     defineField({
       name: "year",
-      title: "Year",
-      type: "number",
+      title: "Year / Duration",
+      type: "string",
       group: "basic",
-      description: "Used for chronological sorting (e.g., 2026).",
-      validation: (Rule) => Rule.integer().min(1900).max(2100),
+      description:
+        "Project duration — a single year (\"2014\"), a range (\"2014–2016\"), or an ongoing status (\"2014 – present\"). Start the value with the 4-digit start year so projects sort chronologically.",
     }),
     defineField({
       name: "overview",
@@ -76,6 +76,24 @@ export default defineType({
         }),
       ],
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "heroImage",
+      title: "Hero Image",
+      type: "image",
+      group: "media",
+      options: { hotspot: true },
+      description:
+        "Optional. Rendered directly beneath the project title to balance the header against the credit lines. Displayed uncropped.",
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          description:
+            "Short description of the image for accessibility and SEO.",
+        }),
+      ],
     }),
     defineField({
       name: "gallery",
@@ -144,7 +162,28 @@ export default defineType({
                       description:
                         "Short description of the image for accessibility and SEO.",
                     }),
+                    defineField({
+                      name: "title",
+                      title: "Title",
+                      type: "string",
+                      description:
+                        "Caption heading shown beneath the carousel when this image is active.",
+                    }),
+                    defineField({
+                      name: "description",
+                      title: "Description",
+                      type: "text",
+                      rows: 3,
+                      description:
+                        "Caption text shown beneath the carousel when this image is active.",
+                    }),
                   ],
+                  preview: {
+                    select: { title: "title", subtitle: "alt", media: "asset" },
+                    prepare({ title, subtitle, media }) {
+                      return { title: title || "Image", subtitle, media };
+                    },
+                  },
                 },
               ],
               validation: (Rule) => Rule.required().min(1),

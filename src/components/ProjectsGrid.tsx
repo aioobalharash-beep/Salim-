@@ -19,7 +19,7 @@ export interface ProjectListItem {
   title: string;
   slug: string | null;
   subtitle: string | null;
-  year: number | null;
+  year: string | null;
   coverImage: ProjectImage | null;
 }
 
