@@ -31,7 +31,7 @@ export default function ConsultationSection() {
         {/* Left — bold typography hierarchy aligned to the site grid. */}
         <div className="max-w-2xl">
           <h2 className="font-serif-brand text-3xl md:text-4xl lg:text-5xl tracking-tight font-light text-on-surface mb-4">
-            Free 15-Minute Written Work Consultation
+            Free 20-Minute Written Work Consultation
           </h2>
           <p className="font-body text-base md:text-lg leading-relaxed text-on-surface-variant max-w-2xl">
             Submit your emerging compositions, scores, or project details for a
@@ -71,7 +71,7 @@ export default function ConsultationSection() {
             <motion.div
               role="dialog"
               aria-modal="true"
-              aria-label="Free 15-Minute Written Work Consultation"
+              aria-label="Free 20-Minute Written Work Consultation"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
@@ -88,7 +88,7 @@ export default function ConsultationSection() {
 
               <iframe
                 src="https://tally.so/embed/dWz4jo?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
-                title="Free 15-Minute Written Work Consultation"
+                title="Free 20-Minute Written Work Consultation"
                 loading="eager"
                 className="w-full h-[680px] md:h-[720px] border-0 overflow-y-auto bg-transparent"
               />

@@ -476,11 +476,11 @@ function buildBodyComponents(): PortableTextComponents {
       normal: ({ children }) => <p>{children}</p>,
       lead: ({ children }) => <p className="lead">{children}</p>,
       caption: ({ children }) => <p className="caption">{children}</p>,
-      alignCenter: ({ children }) => (
-        <p style={{ textAlign: "center" }}>{children}</p>
-      ),
-      alignRight: ({ children }) => (
-        <p style={{ textAlign: "right" }}>{children}</p>
+      alignLeft: ({ children }) => <p className="text-left">{children}</p>,
+      alignCenter: ({ children }) => <p className="text-center">{children}</p>,
+      alignRight: ({ children }) => <p className="text-right">{children}</p>,
+      alignJustify: ({ children }) => (
+        <p className="text-justify">{children}</p>
       ),
       h2: ({ children, value }) => {
         const id = slugify(blockToPlainText(value));
