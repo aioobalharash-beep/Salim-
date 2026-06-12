@@ -122,12 +122,18 @@ const inlineMarks = {
   ],
 };
 
-/* ── Block styles ── */
+/* ── Block styles ──
+ * The four alignment styles (Left / Centre / Right / Justify) give Salim
+ * native menu controls in the Backstage block-style dropdown. The frontend
+ * serializer maps each one to a Tailwind alignment primitive
+ * (text-left / text-center / text-right / text-justify). */
 const blockStyles = [
   { title: "Normal", value: "normal" },
   { title: "Lead (first paragraph)", value: "lead" },
-  { title: "Centered", value: "alignCenter" },
-  { title: "Right-aligned", value: "alignRight" },
+  { title: "Align Left", value: "alignLeft" },
+  { title: "Align Centre", value: "alignCenter" },
+  { title: "Align Right", value: "alignRight" },
+  { title: "Justify", value: "alignJustify" },
   { title: "H2", value: "h2" },
   { title: "H2 — Italic Rust (section head)", value: "h2Italic" },
   { title: "H3", value: "h3" },

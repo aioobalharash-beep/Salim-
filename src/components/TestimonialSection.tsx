@@ -220,7 +220,10 @@ export default function TestimonialSection({
           )}
         </div>
 
-        {/* Write Your Own */}
+        {/* Write Your Own — hidden to keep the homepage purely editorial.
+            Re-enable this block (and the modal below) to re-open public
+            testimonial submissions. */}
+        {/*
         <div className="mt-8 md:mt-16 text-center">
           <button
             onClick={() => setModalOpen(true)}
@@ -229,6 +232,7 @@ export default function TestimonialSection({
             Write Your Own
           </button>
         </div>
+        */}
       </div>
 
       {/* Modal */}

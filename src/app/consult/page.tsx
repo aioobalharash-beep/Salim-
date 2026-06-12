@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 // global Navbar + Footer come from PublicShell, so the route feels native to
 // the main domain.
 export const metadata: Metadata = {
-  title: "Free 15-Minute Written Work Consultation — Salim Dada",
+  title: "Free 20-Minute Written Work Consultation — Salim Dada",
   description:
     "Submit your emerging compositions, scores, or project details for a direct professional review and live strategic breakdown with Salim Dada.",
   robots: { index: false, follow: false },
@@ -19,7 +19,7 @@ export default function ConsultPage() {
         {/* Centered serif header + standard value pitch. */}
         <div className="text-center mb-12 md:mb-16">
           <h1 className="font-serif-brand text-3xl md:text-4xl lg:text-5xl tracking-tight font-light text-on-surface mb-4">
-            Free 15-Minute Written Work Consultation
+            Free 20-Minute Written Work Consultation
           </h1>
           <p className="font-body text-base md:text-lg leading-relaxed text-on-surface-variant max-w-2xl mx-auto">
             Submit your emerging compositions, scores, or project details for a
@@ -32,7 +32,7 @@ export default function ConsultPage() {
         <div className="bg-[#faf8f5] rounded-sm shadow-2xl p-8 md:p-12">
           <iframe
             src="https://tally.so/embed/dWz4jo?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
-            title="Free 15-Minute Written Work Consultation"
+            title="Free 20-Minute Written Work Consultation"
             loading="eager"
             className="w-full h-[720px] border-0 overflow-y-auto bg-transparent"
           />
