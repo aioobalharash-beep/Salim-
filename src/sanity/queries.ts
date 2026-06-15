@@ -229,6 +229,41 @@ export const servicePageBySlugQuery = groq`
   }
 `;
 
+/* ── Visual Arts ──────────────────────────────────────────────────────
+ * The /visual-arts cinematic track is driven by a single `visualArts`
+ * document. `blocks` is an ordered, mixed array of narrative text panels
+ * and full-height artwork assets rendered left-to-right.
+ */
+export const visualArtsQuery = groq`
+  *[_type == "visualArts"][0]{
+    title,
+    subtitle,
+    blocks[]{
+      _key,
+      _type,
+      _type == "textPanel" => {
+        title,
+        chapterSubtitle,
+        body
+      },
+      _type == "artworkAsset" => {
+        caption,
+        medium,
+        tags,
+        image{
+          ...,
+          "alt": coalesce(alt, asset->altText, ""),
+          "dimensions": asset->metadata.dimensions,
+          asset
+        }
+      }
+    },
+    seo{
+      ${seoProjection}
+    }
+  }
+`;
+
 export const testimonialsQuery = groq`
   *[_type == "testimonial" && approved == true && !(_id in path("drafts.**"))] | order(order asc) {
     _id,

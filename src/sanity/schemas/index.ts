@@ -15,6 +15,7 @@ import project from "./project";
 import timeline from "./timeline";
 import servicesPage from "./servicesPage";
 import servicePage from "./servicePage";
+import visualArts from "./visualArts";
 
 export const schemaTypes = [
   articles,
@@ -34,4 +35,5 @@ export const schemaTypes = [
   timeline,
   servicesPage,
   servicePage,
+  visualArts,
 ];
