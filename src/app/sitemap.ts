@@ -20,6 +20,13 @@ const catalogueSlugsQuery = groq`
   }
 `;
 
+const servicePageSlugsQuery = groq`
+  *[_type == "servicePage" && defined(slug.current) && !(_id in path("drafts.**"))]{
+    "slug": slug.current,
+    _updatedAt
+  }
+`;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
@@ -49,6 +56,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${SITE_URL}/services`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
       url: `${SITE_URL}/media/reviews`,
       lastModified: now,
       changeFrequency: "monthly",
@@ -62,9 +75,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  const [articles, catalogue] = await Promise.all([
+  const [articles, catalogue, servicePages] = await Promise.all([
     client.fetch<SlugRow[]>(articleSlugsQuery),
     client.fetch<SlugRow[]>(catalogueSlugsQuery),
+    client.fetch<SlugRow[]>(servicePageSlugsQuery),
   ]);
 
   const articleRoutes: MetadataRoute.Sitemap = (articles ?? []).map((a) => ({
@@ -81,5 +95,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...articleRoutes, ...catalogueRoutes];
+  const serviceRoutes: MetadataRoute.Sitemap = (servicePages ?? []).map((s) => ({
+    url: `${SITE_URL}/services/${s.slug}`,
+    lastModified: s._updatedAt ? new Date(s._updatedAt) : now,
+    changeFrequency: "monthly",
+    priority: 0.8,
+  }));
+
+  return [
+    ...staticRoutes,
+    ...articleRoutes,
+    ...catalogueRoutes,
+    ...serviceRoutes,
+  ];
 }

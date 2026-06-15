@@ -15,6 +15,7 @@ const links = [
   { href: "/", label: "Home" },
   { href: "/catalogue", label: "Catalogue" },
   { href: "/media", label: "Media", children: mediaSubLinks },
+  { href: "/services", label: "Services" },
   { href: "/projects", label: "Projects" },
   { href: "/articles", label: "Articles" },
   { href: "/shop", label: "Shop" },
