@@ -1,0 +1,221 @@
+import { defineType, defineField, defineArrayMember } from "sanity";
+
+/**
+ * Visual Arts — the immersive "graphic novel preview" wing.
+ *
+ * A singleton document that drives /visual-arts. Rather than a standard
+ * e-commerce grid, the page renders an ordered, horizontally-scrolling
+ * cinematic track. Salim authors a single `blocks` array where he can freely
+ * intermix two kinds of panels:
+ *
+ *   - `textPanel`    — a spacious narrative column that introduces a comic
+ *                      chapter (title, chapter subtitle, and rich-text lore).
+ *   - `artworkAsset` — a full-height illustration with a caption, medium
+ *                      notes (e.g. Charcoal, Ink) and optional grouping tags.
+ *
+ * Order is meaningful: blocks render left-to-right exactly as arranged here.
+ */
+export default defineType({
+  name: "visualArts",
+  title: "Visual Arts",
+  type: "document",
+  icon: () => "🎨",
+  groups: [
+    { name: "header", title: "Header", default: true },
+    { name: "track", title: "Cinematic Track" },
+    { name: "seo", title: "SEO" },
+  ],
+  fields: [
+    /* ── Header ─────────────────────────────────────────────────── */
+    defineField({
+      name: "title",
+      title: "Title",
+      type: "string",
+      group: "header",
+      description:
+        "Wing title, e.g. 'Visual Arts'. Used for the browser tab and the opening narrative anchor.",
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "subtitle",
+      title: "Subtitle / Intro",
+      type: "text",
+      rows: 3,
+      group: "header",
+      description:
+        "Short introductory line that sets the tone before the first chapter.",
+    }),
+
+    /* ── Cinematic Track (ordered, mixed blocks) ────────────────── */
+    defineField({
+      name: "blocks",
+      title: "Cinematic Track",
+      type: "array",
+      group: "track",
+      description:
+        "An ordered sequence of panels rendered left-to-right along the horizontal scroll track. Mix narrative text columns and artwork freely — drag to reorder.",
+      of: [
+        /* — Narrative Text Column — */
+        defineArrayMember({
+          type: "object",
+          name: "textPanel",
+          title: "Text Panel",
+          icon: () => "📝",
+          fields: [
+            defineField({
+              name: "title",
+              title: "Title",
+              type: "string",
+              description:
+                "Large chapter heading, e.g. 'Chapter One — The Quiet City'.",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "chapterSubtitle",
+              title: "Chapter Subtitle",
+              type: "string",
+              description:
+                "Small eyebrow line shown above the title, e.g. 'Sequential Story · 2026'.",
+            }),
+            defineField({
+              name: "body",
+              title: "Story Lore / Background",
+              type: "array",
+              description:
+                "Rich-text narrative — story lore, background descriptions, artist notes.",
+              of: [
+                defineArrayMember({
+                  type: "block",
+                  styles: [
+                    { title: "Normal", value: "normal" },
+                    { title: "Heading", value: "h3" },
+                    { title: "Quote", value: "blockquote" },
+                  ],
+                  lists: [],
+                  marks: {
+                    decorators: [
+                      { title: "Bold", value: "strong" },
+                      { title: "Italic", value: "em" },
+                    ],
+                    annotations: [
+                      {
+                        name: "link",
+                        type: "object",
+                        title: "External Link",
+                        fields: [
+                          defineField({
+                            name: "href",
+                            title: "URL",
+                            type: "url",
+                            validation: (Rule) =>
+                              Rule.required().uri({
+                                scheme: ["http", "https", "mailto", "tel"],
+                              }),
+                          }),
+                          defineField({
+                            name: "blank",
+                            title: "Open in new tab",
+                            type: "boolean",
+                            initialValue: true,
+                          }),
+                        ],
+                      },
+                    ],
+                  },
+                }),
+              ],
+            }),
+          ],
+          preview: {
+            select: { title: "title", subtitle: "chapterSubtitle" },
+            prepare({ title, subtitle }) {
+              return {
+                title: title || "Text Panel",
+                subtitle: subtitle
+                  ? `Text · ${subtitle}`
+                  : "Narrative text column",
+              };
+            },
+          },
+        }),
+
+        /* — Artwork Asset — */
+        defineArrayMember({
+          type: "object",
+          name: "artworkAsset",
+          title: "Artwork",
+          icon: () => "🖼️",
+          fields: [
+            defineField({
+              name: "image",
+              title: "Image",
+              type: "image",
+              options: { hotspot: true },
+              validation: (Rule) => Rule.required(),
+              fields: [
+                defineField({
+                  name: "alt",
+                  title: "Alt text",
+                  type: "string",
+                  description:
+                    "Short description of the image for accessibility and SEO.",
+                }),
+              ],
+            }),
+            defineField({
+              name: "caption",
+              title: "Title / Caption",
+              type: "string",
+              description:
+                "Title shown directly beneath the illustration, e.g. 'The Last Tramway'.",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "medium",
+              title: "Medium Notes",
+              type: "string",
+              description: "Materials & technique, e.g. 'Charcoal & Ink on paper'.",
+            }),
+            defineField({
+              name: "tags",
+              title: "Project / Chapter Tags",
+              type: "array",
+              of: [defineArrayMember({ type: "string" })],
+              options: { layout: "tags" },
+              description:
+                "Optional grouping tags that associate this artwork with a project or chapter.",
+            }),
+          ],
+          preview: {
+            select: {
+              title: "caption",
+              subtitle: "medium",
+              media: "image",
+            },
+            prepare({ title, subtitle, media }) {
+              return {
+                title: title || "Artwork",
+                subtitle: subtitle ? `Artwork · ${subtitle}` : "Artwork",
+                media,
+              };
+            },
+          },
+        }),
+      ],
+    }),
+
+    /* ── SEO ────────────────────────────────────────────────────── */
+    defineField({
+      name: "seo",
+      title: "SEO Settings",
+      type: "seoSettings",
+      group: "seo",
+    }),
+  ],
+  preview: {
+    select: { title: "title" },
+    prepare({ title }) {
+      return { title: title || "Visual Arts", subtitle: "Cinematic Track" };
+    },
+  },
+});

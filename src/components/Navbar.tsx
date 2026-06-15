@@ -22,6 +22,9 @@ const links = [
   // Temporarily hidden — re-enable when ready to launch publicly.
   // { href: "/training", label: "Training" },
   { href: "/about", label: "About Dada" },
+  // Final navigation item — sits flush to the right, just before the
+  // primary "Inquiry" action button.
+  { href: "/visual-arts", label: "Visual Arts" },
 ];
 
 export default function Navbar() {
