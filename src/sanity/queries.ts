@@ -258,6 +258,32 @@ export const visualArtsQuery = groq`
         }
       }
     },
+    portfolioFeed[]{
+      _key,
+      title,
+      year,
+      notes,
+      image{
+        ...,
+        "alt": coalesce(alt, asset->altText, ""),
+        "dimensions": asset->metadata.dimensions,
+        asset
+      }
+    },
+    projectAnnouncements[]{
+      _key,
+      eyebrow,
+      title,
+      body,
+      ctaLabel,
+      ctaLink,
+      bannerImage{
+        ...,
+        "alt": coalesce(alt, asset->altText, ""),
+        "dimensions": asset->metadata.dimensions,
+        asset
+      }
+    },
     seo{
       ${seoProjection}
     }

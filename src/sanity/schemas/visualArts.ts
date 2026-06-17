@@ -23,6 +23,8 @@ export default defineType({
   groups: [
     { name: "header", title: "Header", default: true },
     { name: "track", title: "Cinematic Track" },
+    { name: "feed", title: "Portfolio Feed" },
+    { name: "announcements", title: "Project Announcements" },
     { name: "seo", title: "SEO" },
   ],
   fields: [
@@ -196,6 +198,194 @@ export default defineType({
               return {
                 title: title || "Artwork",
                 subtitle: subtitle ? `Artwork · ${subtitle}` : "Artwork",
+                media,
+              };
+            },
+          },
+        }),
+      ],
+    }),
+
+    /* ── Section A · Master Artwork Portfolio Feed ──────────────────
+     * The vertical-scrolling card matrix rendered below the horizontal
+     * track. Each item is a single illustration shown at its native
+     * proportions with a title / year / production-notes panel beneath. */
+    defineField({
+      name: "portfolioFeed",
+      title: "Artwork Portfolio Feed",
+      type: "array",
+      group: "feed",
+      description:
+        "A responsive grid of artworks shown below the cinematic track (2 columns on mobile, 3–4 on desktop).",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "portfolioItem",
+          title: "Artwork",
+          icon: () => "🖼️",
+          fields: [
+            defineField({
+              name: "image",
+              title: "Image",
+              type: "image",
+              options: { hotspot: true },
+              validation: (Rule) => Rule.required(),
+              fields: [
+                defineField({
+                  name: "alt",
+                  title: "Alt text",
+                  type: "string",
+                  description:
+                    "Short description of the image for accessibility and SEO.",
+                }),
+              ],
+            }),
+            defineField({
+              name: "title",
+              title: "Title",
+              type: "string",
+              description: "Artwork title, shown beneath the image.",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "year",
+              title: "Year",
+              type: "string",
+              description: "Year of production, e.g. '2026'.",
+            }),
+            defineField({
+              name: "notes",
+              title: "Production Notes",
+              type: "string",
+              description:
+                "Medium / technique notes, e.g. 'Ink & digital colour'.",
+            }),
+          ],
+          preview: {
+            select: { title: "title", subtitle: "year", media: "image" },
+            prepare({ title, subtitle, media }) {
+              return { title: title || "Artwork", subtitle, media };
+            },
+          },
+        }),
+      ],
+    }),
+
+    /* ── Section B · Future Project Announcements ───────────────────
+     * A vertical stack of large promotional cards. Each splits into a
+     * narrative text column (left) and an optional banner image (right),
+     * stacking on mobile. */
+    defineField({
+      name: "projectAnnouncements",
+      title: "Future Project Announcements",
+      type: "array",
+      group: "announcements",
+      description:
+        "Large promotional cards stacked below the portfolio feed. Each pairs announcement copy with an optional banner illustration.",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "projectAnnouncement",
+          title: "Announcement",
+          icon: () => "📣",
+          fields: [
+            defineField({
+              name: "eyebrow",
+              title: "Eyebrow",
+              type: "string",
+              description: "Small label above the title, e.g. 'Coming 2027'.",
+            }),
+            defineField({
+              name: "title",
+              title: "Title",
+              type: "string",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "body",
+              title: "Announcement Text",
+              type: "array",
+              description: "Narrative promotional copy shown on the left side.",
+              of: [
+                defineArrayMember({
+                  type: "block",
+                  styles: [
+                    { title: "Normal", value: "normal" },
+                    { title: "Quote", value: "blockquote" },
+                  ],
+                  lists: [],
+                  marks: {
+                    decorators: [
+                      { title: "Bold", value: "strong" },
+                      { title: "Italic", value: "em" },
+                    ],
+                    annotations: [
+                      {
+                        name: "link",
+                        type: "object",
+                        title: "External Link",
+                        fields: [
+                          defineField({
+                            name: "href",
+                            title: "URL",
+                            type: "url",
+                            validation: (Rule) =>
+                              Rule.required().uri({
+                                scheme: ["http", "https", "mailto", "tel"],
+                              }),
+                          }),
+                          defineField({
+                            name: "blank",
+                            title: "Open in new tab",
+                            type: "boolean",
+                            initialValue: true,
+                          }),
+                        ],
+                      },
+                    ],
+                  },
+                }),
+              ],
+            }),
+            defineField({
+              name: "ctaLabel",
+              title: "CTA Label",
+              type: "string",
+              description: "Optional button text, e.g. 'Read more'.",
+            }),
+            defineField({
+              name: "ctaLink",
+              title: "CTA Link",
+              type: "string",
+              description: "URL or path the CTA routes to.",
+            }),
+            defineField({
+              name: "bannerImage",
+              title: "Banner Illustration (optional)",
+              type: "image",
+              options: { hotspot: true },
+              description: "Optional banner shown on the right side of the card.",
+              fields: [
+                defineField({
+                  name: "alt",
+                  title: "Alt text",
+                  type: "string",
+                  description:
+                    "Short description of the image for accessibility and SEO.",
+                }),
+              ],
+            }),
+          ],
+          preview: {
+            select: {
+              title: "title",
+              subtitle: "eyebrow",
+              media: "bannerImage",
+            },
+            prepare({ title, subtitle, media }) {
+              return {
+                title: title || "Announcement",
+                subtitle: subtitle || "Project announcement",
                 media,
               };
             },
