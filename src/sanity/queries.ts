@@ -221,6 +221,7 @@ export const servicePageBySlugQuery = groq`
     },
     cta{
       headline,
+      description,
       tallyUrl
     },
     seo{
