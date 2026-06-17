@@ -15,16 +15,14 @@ const links = [
   { href: "/", label: "Home" },
   { href: "/catalogue", label: "Catalogue" },
   { href: "/media", label: "Media", children: mediaSubLinks },
-  { href: "/services", label: "Services" },
   { href: "/projects", label: "Projects" },
+  { href: "/services", label: "Services" },
   { href: "/articles", label: "Articles" },
+  { href: "/visual-arts", label: "Visual Arts" },
   { href: "/shop", label: "Shop" },
   // Temporarily hidden — re-enable when ready to launch publicly.
   // { href: "/training", label: "Training" },
   { href: "/about", label: "About Dada" },
-  // Final navigation item — sits flush to the right, just before the
-  // primary "Inquiry" action button.
-  { href: "/visual-arts", label: "Visual Arts" },
 ];
 
 export default function Navbar() {
