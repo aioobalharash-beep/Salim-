@@ -136,6 +136,161 @@ export const servicesQuery = groq`
   }
 `;
 
+/* ── Services funnel ──────────────────────────────────────────────────
+ * The four service cards on the master directory are authored as separate
+ * `servicePage` documents; the surrounding furniture (header, banner, promo,
+ * FAQ, inquiry toggle) lives on the `servicesPage` singleton.
+ */
+export const servicesDirectoryQuery = groq`{
+  "page": *[_type == "servicesPage"][0]{
+    title,
+    subheader,
+    bannerImage{
+      ...,
+      "alt": coalesce(alt, asset->altText, ""),
+      "dimensions": asset->metadata.dimensions,
+      asset
+    },
+    promo{
+      title,
+      subtitle,
+      image{
+        ...,
+        "alt": coalesce(alt, asset->altText, ""),
+        "dimensions": asset->metadata.dimensions,
+        asset
+      },
+      ctaLabel,
+      ctaLink
+    },
+    faqs[]{
+      _key,
+      question,
+      answer
+    },
+    showInquiry,
+    seo{
+      ${seoProjection}
+    }
+  },
+  "services": *[_type == "servicePage" && defined(slug.current)] | order(coalesce(order, 99) asc, title asc){
+    _id,
+    title,
+    "slug": slug.current,
+    "summary": coalesce(summary, hero.subheadline)
+  }
+}`;
+
+export const servicePagesListQuery = groq`
+  *[_type == "servicePage" && defined(slug.current)]{
+    "slug": slug.current
+  }
+`;
+
+export const servicePageBySlugQuery = groq`
+  *[_type == "servicePage" && slug.current == $slug][0]{
+    _id,
+    title,
+    "slug": slug.current,
+    hero{
+      headline,
+      subheadline,
+      image{
+        ...,
+        "alt": coalesce(alt, asset->altText, ""),
+        "dimensions": asset->metadata.dimensions,
+        asset
+      }
+    },
+    howItWorks{
+      title,
+      body
+    },
+    socialProof{
+      title,
+      content[]{
+        ...,
+        _type == "proofImage" => {
+          ...,
+          "alt": coalesce(alt, asset->altText, ""),
+          caption,
+          "dimensions": asset->metadata.dimensions,
+          asset
+        }
+      }
+    },
+    cta{
+      headline,
+      description,
+      tallyUrl
+    },
+    seo{
+      ${seoProjection}
+    }
+  }
+`;
+
+/* ── Visual Arts ──────────────────────────────────────────────────────
+ * The /visual-arts cinematic track is driven by a single `visualArts`
+ * document. `blocks` is an ordered, mixed array of narrative text panels
+ * and full-height artwork assets rendered left-to-right.
+ */
+export const visualArtsQuery = groq`
+  *[_type == "visualArts"][0]{
+    title,
+    subtitle,
+    blocks[]{
+      _key,
+      _type,
+      _type == "textPanel" => {
+        title,
+        chapterSubtitle,
+        body
+      },
+      _type == "artworkAsset" => {
+        caption,
+        medium,
+        tags,
+        image{
+          ...,
+          "alt": coalesce(alt, asset->altText, ""),
+          "dimensions": asset->metadata.dimensions,
+          asset
+        }
+      }
+    },
+    portfolioFeed[]{
+      _key,
+      title,
+      year,
+      notes,
+      image{
+        ...,
+        "alt": coalesce(alt, asset->altText, ""),
+        "dimensions": asset->metadata.dimensions,
+        asset
+      }
+    },
+    projectAnnouncements[]{
+      _key,
+      eyebrow,
+      title,
+      body,
+      ctaLabel,
+      ctaLink,
+      bannerImage{
+        ...,
+        "alt": coalesce(alt, asset->altText, ""),
+        "dimensions": asset->metadata.dimensions,
+        asset
+      }
+    },
+    seo{
+      ${seoProjection}
+    }
+  }
+`;
+
 export const testimonialsQuery = groq`
   *[_type == "testimonial" && approved == true && !(_id in path("drafts.**"))] | order(order asc) {
     _id,
