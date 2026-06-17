@@ -16,7 +16,9 @@ const links = [
   { href: "/catalogue", label: "Catalogue" },
   { href: "/media", label: "Media", children: mediaSubLinks },
   { href: "/projects", label: "Projects" },
+  { href: "/services", label: "Services" },
   { href: "/articles", label: "Articles" },
+  { href: "/visual-arts", label: "Visual Arts" },
   { href: "/shop", label: "Shop" },
   // Temporarily hidden — re-enable when ready to launch publicly.
   // { href: "/training", label: "Training" },
