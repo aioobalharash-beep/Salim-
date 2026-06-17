@@ -272,14 +272,22 @@ export default defineType({
           title: "Headline",
           type: "string",
           description:
-            "Large, prominent callout shown directly above the embedded form.",
+            "Large, prominent callout shown on the left of the closing banner.",
+        }),
+        defineField({
+          name: "description",
+          title: "Description",
+          type: "text",
+          rows: 3,
+          description:
+            "Optional value-pitch copy shown beneath the headline in an editorial tone.",
         }),
         defineField({
           name: "tallyUrl",
           title: "Tally Form URL",
           type: "url",
           description:
-            "Full Tally embed URL, e.g. https://tally.so/embed/dWz4jo?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1",
+            "Full Tally embed URL opened in the pop-up form, e.g. https://tally.so/embed/dWz4jo?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1",
           validation: (Rule) => Rule.uri({ scheme: ["http", "https"] }),
         }),
       ],

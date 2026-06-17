@@ -11,6 +11,7 @@ import {
   servicePagesListQuery,
 } from "@/sanity/queries";
 import { buildMetadata, type SeoSettings } from "@/sanity/seo";
+import ServiceCtaModal from "@/components/ServiceCtaModal";
 
 export const revalidate = 60;
 
@@ -40,6 +41,7 @@ interface ServiceLanding {
   } | null;
   cta?: {
     headline?: string | null;
+    description?: string | null;
     tallyUrl?: string | null;
   } | null;
   seo?: SeoSettings | null;
@@ -158,7 +160,7 @@ const richTextComponents: PortableTextComponents = {
     strong: ({ children }) => (
       <strong className="font-medium text-foreground/85">{children}</strong>
     ),
-    em: ({ children }) => <em>{children}</em>,
+    em: ({ children }) => <em className="italic">{children}</em>,
     link: ({ value, children }) => {
       const blank = (value as { blank?: boolean })?.blank;
       return (
@@ -260,30 +262,6 @@ function SocialProofSection({
   );
 }
 
-/* ── 4 · Call to Action — headline + embedded Tally form ───────────────── */
-function CtaSection({ cta }: { cta: ServiceLanding["cta"] }) {
-  if (!cta || (!cta.headline && !cta.tallyUrl)) return null;
-  return (
-    <section className="bg-surface-container-low mt-24 md:mt-32">
-      <div className="max-w-4xl mx-auto px-6 md:px-8 py-20 md:py-28 text-center">
-        {cta.headline && (
-          <h2 className="font-headline text-3xl sm:text-4xl md:text-6xl font-light text-foreground leading-tight mb-12 md:mb-16">
-            {cta.headline}
-          </h2>
-        )}
-        {cta.tallyUrl && (
-          <iframe
-            src={cta.tallyUrl}
-            title={cta.headline || "Inquiry form"}
-            loading="lazy"
-            className="w-full h-[680px] md:h-[760px] border-0 bg-transparent"
-          />
-        )}
-      </div>
-    </section>
-  );
-}
-
 export default async function ServiceLandingPage({
   params,
 }: {
@@ -307,7 +285,11 @@ export default async function ServiceLandingPage({
         <HeroSection hero={service.hero} />
         <HowItWorksSection data={service.howItWorks} />
         <SocialProofSection data={service.socialProof} />
-        <CtaSection cta={service.cta} />
+        <ServiceCtaModal
+          headline={service.cta?.headline}
+          description={service.cta?.description}
+          tallyUrl={service.cta?.tallyUrl}
+        />
       </div>
     </div>
   );
