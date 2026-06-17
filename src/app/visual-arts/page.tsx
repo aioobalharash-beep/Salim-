@@ -31,10 +31,30 @@ type TrackBlock =
       image: ArtworkImage | null;
     };
 
+interface PortfolioItem {
+  _key: string;
+  title: string | null;
+  year?: string | null;
+  notes?: string | null;
+  image: ArtworkImage | null;
+}
+
+interface ProjectAnnouncement {
+  _key: string;
+  eyebrow?: string | null;
+  title: string | null;
+  body?: PortableTextBlock[] | null;
+  ctaLabel?: string | null;
+  ctaLink?: string | null;
+  bannerImage: ArtworkImage | null;
+}
+
 interface VisualArtsData {
   title: string | null;
   subtitle?: string | null;
   blocks?: TrackBlock[] | null;
+  portfolioFeed?: PortfolioItem[] | null;
+  projectAnnouncements?: ProjectAnnouncement[] | null;
   seo?: SeoSettings | null;
 }
 
@@ -174,6 +194,105 @@ function ArtworkPanel({
   );
 }
 
+/* ── Section A · Portfolio feed card ───────────────────────────────── */
+function PortfolioCard({ item }: { item: PortfolioItem }) {
+  if (!item.image) return null;
+
+  const src = urlFor(item.image).width(900).auto("format").quality(85).url();
+  const meta = [item.year, item.notes].filter(Boolean).join(" · ");
+
+  return (
+    <figure className="flex flex-col">
+      {/* Bordered box panel — equal padding frames the artwork at its
+          native proportions. */}
+      <div className="border border-neutral-200 bg-white p-3 md:p-4">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt={item.image.alt || item.title || "Artwork"}
+          loading="lazy"
+          className="w-full h-auto object-contain"
+        />
+      </div>
+
+      {/* Typography panel — sits directly beneath the imagery box. */}
+      <figcaption className="pt-3 md:pt-4">
+        {item.title && (
+          <h3 className="font-headline text-base md:text-lg leading-snug text-neutral-900">
+            {item.title}
+          </h3>
+        )}
+        {meta && (
+          <p className="mt-1.5 font-label text-[10px] uppercase tracking-[0.2em] text-neutral-400">
+            {meta}
+          </p>
+        )}
+      </figcaption>
+    </figure>
+  );
+}
+
+/* ── Section B · Project announcement card ─────────────────────────── */
+function AnnouncementCard({
+  announcement,
+}: {
+  announcement: ProjectAnnouncement;
+}) {
+  const { eyebrow, title, body, ctaLabel, ctaLink, bannerImage } = announcement;
+  const bannerSrc = bannerImage
+    ? urlFor(bannerImage).width(1200).auto("format").quality(85).url()
+    : null;
+
+  return (
+    <article className="border border-neutral-200 bg-white">
+      {/* Uniform padding all around the internal card boundary. On mobile the
+          banner stacks beneath the copy; on md+ they sit side by side. */}
+      <div className="flex flex-col md:flex-row gap-8 md:gap-12 p-6 md:p-10">
+        {/* Left · narrative promotional text */}
+        <div className="flex-1 flex flex-col justify-center">
+          {eyebrow && (
+            <span className="font-label text-[11px] uppercase tracking-[0.3em] text-neutral-400 mb-4">
+              {eyebrow}
+            </span>
+          )}
+          {title && (
+            <h3 className="font-headline text-2xl md:text-3xl leading-tight text-neutral-900 mb-4">
+              {title}
+            </h3>
+          )}
+          {body && body.length > 0 && (
+            <div className="max-w-[52ch]">
+              <PortableText value={body} components={loreComponents} />
+            </div>
+          )}
+          {ctaLabel && ctaLink && (
+            <a
+              href={ctaLink}
+              className="mt-6 inline-flex w-fit items-center gap-2 font-label text-[11px] uppercase tracking-[0.25em] text-neutral-900 border-b border-neutral-900/30 pb-1 hover:border-neutral-900 transition-colors"
+            >
+              {ctaLabel}
+              <span aria-hidden>→</span>
+            </a>
+          )}
+        </div>
+
+        {/* Right · optional banner illustration */}
+        {bannerSrc && (
+          <div className="md:w-2/5 flex-shrink-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={bannerSrc}
+              alt={bannerImage?.alt || title || "Project banner"}
+              loading="lazy"
+              className="w-full h-48 md:h-full object-cover"
+            />
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+
 /* ── Page ──────────────────────────────────────────────────────────── */
 export default async function VisualArtsPage() {
   let data: VisualArtsData | null = null;
@@ -184,20 +303,28 @@ export default async function VisualArtsPage() {
   }
 
   const blocks = data?.blocks ?? [];
+  const portfolioFeed = data?.portfolioFeed ?? [];
+  const projectAnnouncements = data?.projectAnnouncements ?? [];
 
   return (
     /*
-     * The cinematic track.
-     *
-     * Desktop (md+): breaks free of vertical scrolling — pinned to the
-     * viewport (h-screen) with horizontal momentum scrolling (overflow-x-auto)
-     * so artwork streams left-to-right like a graphic-novel preview.
-     *
-     * Mobile (<md): the media query un-snaps the track back to a tight,
-     * high-density vertical column flow, keeping each text block stacked
-     * neatly above its respective illustration.
+     * Root: standard vertical document flow. The horizontal cinematic track is
+     * a single full-viewport section at the top; everything below it (the
+     * portfolio feed and project announcements) scrolls vertically as normal.
      */
-    <main className="w-full md:w-screen min-h-screen md:h-screen overflow-x-hidden overflow-y-auto md:overflow-x-auto md:overflow-y-hidden flex flex-col md:flex-row items-stretch md:items-center bg-[#faf8f5]">
+    <div className="bg-[#faf8f5]">
+      {/*
+       * The cinematic track.
+       *
+       * Desktop (md+): breaks free of vertical scrolling — pinned to the
+       * viewport (h-screen) with horizontal momentum scrolling (overflow-x-auto)
+       * so artwork streams left-to-right like a graphic-novel preview.
+       *
+       * Mobile (<md): the media query un-snaps the track back to a tight,
+       * high-density vertical column flow, keeping each text block stacked
+       * neatly above its respective illustration.
+       */}
+      <section className="w-full md:w-screen min-h-screen md:h-screen overflow-x-hidden overflow-y-auto md:overflow-x-auto md:overflow-y-hidden flex flex-col md:flex-row items-stretch md:items-center bg-[#faf8f5]">
       {/* Opening narrative anchor, drawn from the page title + intro. */}
       {(data?.title || data?.subtitle) && (
         <div className="w-full md:w-auto md:min-w-[520px] h-auto md:h-full flex flex-col justify-center px-8 md:px-16 pt-28 pb-12 md:py-0 border-b md:border-b-0 md:border-r border-neutral-200/50">
@@ -248,6 +375,64 @@ export default async function VisualArtsPage() {
       {blocks.length > 0 && (
         <div className="hidden md:block flex-shrink-0 w-24" aria-hidden />
       )}
-    </main>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+       * Section A · Master Artwork Portfolio Feed
+       * A responsive card matrix: 2 cols on mobile, 3 on md, 4 on lg.
+       * Each card frames the illustration at native proportions inside a
+       * bordered box, with a typography panel directly beneath.
+       * ───────────────────────────────────────────────────────────── */}
+      {portfolioFeed.length > 0 && (
+        <section className="w-full px-6 md:px-12 py-20 md:py-28 border-t border-neutral-200/60">
+          <div className="max-w-screen-2xl mx-auto">
+            <header className="mb-10 md:mb-14">
+              <span className="font-label text-[11px] uppercase tracking-[0.4em] text-neutral-400">
+                Portfolio
+              </span>
+              <h2 className="mt-4 font-headline text-3xl md:text-5xl leading-tight text-neutral-900">
+                The Complete Works
+              </h2>
+            </header>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {portfolioFeed.map((item) => (
+                <PortfolioCard key={item._key} item={item} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+       * Section B · Future Project Announcements
+       * A vertical stack of large promotional cards. Each splits into a
+       * narrative text column and an optional banner illustration, with
+       * the graphic stacking beneath the copy on mobile.
+       * ───────────────────────────────────────────────────────────── */}
+      {projectAnnouncements.length > 0 && (
+        <section className="w-full px-6 md:px-12 pb-24 md:pb-32 border-t border-neutral-200/60 pt-20 md:pt-28">
+          <div className="max-w-screen-xl mx-auto">
+            <header className="mb-10 md:mb-14">
+              <span className="font-label text-[11px] uppercase tracking-[0.4em] text-neutral-400">
+                On the Horizon
+              </span>
+              <h2 className="mt-4 font-headline text-3xl md:text-5xl leading-tight text-neutral-900">
+                Upcoming Projects
+              </h2>
+            </header>
+
+            <div className="flex flex-col gap-8 md:gap-12">
+              {projectAnnouncements.map((announcement) => (
+                <AnnouncementCard
+                  key={announcement._key}
+                  announcement={announcement}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+    </div>
   );
 }

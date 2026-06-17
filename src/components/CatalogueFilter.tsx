@@ -93,6 +93,27 @@ export interface CatalogueWork {
   } | null;
 }
 
+/**
+ * Resolve the terminal (end) year an entry should sort by.
+ *
+ * The `year` field is a free-text string that may hold a single year
+ * ("2016") or a development range ("1999-2016" / "1999–2016" with an en-dash,
+ * or "2014 – present"). Lexicographic comparison of the raw string sorts ranges
+ * by their START year, so a piece finished in 2016 but begun in 1999 would be
+ * mis-ranked far below single-year 2016 works.
+ *
+ * This isolates the LAST run of four consecutive digits and returns it as an
+ * integer, so range-based works track their completion year and sort alongside
+ * single-year works from the same year. Returns `null` when no 4-digit year is
+ * present (e.g. an empty field or "present"), letting callers sort those last.
+ */
+const getEndYear = (yearStr: string | null | undefined): number | null => {
+  if (!yearStr) return null;
+  const years = yearStr.match(/\d{4}/g);
+  if (!years || years.length === 0) return null;
+  return parseInt(years[years.length - 1], 10);
+};
+
 function formatPremiereDate(iso: string | null) {
   if (!iso) return "";
   const d = new Date(iso);
@@ -513,9 +534,17 @@ export default function CatalogueFilter({
     sorted.sort((a, b) => {
       switch (sort) {
         case "yearDesc":
-          return (b.year ?? "").localeCompare(a.year ?? "");
-        case "yearAsc":
-          return (a.year ?? "").localeCompare(b.year ?? "");
+        case "yearAsc": {
+          // Sort on the terminal year so ranges ("1999–2016") rank by their
+          // completion year, alongside single-year works ("2016"). Entries
+          // without a parseable year are always pushed to the end.
+          const ay = getEndYear(a.year);
+          const by = getEndYear(b.year);
+          if (ay === null && by === null) return 0;
+          if (ay === null) return 1;
+          if (by === null) return -1;
+          return sort === "yearDesc" ? by - ay : ay - by;
+        }
         case "titleAsc":
           return a.title.localeCompare(b.title);
         case "durationDesc":
