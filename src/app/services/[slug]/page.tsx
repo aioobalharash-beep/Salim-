@@ -11,7 +11,7 @@ import {
   servicePagesListQuery,
 } from "@/sanity/queries";
 import { buildMetadata, type SeoSettings } from "@/sanity/seo";
-import ServiceCtaModal from "@/components/ServiceCtaModal";
+import ServiceCtaForm from "@/components/ServiceCtaForm";
 
 export const revalidate = 60;
 
@@ -285,7 +285,7 @@ export default async function ServiceLandingPage({
         <HeroSection hero={service.hero} />
         <HowItWorksSection data={service.howItWorks} />
         <SocialProofSection data={service.socialProof} />
-        <ServiceCtaModal
+        <ServiceCtaForm
           headline={service.cta?.headline}
           description={service.cta?.description}
           tallyUrl={service.cta?.tallyUrl}
