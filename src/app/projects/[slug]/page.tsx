@@ -10,6 +10,7 @@ import { projectBySlugQuery } from "@/sanity/queries";
 import { buildMetadata, type SeoSettings } from "@/sanity/seo";
 import ProjectContactBar from "@/components/ProjectContactBar";
 import ProjectImageSlider from "@/components/ProjectImageSlider";
+import ProjectYouTube from "@/components/ProjectYouTube";
 
 export const revalidate = 60;
 
@@ -199,24 +200,8 @@ function StandaloneMediaElement({
   if (item._type === "youtube") {
     const id = getYouTubeId(item.url || "");
     if (!id) return null;
-    const start =
-      typeof item.startTime === "number" && item.startTime > 0
-        ? Math.floor(item.startTime)
-        : null;
-    const src = `https://www.youtube-nocookie.com/embed/${id}${
-      start ? `?start=${start}` : ""
-    }`;
     return (
-      <div className="relative w-full aspect-video overflow-hidden bg-on-surface">
-        <iframe
-          src={src}
-          title={item.title || "YouTube video"}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          loading="eager"
-          className="absolute inset-0 w-full h-full"
-        />
-      </div>
+      <ProjectYouTube id={id} start={item.startTime} title={item.title} />
     );
   }
 
@@ -225,6 +210,7 @@ function StandaloneMediaElement({
     return (
       <video
         controls
+        playsInline
         preload="metadata"
         className="w-full h-auto bg-on-surface/5"
         src={item.videoUrl}
