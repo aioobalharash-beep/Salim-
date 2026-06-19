@@ -207,14 +207,19 @@ function StandaloneMediaElement({
 
   if (item._type === "videoFile") {
     if (!item.videoUrl) return null;
+    // Stable 16:9 box + playsInline so iOS plays inline; the `#t=0.1` media
+    // fragment makes iOS render the first frame as a poster instead of a
+    // blank black box.
     return (
-      <video
-        controls
-        playsInline
-        preload="metadata"
-        className="w-full h-auto bg-on-surface/5"
-        src={item.videoUrl}
-      />
+      <div className="relative w-full aspect-video overflow-hidden bg-on-surface">
+        <video
+          controls
+          playsInline
+          preload="metadata"
+          className="absolute inset-0 w-full h-full object-contain"
+          src={`${item.videoUrl}#t=0.1`}
+        />
+      </div>
     );
   }
 
