@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-/* Lightweight YouTube facade: shows the poster thumbnail instantly (so the
- * block is never a blank box on mobile) and only mounts the heavy iframe when
- * the visitor taps play — which also autoplays on demand. */
+/* YouTube embed that adapts to viewport:
+ *  - Mobile: a lightweight facade — the poster thumbnail shows instantly (so
+ *    the block is never a blank box) and the heavy iframe only mounts, and
+ *    autoplays, when the visitor taps play.
+ *  - Desktop: the player loads immediately (ready to play, not autoplaying),
+ *    since eager iframes are fine on desktop. */
 export default function ProjectYouTube({
   id,
   start,
@@ -15,15 +18,30 @@ export default function ProjectYouTube({
   title?: string | null;
 }) {
   const [playing, setPlaying] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  // Resolved after mount, so server + first client render both show the facade
+  // (no hydration mismatch); desktop then swaps in the live player.
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  const showIframe = playing || isDesktop;
 
   const startParam =
     typeof start === "number" && start > 0 ? `&start=${Math.floor(start)}` : "";
-  const src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1${startParam}`;
+  // Autoplay only on an explicit tap — never when desktop auto-loads.
+  const autoplayParam = playing ? "&autoplay=1" : "";
+  const src = `https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1${autoplayParam}${startParam}`;
   const poster = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
   return (
     <div className="relative w-full aspect-video overflow-hidden bg-on-surface">
-      {playing ? (
+      {showIframe ? (
         <iframe
           src={src}
           title={title || "YouTube video"}
