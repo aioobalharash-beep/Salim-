@@ -288,6 +288,89 @@ export default defineType({
             },
           },
         }),
+        /* — Album / Discography — */
+        defineArrayMember({
+          type: "object",
+          name: "projectAlbum",
+          title: "Album / Discography",
+          description:
+            "A discography block: album art on the left, a numbered track list with inline audio players on the right.",
+          fields: [
+            defineField({
+              name: "albumTitle",
+              title: "Album Title",
+              type: "string",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "albumSubtitle",
+              title: "Album Subtitle",
+              type: "string",
+              description: "Optional — e.g. label, year, or format.",
+            }),
+            defineField({
+              name: "albumArt",
+              title: "Album Art",
+              type: "image",
+              options: { hotspot: true },
+              fields: [
+                defineField({
+                  name: "alt",
+                  title: "Alt text",
+                  type: "string",
+                  description:
+                    "Short description of the cover for accessibility and SEO.",
+                }),
+              ],
+            }),
+            defineField({
+              name: "tracks",
+              title: "Tracks",
+              type: "array",
+              of: [
+                defineArrayMember({
+                  type: "object",
+                  name: "track",
+                  title: "Track",
+                  fields: [
+                    defineField({
+                      name: "trackTitle",
+                      title: "Track Title",
+                      type: "string",
+                      validation: (Rule) => Rule.required(),
+                    }),
+                    defineField({
+                      name: "audioFile",
+                      title: "Audio File",
+                      type: "file",
+                      options: { accept: "audio/*" },
+                      validation: (Rule) => Rule.required(),
+                    }),
+                  ],
+                  preview: { select: { title: "trackTitle" } },
+                }),
+              ],
+              validation: (Rule) => Rule.required().min(1),
+            }),
+          ],
+          preview: {
+            select: {
+              title: "albumTitle",
+              subtitle: "albumSubtitle",
+              media: "albumArt",
+              tracks: "tracks",
+            },
+            prepare({ title, subtitle, media, tracks }) {
+              const n = Array.isArray(tracks) ? tracks.length : 0;
+              return {
+                title: title || "Album",
+                subtitle:
+                  subtitle || `${n} track${n === 1 ? "" : "s"}`,
+                media,
+              };
+            },
+          },
+        }),
       ],
     }),
 
