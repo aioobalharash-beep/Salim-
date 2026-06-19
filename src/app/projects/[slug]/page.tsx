@@ -52,6 +52,14 @@ type GalleryItem =
       videoUrl: string | null;
       title?: string | null;
       description?: string | null;
+    }
+  | {
+      _key: string;
+      _type: "projectAlbum";
+      albumTitle: string | null;
+      albumSubtitle?: string | null;
+      albumArt?: ProjectImage | null;
+      tracks?: { trackTitle: string | null; audioUrl: string | null }[] | null;
     };
 
 interface Project {
@@ -224,8 +232,9 @@ function StandaloneMediaElement({
     );
   }
 
-  // imageGroup is handled by GalleryBlock; only galleryImage remains here.
-  if (item._type === "imageGroup") return null;
+  // imageGroup and projectAlbum are handled by GalleryBlock; only the single
+  // galleryImage remains here.
+  if (item._type === "imageGroup" || item._type === "projectAlbum") return null;
 
   return (
     <GalleryImage
@@ -233,6 +242,83 @@ function StandaloneMediaElement({
       priority={priority}
       sizes="(max-width: 896px) 100vw, 896px"
     />
+  );
+}
+
+/* ── Album / Discography block — art + numbered track list with players ── */
+function ProjectAlbum({
+  album,
+}: {
+  album: Extract<GalleryItem, { _type: "projectAlbum" }>;
+}) {
+  const tracks = (album.tracks ?? []).filter((t) => t?.audioUrl);
+  const artReady = hasAsset(album.albumArt);
+
+  return (
+    <div className="flex flex-col lg:flex-row gap-12 max-w-6xl mx-auto my-16 p-6">
+      {/* Left — album art in a sharp square bounding box */}
+      <div className="w-full lg:w-1/3">
+        <div className="aspect-square overflow-hidden shadow-sm bg-on-surface/[0.05]">
+          {artReady && album.albumArt && (
+            <Image
+              src={urlFor(album.albumArt)
+                .width(800)
+                .height(800)
+                .quality(85)
+                .auto("format")
+                .url()}
+              alt={album.albumArt.alt || album.albumTitle || "Album art"}
+              width={800}
+              height={800}
+              sizes="(max-width: 1024px) 100vw, 33vw"
+              className="w-full h-full object-cover"
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Right — title, subtitle, numbered track list */}
+      <div className="w-full lg:w-2/3">
+        {album.albumTitle && (
+          <h3 className="font-headline text-xl md:text-2xl text-foreground">
+            {album.albumTitle}
+          </h3>
+        )}
+        {album.albumSubtitle && (
+          <p className="font-label text-xs uppercase tracking-widest text-foreground/40 mt-1.5 mb-6">
+            {album.albumSubtitle}
+          </p>
+        )}
+
+        {tracks.length > 0 && (
+          <ol className="border-t border-foreground/[0.08]">
+            {tracks.map((track, i) => (
+              <li
+                key={i}
+                className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 py-4 border-b border-foreground/[0.08]"
+              >
+                <div className="flex items-center gap-4 min-w-0 sm:flex-1">
+                  <span className="font-label text-xs tabular-nums text-foreground/40 w-5 shrink-0">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="font-body text-sm md:text-base text-foreground truncate">
+                    {track.trackTitle}
+                  </span>
+                </div>
+                {track.audioUrl && (
+                  <audio
+                    controls
+                    preload="none"
+                    src={track.audioUrl}
+                    className="h-9 w-full sm:w-auto sm:max-w-[260px] sm:ml-auto"
+                  />
+                )}
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -245,6 +331,11 @@ function GalleryBlock({
   item: GalleryItem;
   priority?: boolean;
 }) {
+  // Discography block — its own full-width split layout.
+  if (item._type === "projectAlbum") {
+    return <ProjectAlbum album={item} />;
+  }
+
   if (item._type === "imageGroup") {
     const imgs = (item.images ?? []).filter(hasAsset);
     if (imgs.length === 0) return null;

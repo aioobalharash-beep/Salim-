@@ -444,6 +444,20 @@ export const projectBySlugQuery = groq`
         title,
         description,
         "videoUrl": file.asset->url
+      },
+      _type == "projectAlbum" => {
+        albumTitle,
+        albumSubtitle,
+        albumArt{
+          ...,
+          "alt": coalesce(alt, asset->altText, ""),
+          "dimensions": asset->metadata.dimensions,
+          asset
+        },
+        tracks[]{
+          trackTitle,
+          "audioUrl": audioFile.asset->url
+        }
       }
     },
     projectDetails[]{

@@ -175,9 +175,30 @@ export default function ProjectImageSlider({
         </button>
       </div>
 
+      {/* ── Reactive caption — small editorial tone, sits ABOVE the dots ── */}
+      {(current.title || current.description) && (
+        <div className="min-h-[1.5rem]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={current._key ?? safe}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="text-xs md:text-sm font-body tracking-wide text-foreground/55 text-center mt-4 mb-2 max-w-xl mx-auto whitespace-pre-line"
+            >
+              {current.title && (
+                <span className="block text-foreground/80">{current.title}</span>
+              )}
+              {current.description && <span className="block">{current.description}</span>}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      )}
+
       {/* ── Dots ── */}
       {count > 1 && (
-        <div className="flex justify-center flex-wrap gap-2 mt-6">
+        <div className="flex justify-center flex-wrap gap-2 mt-2">
           {images.map((img, i) => (
             <button
               key={img._key ?? i}
@@ -192,32 +213,6 @@ export default function ProjectImageSlider({
               }`}
             />
           ))}
-        </div>
-      )}
-
-      {/* ── Reactive caption — updates with the focal image ── */}
-      {(current.title || current.description) && (
-        <div className="max-w-2xl mx-auto mt-6 text-center min-h-[2rem]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={current._key ?? safe}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-            >
-              {current.title && (
-                <h3 className="font-headline text-xl md:text-2xl text-foreground mb-2">
-                  {current.title}
-                </h3>
-              )}
-              {current.description && (
-                <p className="font-body text-sm md:text-base leading-relaxed text-foreground/55 whitespace-pre-line">
-                  {current.description}
-                </p>
-              )}
-            </motion.div>
-          </AnimatePresence>
         </div>
       )}
     </div>
