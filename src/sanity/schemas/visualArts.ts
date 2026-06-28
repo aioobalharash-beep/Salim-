@@ -14,7 +14,86 @@ import { defineType, defineField, defineArrayMember } from "sanity";
  *                      notes (e.g. Charcoal, Ink) and optional grouping tags.
  *
  * Order is meaningful: blocks render left-to-right exactly as arranged here.
+ *
+ * The portfolio feed below the track is split into three format-locked
+ * sections — vertical, square and landscape — so every row aligns to a
+ * uniform aspect ratio regardless of the raw source file. Each artwork image
+ * enables Sanity's hotspot & crop tooling so Salim can visually re-frame a
+ * canvas inside its fixed wrapper from the studio.
  */
+
+/**
+ * Shared field-set factory for a single portfolio artwork.
+ *
+ * Each of the three format sections reuses the identical authoring shape
+ * (image + title + year + medium notes); only the array member `name`/`title`
+ * differs so the studio can label the format. The image enables
+ * `options.hotspot`, which surfaces Sanity's native focal-point selector and
+ * crop handles — these crop parameters are then honoured by the frontend image
+ * URL builder when the artwork is composited into its fixed-ratio frame.
+ */
+function portfolioWorkMember({
+  name,
+  title,
+  formatHint,
+}: {
+  name: string;
+  title: string;
+  formatHint: string;
+}) {
+  return defineArrayMember({
+    type: "object",
+    name,
+    title,
+    icon: () => "🖼️",
+    fields: [
+      defineField({
+        name: "image",
+        title: "Image",
+        type: "image",
+        // Hotspot + crop: unlocks the visual focal-point selector and crop
+        // handles in the studio so the artwork can be re-framed inside its
+        // fixed aspect-ratio wrapper on the page.
+        options: { hotspot: true },
+        validation: (Rule) => Rule.required(),
+        fields: [
+          defineField({
+            name: "alt",
+            title: "Alt text",
+            type: "string",
+            description:
+              "Short description of the image for accessibility and SEO.",
+          }),
+        ],
+      }),
+      defineField({
+        name: "title",
+        title: "Title",
+        type: "string",
+        description: "Artwork title, shown beneath the image.",
+        validation: (Rule) => Rule.required(),
+      }),
+      defineField({
+        name: "year",
+        title: "Year",
+        type: "string",
+        description: "Year of production, e.g. '2026'.",
+      }),
+      defineField({
+        name: "notes",
+        title: "Medium / Production Notes",
+        type: "string",
+        description: `Medium or technique, e.g. 'Ink'. ${formatHint}`,
+      }),
+    ],
+    preview: {
+      select: { title: "title", subtitle: "year", media: "image" },
+      prepare({ title, subtitle, media }) {
+        return { title: title || "Artwork", subtitle, media };
+      },
+    },
+  });
+}
 export default defineType({
   name: "visualArts",
   title: "Visual Arts",
@@ -26,6 +105,17 @@ export default defineType({
     { name: "feed", title: "Portfolio Feed" },
     { name: "announcements", title: "Project Announcements" },
     { name: "seo", title: "SEO" },
+  ],
+  // The portfolio feed is authored as three format-locked arrays so each row
+  // on the page snaps to a uniform aspect ratio: verticalWorks (portrait
+  // studies & sketches), squareWorks (1:1 graphic tiles) and landscapeWorks
+  // (wide scenery, storyboards & panoramas).
+  fieldsets: [
+    {
+      name: "portfolioFeed",
+      title: "Artwork Portfolio Feed",
+      options: { collapsible: true, collapsed: false },
+    },
   ],
   fields: [
     /* ── Header ─────────────────────────────────────────────────── */
@@ -208,65 +298,55 @@ export default defineType({
 
     /* ── Section A · Master Artwork Portfolio Feed ──────────────────
      * The vertical-scrolling card matrix rendered below the horizontal
-     * track. Each item is a single illustration shown at its native
-     * proportions with a title / year / production-notes panel beneath. */
+     * track. Split into three format-locked rows so every card aligns to a
+     * uniform aspect ratio regardless of the raw source proportions. Each
+     * image enables hotspot & crop so Salim can re-frame the canvas inside
+     * its fixed wrapper from the studio. */
     defineField({
-      name: "portfolioFeed",
-      title: "Artwork Portfolio Feed",
+      name: "verticalWorks",
+      title: "Vertical Works (Portrait)",
       type: "array",
       group: "feed",
+      fieldset: "portfolioFeed",
       description:
-        "A responsive grid of artworks shown below the cinematic track (2 columns on mobile, 3–4 on desktop).",
+        "Portrait-format illustrations — sketches, figure studies and tall works. Rendered in a 3:4 aspect-ratio grid.",
       of: [
-        defineArrayMember({
-          type: "object",
-          name: "portfolioItem",
-          title: "Artwork",
-          icon: () => "🖼️",
-          fields: [
-            defineField({
-              name: "image",
-              title: "Image",
-              type: "image",
-              options: { hotspot: true },
-              validation: (Rule) => Rule.required(),
-              fields: [
-                defineField({
-                  name: "alt",
-                  title: "Alt text",
-                  type: "string",
-                  description:
-                    "Short description of the image for accessibility and SEO.",
-                }),
-              ],
-            }),
-            defineField({
-              name: "title",
-              title: "Title",
-              type: "string",
-              description: "Artwork title, shown beneath the image.",
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: "year",
-              title: "Year",
-              type: "string",
-              description: "Year of production, e.g. '2026'.",
-            }),
-            defineField({
-              name: "notes",
-              title: "Production Notes",
-              type: "string",
-              description:
-                "Medium / technique notes, e.g. 'Ink & digital colour'.",
-            }),
-          ],
-          preview: {
-            select: { title: "title", subtitle: "year", media: "image" },
-            prepare({ title, subtitle, media }) {
-              return { title: title || "Artwork", subtitle, media };
-            },
-          },
+        portfolioWorkMember({
+          name: "verticalWork",
+          title: "Vertical Artwork",
+          formatHint: "Shown in a portrait (3:4) frame.",
+        }),
+      ],
+    }),
+    defineField({
+      name: "squareWorks",
+      title: "Square Works (1:1)",
+      type: "array",
+      group: "feed",
+      fieldset: "portfolioFeed",
+      description:
+        "Square, 1:1-formatted graphic tiles. Rendered in a perfectly square grid.",
+      of: [
+        portfolioWorkMember({
+          name: "squareWork",
+          title: "Square Artwork",
+          formatHint: "Shown in a square (1:1) frame.",
+        }),
+      ],
+    }),
+    defineField({
+      name: "landscapeWorks",
+      title: "Landscape Works (Wide)",
+      type: "array",
+      group: "feed",
+      fieldset: "portfolioFeed",
+      description:
+        "Wide scenery, storyboards and panoramas. Rendered in a 16:10 aspect-ratio grid.",
+      of: [
+        portfolioWorkMember({
+          name: "landscapeWork",
+          title: "Landscape Artwork",
+          formatHint: "Shown in a wide (16:10) frame.",
         }),
       ],
     }),

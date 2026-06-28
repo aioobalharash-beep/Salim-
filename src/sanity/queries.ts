@@ -259,13 +259,43 @@ export const visualArtsQuery = groq`
         }
       }
     },
-    portfolioFeed[]{
+    verticalWorks[]{
       _key,
       title,
       year,
       notes,
       image{
         ...,
+        crop,
+        hotspot,
+        "alt": coalesce(alt, asset->altText, ""),
+        "dimensions": asset->metadata.dimensions,
+        asset
+      }
+    },
+    squareWorks[]{
+      _key,
+      title,
+      year,
+      notes,
+      image{
+        ...,
+        crop,
+        hotspot,
+        "alt": coalesce(alt, asset->altText, ""),
+        "dimensions": asset->metadata.dimensions,
+        asset
+      }
+    },
+    landscapeWorks[]{
+      _key,
+      title,
+      year,
+      notes,
+      image{
+        ...,
+        crop,
+        hotspot,
         "alt": coalesce(alt, asset->altText, ""),
         "dimensions": asset->metadata.dimensions,
         asset
