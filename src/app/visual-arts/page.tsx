@@ -53,7 +53,9 @@ interface VisualArtsData {
   title: string | null;
   subtitle?: string | null;
   blocks?: TrackBlock[] | null;
-  portfolioFeed?: PortfolioItem[] | null;
+  verticalWorks?: PortfolioItem[] | null;
+  squareWorks?: PortfolioItem[] | null;
+  landscapeWorks?: PortfolioItem[] | null;
   projectAnnouncements?: ProjectAnnouncement[] | null;
   seo?: SeoSettings | null;
 }
@@ -195,24 +197,52 @@ function ArtworkPanel({
 }
 
 /* ── Section A · Portfolio feed card ───────────────────────────────── */
-function PortfolioCard({ item }: { item: PortfolioItem }) {
+/**
+ * A single format-locked artwork card. The image is composited into a rigid,
+ * uniform aspect-ratio wrapper (`aspectClass`) so every card in a row aligns
+ * perfectly regardless of the raw source proportions.
+ *
+ * The Sanity image URL builder is fed an explicit `width`/`height` matching
+ * the frame ratio with `.fit("crop")`, which makes the CDN honour the editor's
+ * hotspot focal point and crop rectangle — Salim's studio framing is baked
+ * into the delivered file, and `object-cover` keeps it flush inside the box.
+ */
+function PortfolioCard({
+  item,
+  aspectClass,
+  width,
+  height,
+}: {
+  item: PortfolioItem;
+  aspectClass: string;
+  width: number;
+  height: number;
+}) {
   if (!item.image) return null;
 
-  const src = urlFor(item.image).width(900).auto("format").quality(85).url();
+  const src = urlFor(item.image)
+    .width(width)
+    .height(height)
+    .fit("crop")
+    .auto("format")
+    .quality(85)
+    .url();
   const meta = [item.year, item.notes].filter(Boolean).join(" · ");
 
   return (
     <figure className="flex flex-col">
-      {/* Bordered box panel — equal padding frames the artwork at its
-          native proportions. */}
+      {/* Bordered box panel — equal padding frames the rigid aspect-ratio
+          image wrapper. */}
       <div className="border border-neutral-200 bg-white p-3 md:p-4">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={src}
-          alt={item.image.alt || item.title || "Artwork"}
-          loading="lazy"
-          className="w-full h-auto object-contain"
-        />
+        <div className={`relative ${aspectClass} w-full overflow-hidden`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={src}
+            alt={item.image.alt || item.title || "Artwork"}
+            loading="lazy"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </div>
       </div>
 
       {/* Typography panel — sits directly beneath the imagery box. */}
@@ -229,6 +259,56 @@ function PortfolioCard({ item }: { item: PortfolioItem }) {
         )}
       </figcaption>
     </figure>
+  );
+}
+
+/* ── Section A · Format-locked portfolio row ───────────────────────── */
+/**
+ * One labelled portfolio section that lays its artworks out in a responsive
+ * grid, every card sharing the same strict aspect ratio so rows stay aligned.
+ */
+function PortfolioRow({
+  eyebrow,
+  heading,
+  items,
+  aspectClass,
+  width,
+  height,
+  columns,
+}: {
+  eyebrow: string;
+  heading: string;
+  items: PortfolioItem[];
+  aspectClass: string;
+  width: number;
+  height: number;
+  columns: string;
+}) {
+  if (items.length === 0) return null;
+
+  return (
+    <div>
+      <header className="mb-8 md:mb-10">
+        <span className="font-label text-[11px] uppercase tracking-[0.4em] text-neutral-400">
+          {eyebrow}
+        </span>
+        <h3 className="mt-3 font-headline text-2xl md:text-3xl leading-tight text-neutral-900">
+          {heading}
+        </h3>
+      </header>
+
+      <div className={`grid ${columns} gap-4 md:gap-6`}>
+        {items.map((item) => (
+          <PortfolioCard
+            key={item._key}
+            item={item}
+            aspectClass={aspectClass}
+            width={width}
+            height={height}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -303,7 +383,13 @@ export default async function VisualArtsPage() {
   }
 
   const blocks = data?.blocks ?? [];
-  const portfolioFeed = data?.portfolioFeed ?? [];
+  const verticalWorks = data?.verticalWorks ?? [];
+  const squareWorks = data?.squareWorks ?? [];
+  const landscapeWorks = data?.landscapeWorks ?? [];
+  const hasPortfolio =
+    verticalWorks.length > 0 ||
+    squareWorks.length > 0 ||
+    landscapeWorks.length > 0;
   const projectAnnouncements = data?.projectAnnouncements ?? [];
 
   return (
@@ -379,14 +465,16 @@ export default async function VisualArtsPage() {
 
       {/* ─────────────────────────────────────────────────────────────
        * Section A · Master Artwork Portfolio Feed
-       * A responsive card matrix: 2 cols on mobile, 3 on md, 4 on lg.
-       * Each card frames the illustration at native proportions inside a
-       * bordered box, with a typography panel directly beneath.
+       * Three format-locked rows stacked vertically. Each row pins every
+       * card to a strict aspect ratio (portrait 3:4, square 1:1, wide
+       * 16:10) so rows align perfectly regardless of the raw source files.
+       * Each card frames the illustration inside a bordered box with a
+       * typography panel directly beneath.
        * ───────────────────────────────────────────────────────────── */}
-      {portfolioFeed.length > 0 && (
+      {hasPortfolio && (
         <section className="w-full px-6 md:px-12 py-20 md:py-28 border-t border-neutral-200/60">
           <div className="max-w-screen-2xl mx-auto">
-            <header className="mb-10 md:mb-14">
+            <header className="mb-12 md:mb-16">
               <span className="font-label text-[11px] uppercase tracking-[0.4em] text-neutral-400">
                 Portfolio
               </span>
@@ -395,10 +483,39 @@ export default async function VisualArtsPage() {
               </h2>
             </header>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {portfolioFeed.map((item) => (
-                <PortfolioCard key={item._key} item={item} />
-              ))}
+            <div className="flex flex-col gap-16 md:gap-24">
+              {/* Vertical row · portrait studies & sketches (3:4). */}
+              <PortfolioRow
+                eyebrow="Studies & Sketches"
+                heading="Vertical Works"
+                items={verticalWorks}
+                aspectClass="aspect-[3/4]"
+                width={900}
+                height={1200}
+                columns="grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+              />
+
+              {/* Square row · 1:1 graphic tiles. */}
+              <PortfolioRow
+                eyebrow="Graphic Tiles"
+                heading="Square Works"
+                items={squareWorks}
+                aspectClass="aspect-square"
+                width={1000}
+                height={1000}
+                columns="grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+              />
+
+              {/* Landscape row · wide scenery, storyboards & panoramas (16:10). */}
+              <PortfolioRow
+                eyebrow="Scenery & Storyboards"
+                heading="Landscape Works"
+                items={landscapeWorks}
+                aspectClass="aspect-[16/10]"
+                width={1280}
+                height={800}
+                columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+              />
             </div>
           </div>
         </section>
