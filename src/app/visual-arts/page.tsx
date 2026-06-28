@@ -391,7 +391,7 @@ export default async function VisualArtsPage() {
                 Portfolio
               </span>
               <h2 className="mt-4 font-headline text-3xl md:text-5xl leading-tight text-neutral-900">
-                The Complete Works
+                Selected Works
               </h2>
             </header>
 
