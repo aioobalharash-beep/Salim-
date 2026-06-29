@@ -94,6 +94,45 @@ function portfolioWorkMember({
     },
   });
 }
+
+/**
+ * Heading fields for a portfolio section. Each format row owns its own
+ * `eyebrow` + `sectionTitle` so the text above the grid is fully editor-driven
+ * — no copy is hardcoded in the frontend. Initial values seed the defaults
+ * Salim is free to overwrite.
+ */
+function portfolioHeadingFields({
+  prefix,
+  label,
+  defaultEyebrow,
+  defaultTitle,
+}: {
+  prefix: string;
+  label: string;
+  defaultEyebrow: string;
+  defaultTitle: string;
+}) {
+  return [
+    defineField({
+      name: `${prefix}Eyebrow`,
+      title: `${label} · Eyebrow`,
+      type: "string",
+      group: "feed",
+      fieldset: "portfolioFeed",
+      description: "Small label shown above the section title.",
+      initialValue: defaultEyebrow,
+    }),
+    defineField({
+      name: `${prefix}Title`,
+      title: `${label} · Section Title`,
+      type: "string",
+      group: "feed",
+      fieldset: "portfolioFeed",
+      description: "Heading displayed above this grid.",
+      initialValue: defaultTitle,
+    }),
+  ];
+}
 export default defineType({
   name: "visualArts",
   title: "Visual Arts",
@@ -301,7 +340,14 @@ export default defineType({
      * track. Split into three format-locked rows so every card aligns to a
      * uniform aspect ratio regardless of the raw source proportions. Each
      * image enables hotspot & crop so Salim can re-frame the canvas inside
-     * its fixed wrapper from the studio. */
+     * its fixed wrapper from the studio. Each row's eyebrow + title are
+     * authored here so no section copy is hardcoded on the page. */
+    ...portfolioHeadingFields({
+      prefix: "vertical",
+      label: "Vertical",
+      defaultEyebrow: "Studies & Sketches",
+      defaultTitle: "Vertical Works",
+    }),
     defineField({
       name: "verticalWorks",
       title: "Vertical Works (Portrait)",
@@ -318,6 +364,12 @@ export default defineType({
         }),
       ],
     }),
+    ...portfolioHeadingFields({
+      prefix: "square",
+      label: "Square",
+      defaultEyebrow: "Graphic Tiles",
+      defaultTitle: "Square Works",
+    }),
     defineField({
       name: "squareWorks",
       title: "Square Works (1:1)",
@@ -333,6 +385,12 @@ export default defineType({
           formatHint: "Shown in a square (1:1) frame.",
         }),
       ],
+    }),
+    ...portfolioHeadingFields({
+      prefix: "landscape",
+      label: "Landscape",
+      defaultEyebrow: "Scenery & Storyboards",
+      defaultTitle: "Landscape Works",
     }),
     defineField({
       name: "landscapeWorks",

@@ -53,6 +53,12 @@ interface VisualArtsData {
   title: string | null;
   subtitle?: string | null;
   blocks?: TrackBlock[] | null;
+  verticalEyebrow?: string | null;
+  verticalTitle?: string | null;
+  squareEyebrow?: string | null;
+  squareTitle?: string | null;
+  landscapeEyebrow?: string | null;
+  landscapeTitle?: string | null;
   verticalWorks?: PortfolioItem[] | null;
   squareWorks?: PortfolioItem[] | null;
   landscapeWorks?: PortfolioItem[] | null;
@@ -198,32 +204,28 @@ function ArtworkPanel({
 
 /* ── Section A · Portfolio feed card ───────────────────────────────── */
 /**
- * A single format-locked artwork card. The image is composited into a rigid,
- * uniform aspect-ratio wrapper (`aspectClass`) so every card in a row aligns
- * perfectly regardless of the raw source proportions.
+ * A single format-locked artwork card. The image sits inside a rigid, uniform
+ * aspect-ratio wrapper (`aspectClass`) so every card in a row aligns perfectly
+ * regardless of the raw source proportions.
  *
- * The Sanity image URL builder is fed an explicit `width`/`height` matching
- * the frame ratio with `.fit("crop")`, which makes the CDN honour the editor's
- * hotspot focal point and crop rectangle — Salim's studio framing is baked
- * into the delivered file, and `object-cover` keeps it flush inside the box.
+ * The URL builder is given a width only (no forced box crop), so the editor's
+ * own crop rectangle from the studio is honoured while the artwork keeps its
+ * natural proportions. `object-contain` then renders the whole image inside the
+ * white card's interior margins — no bleeding past the border, no clipping.
  */
 function PortfolioCard({
   item,
   aspectClass,
   width,
-  height,
 }: {
   item: PortfolioItem;
   aspectClass: string;
   width: number;
-  height: number;
 }) {
   if (!item.image) return null;
 
   const src = urlFor(item.image)
     .width(width)
-    .height(height)
-    .fit("crop")
     .auto("format")
     .quality(85)
     .url();
@@ -231,16 +233,16 @@ function PortfolioCard({
 
   return (
     <figure className="flex flex-col">
-      {/* Bordered box panel — equal padding frames the rigid aspect-ratio
-          image wrapper. */}
-      <div className="border border-neutral-200 bg-white p-3 md:p-4">
+      {/* White card — equal padding frames the rigid aspect-ratio image
+          wrapper; the artwork is contained fully within these margins. */}
+      <div className="border border-neutral-200 bg-white p-3 md:p-4 shadow-sm">
         <div className={`relative ${aspectClass} w-full overflow-hidden`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={src}
             alt={item.image.alt || item.title || "Artwork"}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-contain"
           />
         </div>
       </div>
@@ -273,29 +275,33 @@ function PortfolioRow({
   items,
   aspectClass,
   width,
-  height,
   columns,
 }: {
-  eyebrow: string;
-  heading: string;
+  eyebrow?: string | null;
+  heading?: string | null;
   items: PortfolioItem[];
   aspectClass: string;
   width: number;
-  height: number;
   columns: string;
 }) {
   if (items.length === 0) return null;
 
   return (
     <div>
-      <header className="mb-8 md:mb-10">
-        <span className="font-label text-[11px] uppercase tracking-[0.4em] text-neutral-400">
-          {eyebrow}
-        </span>
-        <h3 className="mt-3 font-headline text-2xl md:text-3xl leading-tight text-neutral-900">
-          {heading}
-        </h3>
-      </header>
+      {(eyebrow || heading) && (
+        <header className="mb-8 md:mb-10">
+          {eyebrow && (
+            <span className="font-label text-[11px] uppercase tracking-[0.4em] text-neutral-400">
+              {eyebrow}
+            </span>
+          )}
+          {heading && (
+            <h3 className="mt-3 font-headline text-2xl md:text-3xl leading-tight text-neutral-900">
+              {heading}
+            </h3>
+          )}
+        </header>
+      )}
 
       <div className={`grid ${columns} gap-4 md:gap-6`}>
         {items.map((item) => (
@@ -304,7 +310,6 @@ function PortfolioRow({
             item={item}
             aspectClass={aspectClass}
             width={width}
-            height={height}
           />
         ))}
       </div>
@@ -356,16 +361,20 @@ function AnnouncementCard({
           )}
         </div>
 
-        {/* Right · optional banner illustration */}
+        {/* Right · optional banner illustration. Locked to a wide 16:10 frame
+            so portrait/vertical source assets can never stack tall in this
+            promotional box — the banner always reads as a horizontal canvas. */}
         {bannerSrc && (
           <div className="md:w-2/5 flex-shrink-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={bannerSrc}
-              alt={bannerImage?.alt || title || "Project banner"}
-              loading="lazy"
-              className="w-full h-48 md:h-full object-cover"
-            />
+            <div className="relative aspect-[16/10] w-full overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={bannerSrc}
+                alt={bannerImage?.alt || title || "Project banner"}
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </div>
           </div>
         )}
       </div>
@@ -484,36 +493,33 @@ export default async function VisualArtsPage() {
             </header>
 
             <div className="flex flex-col gap-16 md:gap-24">
-              {/* Vertical row · portrait studies & sketches (3:4). */}
+              {/* Vertical row · portrait works (3:4). Heading is editor-driven. */}
               <PortfolioRow
-                eyebrow="Studies & Sketches"
-                heading="Vertical Works"
+                eyebrow={data?.verticalEyebrow}
+                heading={data?.verticalTitle}
                 items={verticalWorks}
                 aspectClass="aspect-[3/4]"
                 width={900}
-                height={1200}
                 columns="grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
               />
 
-              {/* Square row · 1:1 graphic tiles. */}
+              {/* Square row · 1:1 tiles. Heading is editor-driven. */}
               <PortfolioRow
-                eyebrow="Graphic Tiles"
-                heading="Square Works"
+                eyebrow={data?.squareEyebrow}
+                heading={data?.squareTitle}
                 items={squareWorks}
                 aspectClass="aspect-square"
                 width={1000}
-                height={1000}
                 columns="grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
               />
 
-              {/* Landscape row · wide scenery, storyboards & panoramas (16:10). */}
+              {/* Landscape row · wide scenery (16:10). Heading is editor-driven. */}
               <PortfolioRow
-                eyebrow="Scenery & Storyboards"
-                heading="Landscape Works"
+                eyebrow={data?.landscapeEyebrow}
+                heading={data?.landscapeTitle}
                 items={landscapeWorks}
                 aspectClass="aspect-[16/10]"
                 width={1280}
-                height={800}
                 columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
               />
             </div>
@@ -535,7 +541,7 @@ export default async function VisualArtsPage() {
                 On the Horizon
               </span>
               <h2 className="mt-4 font-headline text-3xl md:text-5xl leading-tight text-neutral-900">
-                Upcoming Projects
+                Projects
               </h2>
             </header>
 
