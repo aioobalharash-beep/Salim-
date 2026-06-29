@@ -532,10 +532,10 @@ export default async function VisualArtsPage() {
           <div className="max-w-screen-xl mx-auto">
             <header className="mb-10 md:mb-14">
               <span className="font-label text-[11px] uppercase tracking-[0.4em] text-neutral-400">
-                On the Horizon
+              
               </span>
               <h2 className="mt-4 font-headline text-3xl md:text-5xl leading-tight text-neutral-900">
-                Upcoming Projects
+                 Projects
               </h2>
             </header>
 
