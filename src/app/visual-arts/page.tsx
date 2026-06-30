@@ -488,7 +488,7 @@ export default async function VisualArtsPage() {
                 Portfolio
               </span>
               <h2 className="mt-4 font-headline text-3xl md:text-5xl leading-tight text-neutral-900">
-                The Complete Works
+                Selected Works
               </h2>
             </header>
 
@@ -538,7 +538,7 @@ export default async function VisualArtsPage() {
           <div className="max-w-screen-xl mx-auto">
             <header className="mb-10 md:mb-14">
               <span className="font-label text-[11px] uppercase tracking-[0.4em] text-neutral-400">
-                On the Horizon
+                ON THE HORIZON
               </span>
               <h2 className="mt-4 font-headline text-3xl md:text-5xl leading-tight text-neutral-900">
                 Projects
