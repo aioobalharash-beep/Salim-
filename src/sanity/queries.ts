@@ -259,6 +259,12 @@ export const visualArtsQuery = groq`
         }
       }
     },
+    verticalEyebrow,
+    verticalTitle,
+    squareEyebrow,
+    squareTitle,
+    landscapeEyebrow,
+    landscapeTitle,
     verticalWorks[]{
       _key,
       title,
