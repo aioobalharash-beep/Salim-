@@ -366,6 +366,8 @@ export default async function ProjectPage({
   );
   const hasFooterText =
     Array.isArray(project.footerText) && project.footerText.length > 0;
+  const hasHero = hasAsset(project.heroImage);
+  const hasCredits = details.length > 0 || Boolean(project.year);
 
   return (
     <div className="min-h-screen bg-background pt-28">
@@ -378,9 +380,17 @@ export default async function ProjectPage({
           ← Projects
         </Link>
 
-        {/* ── Header Hero: title + hero image (left) · credits (right) ── */}
-        <header className="mt-10 md:mt-14 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
-          <div className="lg:col-span-8">
+        {/* ── Header Hero: adaptive flex row. The title (and hero image, when
+              present) forms a self-balancing left column against the credit
+              metadata on the right. With no hero image, the layout reflows to
+              a clean full-width editorial header — the title stretches across
+              and the credits sit neatly aside with no hollow column gaps. ── */}
+        <header className="mt-10 md:mt-14 mb-12 flex flex-col md:flex-row justify-between items-start gap-12 max-w-7xl mx-auto">
+          <div
+            className={`w-full min-w-0 ${
+              hasHero ? "md:flex-1" : "md:flex-[2]"
+            }`}
+          >
             {project.subtitle && (
               <p className="font-label text-[10px] uppercase tracking-[0.4em] text-primary/50 mb-5">
                 {project.subtitle}
@@ -390,22 +400,30 @@ export default async function ProjectPage({
               {project.title}
             </h1>
 
-            {/* Hero image fills the space under the title, balancing the
-                credit lines pinned on the right. */}
-            {hasAsset(project.heroImage) && (
+            {/* Hero image anchors the bottom edge of the left column so it
+                visually balances the credit lines opposite it. */}
+            {hasHero && (
               <div className="mt-8 md:mt-10">
                 <GalleryImage
-                  image={project.heroImage}
-                  sizes="(max-width: 1024px) 100vw, 66vw"
+                  image={project.heroImage!}
+                  sizes="(max-width: 768px) 100vw, 66vw"
                   priority
                 />
               </div>
             )}
           </div>
 
-          {(details.length > 0 || project.year) && (
-            <aside className="lg:col-span-4 lg:pt-3">
-              <dl className="lg:sticky lg:top-28 grid grid-cols-2 lg:grid-cols-1 gap-x-8 gap-y-6 border-t border-foreground/[0.1] pt-6">
+          {hasCredits && (
+            <aside
+              className={`w-full md:flex-shrink-0 ${
+                hasHero ? "md:w-72 lg:w-80" : "md:w-auto md:max-w-sm"
+              }`}
+            >
+              <dl
+                className={`md:sticky md:top-28 grid grid-cols-2 md:grid-cols-1 gap-x-8 gap-y-6 border-t border-foreground/[0.1] pt-6 ${
+                  hasHero ? "" : "sm:grid-cols-3"
+                }`}
+              >
                 {details.map((detail, idx) => (
                   <div key={idx} className="flex flex-col">
                     <dt className="font-label text-[10px] uppercase tracking-[0.25em] text-foreground/40 mb-1.5">

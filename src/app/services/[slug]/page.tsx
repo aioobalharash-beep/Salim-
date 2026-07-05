@@ -120,7 +120,7 @@ const richTextComponents: PortableTextComponents = {
       if (!v?.text) return null;
       return (
         <blockquote className="my-10 md:my-14 border-l-2 border-primary/40 pl-6 md:pl-8">
-          <p className="font-headline text-xl md:text-2xl font-light leading-relaxed text-foreground/80">
+          <p className="font-serif italic text-neutral-800/90 text-xl md:text-2xl font-light leading-relaxed">
             {v.text}
           </p>
           {v.attribution && (

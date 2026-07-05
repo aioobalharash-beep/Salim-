@@ -185,7 +185,7 @@ export default function ProjectImageSlider({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="text-xs md:text-sm font-body tracking-wide text-foreground/55 text-center mt-4 mb-2 max-w-xl mx-auto whitespace-pre-line"
+              className="text-xs md:text-sm font-body tracking-wide text-foreground/55 text-center mt-1.5 mb-2 max-w-xl mx-auto whitespace-pre-line"
             >
               {current.title && (
                 <span className="block text-foreground/80">{current.title}</span>
