@@ -41,12 +41,6 @@ export default function ProjectImageSlider({
   // Last committed slot per card, so we can detect a wrap-around jump and let
   // that card teleport (transition disabled) instead of sliding across screen.
   const prevOffsets = useRef<Map<string, number>>(new Map());
-  // Because every card is absolutely positioned, the stage can't shrink to fit
-  // the focal image — so a short landscape shot would float in a tall box with
-  // a dead gap beneath it. We measure the centered image and drive the stage
-  // height from it, so the caption always sits directly below the picture.
-  const centerRef = useRef<HTMLDivElement | null>(null);
-  const [stageH, setStageH] = useState(0);
 
   // `active` runs unbounded; the ring wraps via modulo.
   const safe = count > 0 ? ((active % count) + count) % count : 0;
@@ -65,19 +59,6 @@ export default function ProjectImageSlider({
     const m = new Map<string, number>();
     images.forEach((img, i) => m.set(img._key ?? String(i), offsetOf(i)));
     prevOffsets.current = m;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [safe, count]);
-
-  // Keep the stage height locked to the focal image (re-measures on slide
-  // change and on any resize/aspect reflow).
-  useEffect(() => {
-    const el = centerRef.current;
-    if (!el) return;
-    const update = () => setStageH(el.getBoundingClientRect().height);
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => ro.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safe, count]);
 
@@ -100,8 +81,7 @@ export default function ProjectImageSlider({
     <div className="w-full max-w-6xl mx-auto">
       {/* ── Coverflow track ── */}
       <div
-        className="relative w-full h-[320px] sm:h-[440px] md:h-[520px] flex items-center justify-center overflow-hidden select-none transition-[height] duration-500 ease-out"
-        style={stageH ? { height: stageH } : undefined}
+        className="relative w-full h-[340px] sm:h-[460px] md:h-[540px] flex items-center justify-center overflow-hidden select-none"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
@@ -144,10 +124,7 @@ export default function ProjectImageSlider({
               }}
               className="absolute top-1/2 will-change-transform"
             >
-              <div
-                ref={isCenter ? centerRef : undefined}
-                className="relative shadow-[0_20px_48px_rgba(26,26,26,0.16)]"
-              >
+              <div className="relative shadow-[0_20px_48px_rgba(26,26,26,0.16)]">
                 <Image
                   src={urlFor(img)
                     .width(1100)
@@ -208,7 +185,7 @@ export default function ProjectImageSlider({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="text-xs md:text-sm font-body tracking-wide text-foreground/55 text-center mt-3 mb-2 max-w-xl mx-auto whitespace-pre-line"
+              className="text-xs md:text-sm font-body tracking-wide text-foreground/55 text-center mt-4 mb-2 max-w-xl mx-auto whitespace-pre-line"
             >
               {current.title && (
                 <span className="block text-foreground/80">{current.title}</span>

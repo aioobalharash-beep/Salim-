@@ -352,6 +352,42 @@ const footerComponents: PortableTextComponents = {
   },
 };
 
+/* ── Project credits — an understated horizontal meta bar. Sits beneath the
+      hero image (or directly under the title when no image is set) so it never
+      competes with the media for width or height. ────────────────────────── */
+function ProjectCredits({
+  details,
+  year,
+}: {
+  details: ProjectDetail[];
+  year: string | null;
+}) {
+  return (
+    <dl className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-10 gap-y-7 border-t border-foreground/[0.1] pt-7">
+      {details.map((detail, idx) => (
+        <div key={idx} className="flex flex-col">
+          <dt className="font-label text-[10px] uppercase tracking-[0.25em] text-foreground/40 mb-2">
+            {detail.label}
+          </dt>
+          <dd className="font-body text-sm leading-relaxed text-foreground/75">
+            {detail.value}
+          </dd>
+        </div>
+      ))}
+      {year && (
+        <div className="flex flex-col">
+          <dt className="font-label text-[10px] uppercase tracking-[0.25em] text-foreground/40 mb-2">
+            Dates
+          </dt>
+          <dd className="font-body text-sm leading-relaxed text-foreground/75 tabular-nums">
+            {year}
+          </dd>
+        </div>
+      )}
+    </dl>
+  );
+}
+
 export default async function ProjectPage({
   params,
 }: {
@@ -386,64 +422,28 @@ export default async function ProjectPage({
           ← Projects
         </Link>
 
-        {/* ── Header Hero — a compact masthead (title ↔ credits) sitting above
-              a full-width media band. Decoupling the image from the credit
-              column means neither one dictates the other's height: long credit
-              lists no longer outrun a short image, and a square image no longer
-              leaves a dead gap beside a wide column. With no image the masthead
-              simply stands on its own as a clean editorial header. ── */}
-        <header className="mt-10 md:mt-14 mb-12 max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-8 md:gap-16">
-            {/* Title block — grows to fill, wraps beneath the credits on mobile. */}
-            <div className="w-full md:flex-1 md:min-w-0">
-              {project.subtitle && (
-                <p className="font-label text-[10px] uppercase tracking-[0.4em] text-primary/50 mb-5">
-                  {project.subtitle}
-                </p>
-              )}
-              <h1 className="font-headline font-light text-4xl sm:text-6xl md:text-7xl leading-[1.05] text-foreground text-balance">
-                {project.title}
-              </h1>
-            </div>
-
-            {/* Credits — a fixed-width rail that stays legible no matter how
-                many lines it holds; two columns on mobile, a single stack on
-                desktop. Never overlaps the media because the image lives in
-                its own band below. */}
-            {hasCredits && (
-              <aside className="w-full md:w-64 lg:w-72 md:flex-shrink-0">
-                <dl className="grid grid-cols-2 md:grid-cols-1 gap-x-8 gap-y-5 border-t border-foreground/[0.1] pt-5">
-                  {details.map((detail, idx) => (
-                    <div key={idx} className="flex flex-col">
-                      <dt className="font-label text-[10px] uppercase tracking-[0.25em] text-foreground/40 mb-1.5">
-                        {detail.label}
-                      </dt>
-                      <dd className="font-body text-sm leading-relaxed text-foreground/75">
-                        {detail.value}
-                      </dd>
-                    </div>
-                  ))}
-                  {project.year && (
-                    <div className="flex flex-col">
-                      <dt className="font-label text-[10px] uppercase tracking-[0.25em] text-foreground/40 mb-1.5">
-                        Dates
-                      </dt>
-                      <dd className="font-body text-sm leading-relaxed text-foreground/75 tabular-nums">
-                        {project.year}
-                      </dd>
-                    </div>
-                  )}
-                </dl>
-              </aside>
+        {/* ── Header Hero — a calm, stacked editorial masthead: eyebrow +
+              title, then the image as the dominant element, then an
+              understated credits bar. Nothing flanks the image, so there is no
+              aspect-driven gap beside it and no credit column that can outrun
+              its height. Landscape art spans full width; square / portrait art
+              is capped and centered so its whitespace reads as composed. ── */}
+        <header className="mt-10 md:mt-14 max-w-7xl mx-auto">
+          <div className="max-w-4xl">
+            {project.subtitle && (
+              <p className="font-label text-[10px] uppercase tracking-[0.4em] text-primary/50 mb-5">
+                {project.subtitle}
+              </p>
             )}
+            <h1 className="font-headline font-light text-4xl sm:text-6xl md:text-7xl leading-[1.05] text-foreground text-balance">
+              {project.title}
+            </h1>
           </div>
 
-          {/* Media band — full-width for landscape art; height-capped and
-              centered for square/portrait art so it stays balanced. */}
           {hasHero && (
-            <div
-              className={`mt-10 md:mt-14 mx-auto w-full ${
-                heroIsWide ? "" : "max-w-3xl"
+            <figure
+              className={`mt-8 md:mt-12 w-full ${
+                heroIsWide ? "" : "max-w-2xl mx-auto"
               }`}
             >
               <GalleryImage
@@ -451,10 +451,16 @@ export default async function ProjectPage({
                 sizes={
                   heroIsWide
                     ? "(max-width: 1280px) 100vw, 1216px"
-                    : "(max-width: 768px) 100vw, 768px"
+                    : "(max-width: 672px) 100vw, 672px"
                 }
                 priority
               />
+            </figure>
+          )}
+
+          {hasCredits && (
+            <div className="mt-10 md:mt-12">
+              <ProjectCredits details={details} year={project.year} />
             </div>
           )}
         </header>
