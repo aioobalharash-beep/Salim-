@@ -1,4 +1,8 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
+import {
+  orderRankField,
+  orderRankOrdering,
+} from "@sanity/orderable-document-list";
 
 export default defineType({
   name: "project",
@@ -13,6 +17,12 @@ export default defineType({
     { name: "seo", title: "SEO" },
   ],
   fields: [
+    // Hidden field that stores the drag-and-drop weight. Managed automatically
+    // by the orderable document list in the Projects desk panel — editors set
+    // the order by dragging items in the middle list, never by editing this
+    // field directly. Equivalent to a hidden `orderRank` string field.
+    orderRankField({ type: "project" }),
+
     /* ── Basic Info ────────────────────────────────────────────── */
     defineField({
       name: "title",
@@ -510,6 +520,7 @@ export default defineType({
     },
   },
   orderings: [
+    orderRankOrdering,
     {
       title: "Year (Newest)",
       name: "yearDesc",
